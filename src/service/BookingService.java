@@ -51,6 +51,45 @@ public class BookingService {
         return newTicket;
     }
 
+    public Ticket bookSpecificTicket(Long eventId, String sectionName, int row, int seatNumber, Customer customer) throws SeatAlreadyBookedException {
+        // 1. Event und Section suchen
+        Event event = eventRepo.findById(eventId);
+        if (event == null) {
+            throw new IllegalArgumentException("Event mit ID " + eventId + " wurde nicht gefunden.");
+        }
+
+        Section section = event.findSectionByName(sectionName);
+        if (section == null) {
+            throw new IllegalArgumentException("Der Block '" + sectionName + "' existiert nicht.");
+        }
+
+        // 2. Check ob es ein Sitzplatz-Block ist
+        if(!(section instanceof SeatedSection)) {
+            throw new IllegalArgumentException("Der Bereich '" + sectionName + "' erlaubt keine gezielte Platzwahl.");
+        }
+
+        SeatedSection seatedSection = (SeatedSection) section;
+
+        // 3. Konkreten Sitzplatz holen
+        Seat chosenSeat = seatedSection.getSeat(row, seatNumber);
+        if (chosenSeat == null) {
+            throw new IllegalArgumentException("Der Platz (Reihe " + row + ", Platz " + seatNumber + ") existiert in diesem Block nicht.");
+        }
+
+        // 4. Platz buchen
+        chosenSeat.book();
+
+        // 5. Ticket generieren
+        ticketIdCounter++;
+        String generatedTicketId = "T-" + ticketIdCounter;
+        double finalPrice = event.getBasePrice() * section.getPriceFactor();
+
+        Ticket newTicket = new Ticket(generatedTicketId, event, section, customer, finalPrice);
+        activeTickets.add(newTicket);
+
+        return newTicket;
+    }
+
     // Liste aller aktiven Tickets im System
     public List<Ticket> getActiveTickets() {
         return new ArrayList<>(this.activeTickets);

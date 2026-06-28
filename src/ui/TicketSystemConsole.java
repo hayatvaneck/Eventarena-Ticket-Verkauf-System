@@ -100,6 +100,11 @@ public class TicketSystemConsole {
         // 2. Blocknamen abfragen
         System.out.println("Geben Sie den exakten Namen des Bereichs ein: ");
         String sectionName = scanner.nextLine();
+        Section selectedSection = selectedEvent.findSectionByName(sectionName);
+
+        if (selectedSection == null) {
+            System.out.println("[FEHLER] Dieser Bereich existiert nicht.");
+        }
 
         // 3. Kundendaten abfragen
         System.out.print("Geben Sie Ihren Vornamen ein: ");
@@ -119,10 +124,25 @@ public class TicketSystemConsole {
         // 4. Buchung ausführen und absichern
         try {
             System.out.println("\n[SYSTEM] Verarbeite Buchung...");
-            Ticket ticket = bookingService.bookTicket(eventId, sectionName, customer);
+            Ticket ticket;
+
+            if (selectedSection instanceof SeatedSection) {
+                System.out.print("In welcher Reihe möchten Sie sitzen? ");
+                int row = Integer.parseInt(scanner.nextLine());
+                System.out.print("Welche Sitznummer möchten Sie haben? ");
+                int seatNumber = Integer.parseInt(scanner.nextLine());
+
+                ticket = bookingService.bookSpecificTicket(eventId, sectionName, row, seatNumber, customer);
+                System.out.println("\n[ERFOLG] Ihr gewählter Sitzplatz wurde reserviert!");
+            } else {
+                ticket = bookingService.bookTicket(eventId, sectionName, customer);
+            }
 
             // Erfolg: Ticket ausdrucken/anzeigen
             ticket.printTicketDetails();
+        } catch (NumberFormatException e) {
+            // Fängt falsche Angaben für Sitz und Reihe ab
+            System.out.println("\n[EINGABEFEHLER] Reihe und Sitznummer müssen Zahlen sein!");
         } catch (SeatAlreadyBookedException e) {
             // Fängt ab, wenn der Block voll oder gesperrt ist
             System.out.println("\n[BUCHUNGSFEHLER] " + e.getMessage());
@@ -130,39 +150,6 @@ public class TicketSystemConsole {
             // Fängt falschen Blocknamen oder Event-ID ab
             System.out.println("\n[EINGABEFEHLER] " + e.getMessage());
         }
-    }
-
-    public Ticket bookSpecificTicket(Long eventId, String sectionName, int row, int seatNumber, Customer customer) throws SeatAlreadyBookedException {
-        // 1. Event und Section suchen
-        Event event = eventRepository.findById(eventId);
-        if (event == null) {
-            throw new IllegalArgumentException("Event mit ID " + eventId + " wurde nicht gefunden.");
-        }
-
-        Section section = event.findSectionByName(sectionName);
-        if (section == null) {
-            throw new IllegalArgumentException("Der Block '" + sectionName + "' existiert nicht.");
-        }
-
-        // 2. Check ob es ein Sitzplatz-Block ist
-        if(!(section instanceof SeatedSection)) {
-            throw new IllegalArgumentException("Der Bereich '" + sectionName + "' erlaubt keine gezielte Platzwahl.");
-        }
-
-        SeatedSection seatedSection = (SeatedSection) section;
-
-        // 3. Konkreten Sitzplatz holen
-        Seat chosenSeat = seatedSection.getSeat(row, seatNumber);
-        if (chosenSeat == null) {
-            throw new IllegalArgumentException("Der Platz (Reihe " + row + ", Platz " + seatNumber + ") existiert in diesem Block nicht.");
-        }
-
-        // 4. Platz buchen
-        chosenSeat.book();
-
-        // 5. Ticket generieren
-        ticketIdCounter++;
-        String generatedTicketId = "T-" + ticketIdCounter;
     }
 
     public static void main(String[] args) {
