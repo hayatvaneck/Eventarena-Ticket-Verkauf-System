@@ -271,28 +271,153 @@ public class App extends Application {
         imageView.setFitWidth(600);
         imageView.setPreserveRatio(true);
 
-        imageView.setOnMouseClicked(e -> {
-            System.out.println("Punkt: " + e.getX() + ", " + e.getY() + ",");
-        });
         
         // 2. Container für das Bild und die klickbaren Bereiche
         StackPane mapContainer = new StackPane();
         Pane clickLayer = new Pane();
 
-        // Begrenzen der Größe des Klickbereichs auf die Größe des Bildes
-        clickLayer.setMaxSize(arenaMapImage.getWidth(), arenaMapImage.getHeight());
+        // 3. Klickbare Bereiche für die Blöcke erstellen
+        // Block 1
+        Polygon block1 = new Polygon(new double[]{
+            372.0, 159.0, // unten links
+            372.0, 66.4, // oben links
+            583.0, 66.4, // oben rechts
+            583.0, 159.0 // unten rechts
+        });
+
+        block1.setFill(Color.rgb(52, 152, 219, 0.2)); // leicht transparentes Blau
+        block1.setStroke(Color.DARKBLUE); // Rahmenlinie
+        block1.setStrokeWidth(1);
+
+        // Hover-Effekt:
+        block1.setOnMouseEntered(e -> block1.setFill(Color.rgb(52, 152, 219, 0.6)));
+        block1.setOnMouseExited(e -> block1.setFill(Color.rgb(52, 152, 219, 0.2)));
+
+        // Klick-Event:
+        block1.setOnMouseClicked(e -> {
+            currentSelectedSection = findSectionByName("Block 1");
+            if (currentSelectedSection != null) {
+                showSeatSelection();
+            }
+        });
+
+        // Block 2
+        Polygon block2 = new Polygon(new double[]{
+            368.8, 159.0,
+            156.8, 159.0,
+            156.8, 66.4,
+            368.8, 65.0
+        });
+
+        block2.setFill(Color.rgb(46, 204, 113, 0.2)); // leicht transparentes Grün
+        block2.setStroke(Color.DARKGREEN);
+        block2.setStrokeWidth(1);
+        block2.setOnMouseEntered(e -> block2.setFill(Color.rgb(46, 204, 113, 0.6)));
+        block2.setOnMouseExited(e -> block2.setFill(Color.rgb(46, 204, 113, 0.2)));
+        block2.setOnMouseClicked(e -> {
+            currentSelectedSection = findSectionByName("Block 2");
+            if (currentSelectedSection != null) {
+                showSeatSelection();
+            }
+        });
+
+        // Block 3
+        Polygon block3 = new Polygon(new double[]{
+            155.2, 354.4,
+            368.8, 354.4,
+            369.6, 447.2,
+            156.0, 447.2
+        });
+        block3.setFill(Color.rgb(231, 76, 60, 0.2));
+        block3.setStroke(Color.DARKRED);
+        block3.setStrokeWidth(1);
+        block3.setOnMouseEntered(e -> block3.setFill(Color.rgb(231, 76, 60, 0.6)));
+        block3.setOnMouseExited(e -> block3.setFill(Color.rgb(231, 76, 60, 0.2)));
+        block3.setOnMouseClicked(e -> {
+            currentSelectedSection = findSectionByName("Block 3");
+            if (currentSelectedSection != null) {
+                showSeatSelection();
+            }
+        });
+
+        // Block 4
+        Polygon block4 = new Polygon(new double[]{
+            372.8, 354.4,
+            583.2, 354.4,
+            583.2, 447.2,
+            372.8, 447.2
+        });
+        block4.setFill(Color.rgb(155, 89, 182, 0.2));
+        block4.setStroke(Color.DARKVIOLET);
+        block4.setStrokeWidth(1);
+        block4.setOnMouseEntered(e -> block4.setFill(Color.rgb(155, 89, 182, 0.6)));
+        block4.setOnMouseExited(e -> block4.setFill(Color.rgb(155, 89, 182, 0.2)));
+        block4.setOnMouseClicked(e -> {
+            currentSelectedSection = findSectionByName("Block 4");
+            if (currentSelectedSection != null) {
+                showSeatSelection();
+            }
+        });
+
+        // Block 6
+        Polygon block6 = new Polygon(new double[]{
+            97.6, 176.0,
+            166.4, 176.8,
+            165.6, 336.0,
+            97.6, 336.0
+        });
+        block6.setFill(Color.rgb(52, 152, 219, 0.2));
+        block6.setStroke(Color.DARKBLUE);
+        block6.setStrokeWidth(1);
+        block6.setOnMouseEntered(e -> block6.setFill(Color.rgb(52, 152, 219, 0.6)));
+        block6.setOnMouseExited(e -> block6.setFill(Color.rgb(52, 152, 219, 0.2)));
+        block6.setOnMouseClicked(e -> {
+            currentSelectedSection = findSectionByName("Block 6");
+            if (currentSelectedSection != null) {
+                showSeatSelection();
+            }
+        });
+
+        // Stehplätze
+        Polygon standingArea = new Polygon(new double[]{
+            185.6, 176.8,
+            548.8, 176.8,
+            548.8, 336.0,
+            185.6, 336.0
+        });
+        standingArea.setFill(Color.rgb(241, 196, 15, 0.2));
+        standingArea.setStroke(Color.GOLDENROD);
+        standingArea.setStrokeWidth(1);
+        standingArea.setOnMouseEntered(e -> standingArea.setFill(Color.rgb(241, 196, 15, 0.6)));
+        standingArea.setOnMouseExited(e -> standingArea.setFill(Color.rgb(241, 196, 15, 0.2)));
+        standingArea.setOnMouseClicked(e -> {
+            currentSelectedSection = findSectionByName("Stehplätze");
+            if (currentSelectedSection != null) {
+                showSeatSelection();
+            }
+        });
+
+        clickLayer.getChildren().addAll(block1, block2, block3, block4, block6, standingArea);
 
         mapContainer.getChildren().addAll(imageView, clickLayer);
 
         Button backButton = new Button("Zurück zu den Events");
-        backButton.setStyle("-fx-background-color: #7f8c8d -fx-text-fill: white;");
+        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
         backButton.setOnAction(e -> showMainMenu());
 
         root.getChildren().addAll(title, mapContainer, backButton);
-
-        Scene scene = new Scene(root, 800, 650);
+        Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public SeatedSection findSectionByName(String name) {
+        for (Section section : currentSelectedEvent.getSections()) {
+            if (section instanceof SeatedSection && section.getName().equalsIgnoreCase(name)) {
+                return (SeatedSection) section;
+            }
+        }
+        return null;
     }
 
     public static void main(String[] args) {
