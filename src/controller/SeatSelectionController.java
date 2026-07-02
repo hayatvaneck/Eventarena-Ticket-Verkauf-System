@@ -5,16 +5,18 @@ import domain.SeatedSection;
 import domain.Section;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import ui.App;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SeatSelectionController {
 
     private final GridPane seatGrid;
     private final App mainApp;
-    private Seat selectedSeat = null;
-    private Button selectedButton = null;
+
+    private final List<Seat> selectedSeats = new ArrayList<>();
+    private final List<Button> selectedButtons = new ArrayList<>();
 
     public SeatSelectionController(GridPane seatGrid, App mainApp) {
         this.seatGrid = seatGrid;
@@ -23,6 +25,8 @@ public class SeatSelectionController {
 
     public void populateSeatPlan(Section section) {
         seatGrid.getChildren().clear();
+        selectedSeats.clear();
+        selectedButtons.clear();
 
         if (section instanceof SeatedSection) {
             SeatedSection seatedSection = (SeatedSection) section;
@@ -35,7 +39,7 @@ public class SeatSelectionController {
                     Seat seat = seatedSection.getSeat(r + 1, s + 1);
 
                     Button seatButton = new Button((s + 1) + "");
-                    seatButton.setPrefSize(40,40);
+                    seatButton.setPrefSize(40,5);
 
                     // 1. Bereits gebuchte Sitze rot markieren und deaktivieren
                     if (seat.isBooked()) {
@@ -47,22 +51,17 @@ public class SeatSelectionController {
 
                         seatButton.setOnAction(event -> {
                             // Deselektieren des zuvor ausgewählten Sitzes
-                            if (selectedSeat == seat) {
-                                selectedButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white");
-                                selectedSeat = null;
-                                selectedButton = null;
-                                mainApp.updateSelectionLabel("Kein Platz ausgewählt");
+                            if (selectedSeats.contains(seat)) {
+                                seatButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white");
+                                selectedSeats.remove(seat);
+                                selectedButtons.remove(seatButton);
                             } else {
-                                if (selectedSeat != null) {
-                                    selectedButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white");
-                                }
+                                seatButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white");
+                                selectedSeats.add(seat);
+                                selectedButtons.add(seatButton);
                             }
 
-                            // Selektieren des neuen Sitzes
-                            seatButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white");
-                            selectedSeat = seat;
-                            selectedButton = seatButton;
-                            mainApp.updateSelectionLabel("Sitz gewählt: Reihe " + seat.getRowNumber() + ", Platz " + seat.getSeatNumber());
+                            updateStatusLabel();
                         });
                     }
 
@@ -74,7 +73,19 @@ public class SeatSelectionController {
 
     }
 
-    public Seat getSelectedSeat() {
-        return selectedSeat;
+    private void updateStatusLabel() {
+        if (selectedSeats.isEmpty()) {
+            mainApp.updateSelectionLabel("Keine Plätze ausgewählt");
+        } else {
+            StringBuilder sb = new StringBuilder("Ausgewählt: ");
+            for (Seat s : selectedSeats) {
+                sb.append(String.format("[R:%d, P:%d] ", s.getRowNumber(), s.getSeatNumber()));
+            }
+            mainApp.updateSelectionLabel(sb.toString());
+        }
+    }
+
+    public List<Seat> getSelectedSeats() {
+        return selectedSeats;
     }
 }
