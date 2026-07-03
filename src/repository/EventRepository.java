@@ -27,9 +27,12 @@ public class EventRepository {
         // Event 1: Konzert mit Stehplätze im Innenraum
         Event concert = new Event(1L, "Don Toliver Octane Tour Leg 2", LocalDateTime.of(2026, 11, 02, 19, 0), 100.0);
         concert.addSection(new StandingSection("Innenraum (Stehplatz)", 1.0, 2000));
-        concert.addSection(new SeatedSection("Block A", 1.2, 20, 10));
-        concert.addSection(new SeatedSection("Block B", 1.2, 20, 10));
-        concert.addSection(new SeatedSection("VIP", 2.5, 2, 10));
+        concert.addSection(new SeatedSection("Block 1", 1.2, 10, 20));
+        concert.addSection(new SeatedSection("Block 2", 1.2, 10, 20));
+        concert.addSection(new SeatedSection("Block 3", 1.2, 10, 20));
+        concert.addSection(new SeatedSection("Block 4", 1.2, 10, 20));
+        concert.addSection(new SeatedSection("Block 6", 0.8, 10, 20));
+        concert.addSection(new SeatedSection("VIP", 2.5, 3, 15));
         events.add(concert);
     
         // Event 2: Gala mit Innenraum Bestuhlung
