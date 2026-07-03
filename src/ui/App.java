@@ -82,7 +82,8 @@ public class App extends Application {
         primaryStage.show();
     }
 
-    // --- SCREEN 1b: BLOCKAUSWAHL ---
+    /*
+    // --- SCREEN 1b: BLOCKAUSWAHL ---    ERSETZT DURCH GRAFISCHE DARSTELLUNG
     private void showSectionSelection() {
         VBox root = new VBox(15);
         root.setPadding(new Insets(30));
@@ -132,6 +133,7 @@ public class App extends Application {
         Scene scene = new Scene(root, 600, 500);
         primaryStage.setScene(scene);
     }
+    */
 
     // --- SCREEN 2: SITZAUSWAHL ---
     public void showSeatSelection() {
@@ -231,7 +233,7 @@ public class App extends Application {
         backButton.setOnAction(e -> showGraphicSectionSelection());
 
         root.getChildren().addAll(header, infoLabel, ticketSpinner, confirmButton, backButton);
-        Scene scene = new Scene(root, 500, 400);
+        Scene scene = new Scene(root, 600, 500);
         primaryStage.setScene(scene);
     }
 
@@ -276,9 +278,21 @@ public class App extends Application {
         btnFinalBook.setPrefWidth(200);
 
         btnFinalBook.setOnAction(e -> {
-            if (txtFirstName.getText().isBlank() || txtLastName.getText().isBlank()) {
+            String firstName = txtFirstName.getText().trim();
+            String lastName = txtLastName.getText().trim();
+
+            if (firstName.isBlank() || lastName.isBlank()) {
                 showAlert(Alert.AlertType.ERROR, "Fehler", "Bitte füllen Sie alle Namensfelder aus!");
                 return;
+            }
+
+            String nameRegex = "^[a-zA-ZäöüÄÖÜß\\s\\-]+$";
+
+            if (!firstName.matches(nameRegex) || !lastName.matches(nameRegex)) {
+                showAlert(Alert.AlertType.WARNING,
+                    "Ungültige Namenseingabe",
+                    "Die Namensfelder dürfen keine Zahlen oder Sonderzeichen enthalten. Bitte korrigieren Sie Ihre Eingabe.");
+                    return;
             }
 
             Customer customer = new Customer(customerIdCounter++, txtFirstName.getText(), txtLastName.getText(), cbCustomerType.getValue());
@@ -287,17 +301,32 @@ public class App extends Application {
             double totalExtendedPrice = 0.0;
 
             try {
-                // Ausführung der Buchung im Service
-                for (Seat seat : chosenSeats) {
-                    Ticket ticket = bookingService.bookSpecificTicket(
-                        currentSelectedEvent.getId(),
-                        currentSelectedSection.getName(),
-                        seat.getRowNumber(),
-                        seat.getSeatNumber(),
-                        customer
-                    );
-                    generatedTickets.add(ticket);
-                    totalExtendedPrice += ticket.getFinalPrice();
+                if (currentSelectedSection instanceof SeatedSection) {
+
+                    // Ausführung der Buchung im Service
+                    for (Seat seat : chosenSeats) {
+                        Ticket ticket = bookingService.bookSpecificTicket(
+                            currentSelectedEvent.getId(),
+                            currentSelectedSection.getName(),
+                            seat.getRowNumber(),
+                            seat.getSeatNumber(),
+                            customer
+                        );
+                        generatedTickets.add(ticket);
+                        totalExtendedPrice += ticket.getFinalPrice();
+                    }
+                } else if (currentSelectedSection instanceof StandingSection) {
+
+                    for (Seat seat : chosenSeats) {
+                        Ticket ticket = bookingService.bookTicket(
+                            currentSelectedEvent.getId(), 
+                            currentSelectedSection.getName(), 
+                            customer
+                        );
+                        generatedTickets.add(ticket);
+                        totalExtendedPrice += ticket.getFinalPrice();
+                    }
+
                 }
                     
                 // Erfolgsmeldung
@@ -385,7 +414,7 @@ public class App extends Application {
             422.4, 124.0,
         });
 
-        block1.setFill(Color.rgb(56, 62, 66, 0.2)); // leicht transparentes Blau
+        block1.setFill(Color.rgb(56, 62, 66, 0.2)); 
         block1.setStroke(Color.DARKGREY); // Rahmenlinie
         block1.setStrokeWidth(1);
 
@@ -411,7 +440,7 @@ public class App extends Application {
             158.4, 68.0
         });
 
-        block2.setFill(Color.rgb(56, 62, 66, 0.2)); // leicht transparentes Grün
+        block2.setFill(Color.rgb(56, 62, 66, 0.2)); 
         block2.setStroke(Color.DARKGREY);
         block2.setStrokeWidth(1);
         block2.setOnMouseEntered(e -> block2.setFill(Color.rgb(56, 62, 66, 0.6)));
