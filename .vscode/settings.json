@@ -1,7 +1,20 @@
 {
-    "java.project.sourcePaths": ["src"],
+    "java.launch.config.vmArgs": "--module-path \"C:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\" --add-modules javafx.controls,javafx.fxml",
+    "java.project.sourcePaths": [
+        "src"
+    ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\jdk.jsobject.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx.swing.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx.controls.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx.graphics.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx.base.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx-swt.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\jfx.incubator.input.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx.fxml.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\jfx.incubator.richtext.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx.web.jar",
+        "c:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\\javafx.media.jar"
     ]
 }

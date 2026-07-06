@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "java",
+            "name": "Launch Arena App",
+            "request": "launch",
+            "mainClass": "ui.App",
+            "vmArgs": "--module-path \"C:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\" --add-modules javafx.controls,javafx.fxml"
+        }
+    ]
+}
