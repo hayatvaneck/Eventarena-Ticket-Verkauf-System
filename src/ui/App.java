@@ -339,7 +339,7 @@ public class App extends Application {
 
                 Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                 successAlert.setTitle("Buchung erfolgreich!");
-                successAlert.setHeaderText("Tickets erfolgreiche gebucht.");
+                successAlert.setHeaderText("Tickets erfolgreich gebucht.");
                 successAlert.setContentText(successMessage.toString());
                 successAlert.showAndWait();
 
