@@ -7,6 +7,8 @@ import domain.*;
 import exceptions.*;
 import service.BookingService;
 
+// wird nicht mehr verwendet, oder? 
+
 public class TicketSystemConsole {
     private final EventRepository eventRepository = EventRepository.getInstance();
     private final Scanner scanner = new Scanner(System.in);

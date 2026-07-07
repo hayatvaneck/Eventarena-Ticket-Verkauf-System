@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import domain.*;
+// Hier sind alle Demoevents gesammelt und werden durch die Methode createDemoEvents() in der EventRepository-Klasse aufgerufen.
 
 public class DemoData {
 
+    // Erstellen der Demo-Events
     public static List<Event> createDemoEvents() {
         List<Event> events = new ArrayList<>();
 
@@ -25,12 +27,12 @@ public class DemoData {
     }
 
     
-    // Erstellen der Events --> // Parameterübergabe: Long id, String title, String description, LocalDateTime dateTime, double basePrice
-    //  und die zugehörigen Sections
-
-      //                                   //
-     //Events mit Bestuhlung im Innenraum// 
-    //                                 //
+    /*  Es folgen  Methoden zur Initialisierung der Events inkl. der zugehörigen Sections.
+     - dabei gilt Parameterübergabe: (Long id, String title, String description, LocalDateTime dateTime, double basePrice) */
+    
+ /*                                   
+     Events mit Stehfläche im Innenraum 
+                                         */ 
 
     // Event 1: Konzert mit Stehplätze im Innenraum
     private static Event createConcert() {
@@ -79,9 +81,9 @@ public class DemoData {
     }
 
     
-      //                                 //
-     //Events Nutzung der Innenfläche   // 
-    //                                 //
+    /*                                   
+     Events mit Nutzfläche im Innenraum 
+                                         */ 
 
     // Event 3: Sportevent - Innenraum ist Spielfläche
     private static Event createSportEvent() {
@@ -123,9 +125,9 @@ public class DemoData {
     }
 
 
-      //                                   //
-     //Events Sitzfläche im Innenraum// 
-    //                                 //
+   /*                                   
+     Events mit Sitzfläche im Innenraum 
+                                         */ 
 
     // Event 2: Gala mit Innenraum Bestuhlung
     private static Event createGala(){

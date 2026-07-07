@@ -15,6 +15,7 @@ public class Ticket {
         this.finalPrice = finalPrice;
     }
 
+    // Wird mit GUI nicht mehr benutzt, oder? 
     // Anzeige des Tickets in der Konsole
     public void printTicketDetails() {
         System.out.println("\n=======================================================");

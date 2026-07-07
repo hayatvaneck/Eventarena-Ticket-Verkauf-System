@@ -3,7 +3,7 @@ package ui;
 import domain.*;
 import exceptions.SeatAlreadyBookedException;
 import repository.*;
-import service.BookingService;
+import service.*;
 import controller.SeatSelectionController;
 
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ public class App extends Application {
     private Stage primaryStage;
     private final EventRepository eventRepo = EventRepository.getInstance();
     private final BookingService bookingService = new BookingService();
+    private final ReceiptService receiptService = new ReceiptService(); 
 
     // Globale Zustände für den Buchungsprozess
     private Event currentSelectedEvent = null;
@@ -299,12 +300,10 @@ public class App extends Application {
             Customer customer = new Customer(customerIdCounter++, txtFirstName.getText(), txtLastName.getText(), cbCustomerType.getValue());
 
             List<Ticket> generatedTickets = new ArrayList<>();
-            double totalExtendedPrice = 0.0;
 
             try {
+                // Ausführung der Buchung in BookingService für jeden ausgewählten Sitzplatz
                 if (currentSelectedSection instanceof SeatedSection) {
-
-                    // Ausführung der Buchung im Service
                     for (Seat seat : chosenSeats) {
                         Ticket ticket = bookingService.bookSpecificTicket(
                             currentSelectedEvent.getId(),
@@ -314,34 +313,28 @@ public class App extends Application {
                             customer
                         );
                         generatedTickets.add(ticket);
-                        totalExtendedPrice += ticket.getFinalPrice();
                     }
-                } else if (currentSelectedSection instanceof StandingSection) {
-
-                    for (Seat seat : chosenSeats) {
+                } 
+                // Ausführung der Buchung in BookingService für Stehplätze (nur Anzahl relevant, daher ignored) ; 
+                else if (currentSelectedSection instanceof StandingSection) {
+                    for (Seat ignored : chosenSeats) {
                         Ticket ticket = bookingService.bookTicket(
                             currentSelectedEvent.getId(), 
                             currentSelectedSection.getName(), 
                             customer
                         );
                         generatedTickets.add(ticket);
-                        totalExtendedPrice += ticket.getFinalPrice();
                     }
 
                 }
-                    
-                // Erfolgsmeldung
-                StringBuilder successMessage = new StringBuilder();
-                successMessage.append(String.format("Kunde: %s\nGesamtpreis: %.2f EUR\n\nGenerierte Ticket-IDs:\n",
-                        customer.getFullName(), totalExtendedPrice));
-                for (Ticket t : generatedTickets) {
-                    successMessage.append("- ").append(t.getTicketId()).append("\n");
-                }
 
+                //erstellt Quittung und fasst Tickets zusammen durch Nutzung von receiptService
+                Receipt receipt = receiptService.createReceipt(customer, generatedTickets);
+                
                 Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                 successAlert.setTitle("Buchung erfolgreich!");
                 successAlert.setHeaderText("Tickets erfolgreiche gebucht.");
-                successAlert.setContentText(successMessage.toString());
+                successAlert.setContentText(receipt.getReceiptText());
                 successAlert.showAndWait();
 
                 // Zurück zum Hauptmenü
