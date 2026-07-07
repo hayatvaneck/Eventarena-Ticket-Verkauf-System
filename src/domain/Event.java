@@ -7,11 +7,13 @@ public class Event {
     private String title;
     private LocalDateTime dateTime;
     private double basePrice;
+    private String description;
     private List<Section> sections;
 
-    public Event(Long id, String title, LocalDateTime dateTime, double basePrice) {
+    public Event(Long id, String title, String description, LocalDateTime dateTime, double basePrice) {
         this.id = id;
         this.title = title;
+        this.description = description;
         this.dateTime = dateTime;
         this.basePrice = basePrice;
         this.sections = new ArrayList<>();
@@ -44,18 +46,52 @@ public class Event {
         return getTotalAvailableSeats() == 0;
     }
 
+   // getter --> für Ticketerstellung
+   // & setter --> Für Eventbearbeitung  
+
+   // ID
     public Long getId() {
         return id;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    // Title 
     public String getTitle() {
         return title;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+
+    // Description 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    // Spielzeit
     public LocalDateTime getDateTime() {
         return dateTime;
     }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+    
+    // Grundpreis   //!!Gedanke: nachträgliche Preisänderungen anhand vom verändertem Faktor statt verändertem Grundpreis
     public double getBasePrice() {
         return basePrice;
     }
+
+    // Blöcke //Gedanke: Bedarf es hier einer nachträglichen Änderung? 
     public List<Section> getSections() {
         return sections;
     }

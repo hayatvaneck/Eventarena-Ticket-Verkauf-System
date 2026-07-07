@@ -1,9 +1,7 @@
 package repository;
-
-import domain.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import domain.Event;
 
 public class EventRepository {
     private static EventRepository instance;
@@ -11,8 +9,7 @@ public class EventRepository {
     private final List<Event> events;
 
     private EventRepository() {
-        this.events = new ArrayList<>();
-        seedMockData();
+        this.events = DemoData.createDemoEvents();
     }
 
     public static synchronized EventRepository getInstance() {
@@ -20,35 +17,6 @@ public class EventRepository {
             instance = new EventRepository();
         }
         return instance;
-    }
-
-    // Erstellen der Events und die zugehörigen Sections
-    private void seedMockData() {
-        // Event 1: Konzert mit Stehplätze im Innenraum
-        Event concert = new Event(1L, "Don Toliver Octane Tour Leg 2", LocalDateTime.of(2026, 11, 02, 19, 0), 100.0);
-        concert.addSection(new StandingSection("Innenraum (Stehplatz)", 1.0, 2000));
-        concert.addSection(new SeatedSection("Block 1", 1.2, 10, 20));
-        concert.addSection(new SeatedSection("Block 2", 1.2, 10, 20));
-        concert.addSection(new SeatedSection("Block 3", 1.2, 10, 20));
-        concert.addSection(new SeatedSection("Block 4", 1.2, 10, 20));
-        concert.addSection(new SeatedSection("Block 6", 0.8, 10, 20));
-        concert.addSection(new SeatedSection("VIP", 2.5, 3, 15));
-        events.add(concert);
-    
-        // Event 2: Gala mit Innenraum Bestuhlung
-        Event gala = new Event(2L, "Klassik Gala", LocalDateTime.of(2026, 12, 15, 20, 0), 150.0);
-        gala.addSection(new SeatedSection("Parkett (bestuhlter Innenraum", 1.0, 15, 12));
-        gala.addSection(new SeatedSection("Loge", 2.0, 5, 6));
-        gala.addSection(new SeatedSection("Premium", 1.5, 10, 8));
-        events.add(gala);
-
-        // Event 3: Sportevent - Innenraum ist Spielfläche
-        Event sport = new Event(3L, "Alba Berlin vs. FC Bayern München", LocalDateTime.of(2026, 8, 11, 18, 00), 80.0);
-        sport.addSection(new EmptySection("Spielfläche"));
-        sport.addSection(new SeatedSection("Fankurve Heim", 0.9, 20, 30));
-        sport.addSection(new SeatedSection("Gästeblock", 0.9, 10, 20));
-        sport.addSection(new SeatedSection("Haupttribüne", 1.2, 15, 30));
-        events.add(sport);
     }
 
     // Liste aller geladenen Events
@@ -66,11 +34,11 @@ public class EventRepository {
         return null;
     }
 
-    // Event während der Laufzeit hinzufügen
+    // Event während der Laufzeit hinzufügen  //Gedanke für spätere Implementierung: Wenn wir Eventeingabe erstellen: Wie wird Dopplung der ID vermieden? 
     public void save(Event event) {
         if(event != null) {
             this.events.add(event);
-        }
+        } 
     }
     
 }

@@ -57,6 +57,7 @@ public class App extends Application {
         
         ListView<String> eventListView = new ListView<>();
         List<Event> events = eventRepo.getAllEvents();
+       
         for (Event event : events) {
             eventListView.getItems().add("ID: " + event.getId() + " | " + event.getTitle() + " (" + event.getBasePrice() + " EUR)");
         }
