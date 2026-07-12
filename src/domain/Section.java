@@ -1,30 +1,29 @@
 package domain;
-import exceptions.SeatAlreadyBookedException;
 
 public abstract class Section {
-    private String name;
-    private double priceFactor;
+    private final String name;
+    private final double priceFactor;
 
     public Section(String name, double priceFactor) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name darf nicht leer sein.");
+        }
+        if (priceFactor < 0) {
+            throw new IllegalArgumentException("Preisfaktor muss größer als 0 sein.");
+        }
+
         this.name = name;
         this.priceFactor = priceFactor;
     }
 
-    public abstract boolean bookNextAvailableTicket() throws SeatAlreadyBookedException;
     public abstract int getAvailableSeats();
     public abstract void printLayout();
 
     public String getName() {
         return name;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
+
     public double getPriceFactor() {
         return priceFactor;
     }
-    public void setPriceFactor(double priceFactor) {
-        this.priceFactor = priceFactor;
-    }
-    
 }
