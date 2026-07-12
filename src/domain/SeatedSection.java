@@ -64,5 +64,16 @@ public class SeatedSection extends Section {
         }
         return null;
     }
+
+    public int getRowCount() {
+        return this.seats.length;
+    }
+
+    public int getSeatsPerRow() {
+        if (this.seats.length > 0) {
+            return this.seats[0].length;
+        }
+        return 0;
+    }
     
 }
