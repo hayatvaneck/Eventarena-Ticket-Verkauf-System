@@ -35,6 +35,12 @@ public class SeatSelectionController {
             int seatsPerRow = seatedSection.getSeatsPerRow();
 
             for (int r = 0; r < rows; r++) {
+
+                javafx.scene.control.Label rowLabel = new javafx.scene.control.Label("Reihe " + (r + 1) + ": ");
+                rowLabel.setStyle("-fx-font-weight: bold; -fx-padding: 0 10 0 0;");
+
+                seatGrid.add(rowLabel, 0, r);
+
                 for (int s = 0; s < seatsPerRow; s++) {
                     Seat seat = seatedSection.getSeat(r + 1, s + 1);
 
@@ -65,7 +71,7 @@ public class SeatSelectionController {
                         });
                     }
 
-                    seatGrid.add(seatButton, s, r);
+                    seatGrid.add(seatButton, s+1, r);
                 }
             }
 

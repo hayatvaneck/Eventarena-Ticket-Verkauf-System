@@ -1,13 +1,13 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "java",
-            "name": "Launch Arena App",
+            "name": "App",
             "request": "launch",
             "mainClass": "ui.App",
-            "vmArgs": "--module-path \"C:\\java\\javafx-sdk\\javafx-sdk-17.0.19\\lib\" --add-modules javafx.controls,javafx.fxml"
+            "projectName": "Eventarena-Ticket-Verkauf-System_c75422ee",
+            "vmArgs": "--module-path \"C:\\Users\\Hayat\\Documents\\java\\javafx-sdk-17.0.19\\lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }
