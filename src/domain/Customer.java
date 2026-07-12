@@ -7,24 +7,25 @@ public class Customer {
     private final CustomerType customerType;
 
     public Customer(long id, String firstName, String lastName, CustomerType customerType) {
-         if (id <= 0) {
+        if (id <= 0) {
             throw new IllegalArgumentException("ID muss größer als 0 sein.");
         }
-        if (firstName == null || firstName.isBlank()) {
-        throw new IllegalArgumentException("Vorname darf nicht leer sein.");
-    }
-        if (lastName == null || lastName.isBlank()) {
-        throw new IllegalArgumentException("Nachname darf nicht leer sein.");
-    }
+        if (firstName == null || firstName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Vorname darf nicht leer sein.");
+        }
+        if (lastName == null || lastName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nachname darf nicht leer sein.");
+        }
         if (customerType == null) {
-        throw new IllegalArgumentException("CustomerType darf nicht null sein.");
+            throw new IllegalArgumentException("CustomerType darf nicht null sein.");
+        }
+
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.customerType = customerType;
     }
 
-    this.id = id;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.customerType = customerType;
-}
     public long getId() {
         return id;
     }
