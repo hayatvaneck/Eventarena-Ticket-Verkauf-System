@@ -1,5 +1,7 @@
 package domain;
 
+import exceptions.SeatAlreadyBookedException;
+
 public abstract class Section {
     private final String name;
     private final double priceFactor;
@@ -16,6 +18,7 @@ public abstract class Section {
         this.priceFactor = priceFactor;
     }
 
+    public abstract boolean bookNextAvailableTicket() throws SeatAlreadyBookedException;
     public abstract int getAvailableSeats();
     public abstract void printLayout();
 
