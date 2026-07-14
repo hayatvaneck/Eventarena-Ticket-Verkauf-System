@@ -4,9 +4,9 @@ public class Customer {
     private final long id;
     private final String firstName;
     private final String lastName;
-    private final CustomerType customerType;
+    private final String customerType;
 
-    public Customer(long id, String firstName, String lastName, CustomerType customerType) {
+    public Customer(long id, String firstName, String lastName, String customerType) {
         if (id <= 0) {
             throw new IllegalArgumentException("ID muss größer als 0 sein.");
         }
@@ -38,7 +38,7 @@ public class Customer {
         return lastName;
     }
 
-    public CustomerType getCustomerType() {
+    public String getCustomerType() {
         return customerType;
     }
 
