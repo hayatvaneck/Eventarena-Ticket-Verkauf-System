@@ -38,25 +38,32 @@ public class SeatSelectionController {
                 for (int s = 0; s < seatsPerRow; s++) {
                     Seat seat = seatedSection.getSeat(r + 1, s + 1);
 
-                    Button seatButton = new Button((s + 1) + "");
+                    Button seatButton = new Button();
                     seatButton.setPrefSize(40,5);
+
+                    // Tooltip hinzufügen
+                    javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip(
+                        "Reihe " + seat.getRowNumber() + ", Platz " + seat.getSeatNumber()
+                    );
+                    tooltip.setShowDelay(javafx.util.Duration.millis(100));
+                    javafx.scene.control.Tooltip.install(seatButton, tooltip);
 
                     // 1. Bereits gebuchte Sitze rot markieren und deaktivieren
                     if (seat.isBooked()) {
-                        seatButton.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white");
+                        seatButton.setStyle("-fx-background-color: #ff4d4d;");
                         seatButton.setDisable(true);
                     } else {
                         // 2. Freie Plätze grün markieren und auswählbar machen
-                        seatButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white");
+                        seatButton.setStyle("-fx-background-color: #2c3e50;");
 
                         seatButton.setOnAction(event -> {
                             // Deselektieren des zuvor ausgewählten Sitzes
                             if (selectedSeats.contains(seat)) {
-                                seatButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white");
+                                seatButton.setStyle("-fx-background-color: #2c3e50;");
                                 selectedSeats.remove(seat);
                                 selectedButtons.remove(seatButton);
                             } else {
-                                seatButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white");
+                                seatButton.setStyle("-fx-background-color: #d4af37;");
                                 selectedSeats.add(seat);
                                 selectedButtons.add(seatButton);
                             }
@@ -79,7 +86,7 @@ public class SeatSelectionController {
         } else {
             StringBuilder sb = new StringBuilder("Ausgewählt: ");
             for (Seat s : selectedSeats) {
-                sb.append(String.format("[R:%d, P:%d] ", s.getRowNumber(), s.getSeatNumber()));
+                sb.append(String.format("| Reihe: %d, Platz: %d |", s.getRowNumber(), s.getSeatNumber()));
             }
             mainApp.updateSelectionLabel(sb.toString());
         }

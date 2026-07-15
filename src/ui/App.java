@@ -10,6 +10,9 @@ import controller.SeatSelectionController;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -51,7 +54,7 @@ public class App extends Application {
         VBox root = new VBox(15);
         root.setPadding(new Insets(30));
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #f5f6fa;");
+        root.setStyle("-fx-background-color: #f5f5f7;");
 
         Label title = new Label("ARENA TICEKETSYSTEM");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
@@ -63,7 +66,7 @@ public class App extends Application {
         }
 
         Button nextButton = new Button("Blöcke anzeigen");
-        nextButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px;");
+        nextButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px");
         nextButton.setPrefWidth(200);
 
         nextButton.setOnAction(e -> {
@@ -154,7 +157,7 @@ public class App extends Application {
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         Label stageLabel = new Label("--- BÜHNE / SPIELFELD ---");
-        stageLabel.setStyle("-fx-background-color: #bdc3c7; -fx-padding: 5 50 5 50;");
+        stageLabel.setStyle("-fx-background-color: #2c3e50; -fx-padding: 5 50 5 50; -fx-text-fill: white;");
 
         GridPane seatGrid = new GridPane();
         seatGrid.setHgap(6);
@@ -173,11 +176,11 @@ public class App extends Application {
         SeatSelectionController controller = new SeatSelectionController(seatGrid, this);
         controller.populateSeatPlan(currentSelectedSection);
 
-        selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2980b9;");
+        selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         selectionStatusLabel.setText("Kein Platz ausgewählt");
 
         Button confirmButton = new Button("Sitzplatz bestätigen");
-        confirmButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
+        confirmButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: #2c3e50;");
 
         confirmButton.setOnAction(e -> {
             List<Seat> chosenSeats = controller.getSelectedSeats();
@@ -189,11 +192,11 @@ public class App extends Application {
         });
 
         Button backButton = new Button("Zurück zum Saalplan");
-        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
+        backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
         backButton.setOnAction(e -> showGraphicSectionSelection());
 
         root.getChildren().addAll(header, stageLabel, seatGrid, confirmButton, backButton, selectionStatusLabel);
-        Scene scene = new Scene(root, 800, 650);
+        Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
     }
 
@@ -245,7 +248,7 @@ public class App extends Application {
         root.setAlignment(Pos.CENTER);
 
         Label title = new Label("Personalisierung & Zahlung");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-filling: #2c3e50");
 
         StringBuilder seatInfo = new StringBuilder();
         boolean isStandingArea = false;
@@ -255,13 +258,17 @@ public class App extends Application {
                 isStandingArea = true;
                 break;
             }
-            seatInfo.append(String.format("Reihe: %d / Platz: %d, ", s.getRowNumber(), s.getSeatNumber()));
+            seatInfo.append(String.format("| Reihe: %d, Platz: %d ", s.getRowNumber(), s.getSeatNumber()));
         }
 
         String seatDetails = isStandingArea ? "Freie Platzwahl" : seatInfo.toString();
 
-        Label infoLabel = new Label(String.format("Event: %s\nBlock: %s\nDetails: %s",
-                currentSelectedEvent.getTitle(), currentSelectedSection.getName(), seatDetails));
+        // Deutsches Datenformat einfügen
+        DateTimeFormatter germanDateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
+        String formatiertesDatum = currentSelectedEvent.getDateTime().format(germanDateTimeFormatter);
+
+        Label infoLabel = new Label(String.format("Event: %s\nDatum: %s\nBlock: %s\nDetails: %s",
+                currentSelectedEvent.getTitle(), formatiertesDatum, currentSelectedSection.getName(), seatDetails));
         infoLabel.setStyle("-fx-background-color: #ecf0f1; -fx-padding: 10;");
 
         TextField txtFirstName = new TextField();
@@ -273,12 +280,12 @@ public class App extends Application {
         txtLastName.setMaxWidth(250);
 
         ComboBox<String> cbCustomerType = new ComboBox<>();
-        cbCustomerType.getItems().addAll("REGULAR", "STUDENT", "RENTNER", "VIP");
+        cbCustomerType.getItems().addAll("REGULAR", "STUDENT", "RENTNER");
         cbCustomerType.setPromptText("Kundentyp auswählen");
         cbCustomerType.getSelectionModel().selectFirst();
 
         Button btnFinalBook = new Button("Kostenpflichtig buchen (" + chosenSeats.size() + " Tickets)");
-        btnFinalBook.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;");
+        btnFinalBook.setStyle("-fx-background-color: #d4af37; -fx-text-fill: white; -fx-font-weight: bold;");
         btnFinalBook.setPrefWidth(200);
 
         btnFinalBook.setOnAction(e -> {
@@ -356,6 +363,7 @@ public class App extends Application {
         });
 
         Button btnCancel = new Button("Abbrechen");
+        btnCancel.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
         btnCancel.setOnAction(e -> showGraphicSectionSelection());
 
         root.getChildren().addAll(title, infoLabel, new Label("Vorname:"), txtFirstName, new Label("Nachname:"), txtLastName,
@@ -512,11 +520,11 @@ public class App extends Application {
             548.8, 336.0,
             185.6, 336.0
         });
-        standingArea.setFill(Color.rgb(56, 62, 66, 0.8));
-        standingArea.setStroke(Color.DARKGREY);
+        standingArea.setFill(Color.web("#2c3e50", 0.15));
+        standingArea.setStroke(Color.web("#2c3e50", 0.4));
         standingArea.setStrokeWidth(1);
-        standingArea.setOnMouseEntered(e -> standingArea.setFill(Color.rgb(56, 62, 66, 0.6)));
-        standingArea.setOnMouseExited(e -> standingArea.setFill(Color.rgb(56, 62, 66, 0.2)));
+        standingArea.setOnMouseEntered(e -> standingArea.setFill(Color.web("#2c3e50", 0.5)));
+        standingArea.setOnMouseExited(e -> standingArea.setFill(Color.web("#2c3e50", 0.15)));
         standingArea.setOnMouseClicked(e -> {
             currentSelectedSection = findSectionByName("Innenraum (Stehplatz)");
             if (currentSelectedSection instanceof StandingSection) {
@@ -624,12 +632,12 @@ private StackPane createBasketballLayout() {
 
 // Hilfsmethode für das Stylen der Polygon um Code zu sparen
 private void setupStandardBlock(Polygon block, String sectionName) {
-    block.setFill(Color.rgb(56, 62, 66, 0.2));
-    block.setStroke(Color.DARKGREY);
+    block.setFill(Color.web("#2c3e50", 0.15));
+    block.setStroke(Color.web("#2c3e50", 0.4));
     block.setStrokeWidth(1);
 
-    block.setOnMouseEntered(e -> block.setFill(Color.rgb(56, 62, 66, 0.6)));
-    block.setOnMouseExited(e -> block.setFill(Color.rgb(56, 62, 66, 0.2)));
+    block.setOnMouseEntered(e -> block.setFill(Color.web("#2c3e50", 0.5)));
+    block.setOnMouseExited(e -> block.setFill(Color.web("#2c3e50", 0.15)));
 
     block.setOnMouseClicked(e -> {
         currentSelectedSection = findSectionByName(sectionName);

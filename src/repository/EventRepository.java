@@ -9,7 +9,6 @@ import java.util.List;
 
 public class EventRepository {
     private static EventRepository instance;
-
     private final List<Event> events;
 
     private EventRepository() {
