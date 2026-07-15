@@ -78,7 +78,7 @@ public class App extends Application {
         });
 
         root.getChildren().addAll(title, new Label("Verfügbare Events:"), eventListView, nextButton);
-        Scene scene = new Scene(root, 600, 500);
+        Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -234,7 +234,7 @@ public class App extends Application {
         backButton.setOnAction(e -> showGraphicSectionSelection());
 
         root.getChildren().addAll(header, infoLabel, ticketSpinner, confirmButton, backButton);
-        Scene scene = new Scene(root, 600, 500);
+        Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
     }
 
@@ -268,6 +268,20 @@ public class App extends Application {
         txtFirstName.setPromptText("Vorname");
         TextField txtLastName = new TextField();
         txtLastName.setPromptText("Nachname");
+
+        txtFirstName.setMaxWidth(250);
+        txtLastName.setMaxWidth(250);
+        int maxZeichen = 20;
+        txtFirstName.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue.length() > maxZeichen) {
+                txtFirstName.setText(oldValue);
+            }
+        });
+        txtLastName.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue.length() > maxZeichen) {
+                txtLastName.setText(oldValue);
+            }
+        });
 
         ComboBox<String> cbCustomerType = new ComboBox<>();
         cbCustomerType.getItems().addAll("REGULAR", "STUDENT", "RENTNER", "VIP");
@@ -357,7 +371,7 @@ public class App extends Application {
 
         root.getChildren().addAll(title, infoLabel, new Label("Vorname:"), txtFirstName, new Label("Nachname:"), txtLastName,
                 new Label("Kundentyp:"), cbCustomerType, btnFinalBook, btnCancel);
-        Scene scene = new Scene(root, 450, 550);
+        Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
     }
 
@@ -388,18 +402,16 @@ public class App extends Application {
 
         // Auswahl des Saalplans
         StackPane mapContainer = null;
-        if (currentSelectedEvent.getEventType() == EventType.BASKETBALL) {
-            root.getChildren().add(createBasketballLayout());
-        } else if (currentSelectedEvent.getEventType() == EventType.CONCERT) {
-            root.getChildren().add(createConcertLayout());
-        } else {
-            root.getChildren().add(createGalaLayout());
-        }
 
-        Button backButton = new Button("Zurück zu den Events");
-        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
-        backButton.setOnAction(e -> showMainMenu());
- 
+        if (currentSelectedEvent.getEventType() == EventType.BASKETBALL) {
+            mapContainer = createBasketballLayout();
+        } else if (currentSelectedEvent.getEventType() == EventType.CONCERT) {
+            mapContainer = createConcertLayout();
+        } else {
+            mapContainer = createGalaLayout();
+        }
+        
+        // Sicherheitscheck falls eine der drei Methoden null zurückgibt
         if (mapContainer == null) {
             System.err.println("KRITISCH: mapContainer ist null! Ein Fallback-Layout wird erzeugt.");
             mapContainer = new StackPane(new Label("Fehler: Saalplan-Layout ist null!"));
@@ -407,11 +419,15 @@ public class App extends Application {
             mapContainer.setPrefSize(600, 400);
         }
 
+        Button backButton = new Button("Zurück zu den Events");
+        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
+        backButton.setOnAction(e -> showMainMenu());
+ 
         root.getChildren().add(title);
         root.getChildren().add(mapContainer);
         root.getChildren().add(backButton);
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
