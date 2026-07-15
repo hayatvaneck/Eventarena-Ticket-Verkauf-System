@@ -47,9 +47,13 @@ public class EventRepository {
         // Event 3: Sportevent - Innenraum ist Spielfläche
         Event sport = new Event(3L, "Alba Berlin vs. FC Bayern München", LocalDateTime.of(2026, 8, 11, 18, 00), 80.0, EventType.BASKETBALL);
         sport.addSection(new EmptySection("Spielfläche"));
-        sport.addSection(new SeatedSection("Fankurve Heim", 0.9, 20, 30));
-        sport.addSection(new SeatedSection("Gästeblock", 0.9, 10, 20));
-        sport.addSection(new SeatedSection("Haupttribüne", 1.2, 15, 30));
+        sport.addSection(new SeatedSection("Block 1", 0.9, 10, 20));
+        sport.addSection(new SeatedSection("Block 2", 0.9, 10, 20));
+        sport.addSection(new SeatedSection("Block 3", 1.2, 10, 20));
+        sport.addSection(new SeatedSection("Block 4", 1.0, 10, 20));
+        sport.addSection(new SeatedSection("Block 5", 1.0, 10, 20));
+        sport.addSection(new SeatedSection("Block 6", 1.0, 10, 20));
+        sport.addSection(new SeatedSection("VIP", 2.0, 3, 15));
         events.add(sport);
     }
 

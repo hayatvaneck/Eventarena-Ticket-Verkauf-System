@@ -271,17 +271,6 @@ public class App extends Application {
 
         txtFirstName.setMaxWidth(250);
         txtLastName.setMaxWidth(250);
-        int maxZeichen = 20;
-        txtFirstName.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue.length() > maxZeichen) {
-                txtFirstName.setText(oldValue);
-            }
-        });
-        txtLastName.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue.length() > maxZeichen) {
-                txtLastName.setText(oldValue);
-            }
-        });
 
         ComboBox<String> cbCustomerType = new ComboBox<>();
         cbCustomerType.getItems().addAll("REGULAR", "STUDENT", "RENTNER", "VIP");
@@ -553,68 +542,78 @@ private StackPane createBasketballLayout() {
     Pane clickLayer = new Pane();
     mapContainer.setStyle("-fx-border-color: rgba(0,0,0,0.1);");
 
-    Image arenaMapImage = new Image(getClass().getResourceAsStream("saalplan_basketball.png"));
+    Image arenaMapImage = new Image(getClass().getResourceAsStream("/saalplan_basketball.png"));
     ImageView imageView = new ImageView(arenaMapImage);
     imageView.setFitWidth(600);
     imageView.setPreserveRatio(true);
 
+    /* 
+    // Koordinaten für Polygone ausgeben lassen
+    mapContainer.setOnMouseClicked(e -> {
+        System.out.println("Punkt: " + e.getX() + ", " + e.getY() + ",");
+    });
+    
+    mapContainer.getChildren().addAll(imageView, clickLayer);
+    */
+    
+
     Polygon block2 = new Polygon(new double[]{
-        108.0, 68.0,
-        296.0, 68.0,
-        296.0, 155.0,
-        240.0, 155.0,
-        240.0, 120.0,
-        108.0, 120.0
+        191.0, 96.0,
+        369.6, 96.0,
+        369.6, 137.6,
+        318.4, 138.4,
+        318.4, 174.4,
+        191.0, 174.4
     });
     setupStandardBlock(block2, "Block 2");
 
     Polygon vipBlock = new Polygon(new double[]{
-        240.0, 120.0,
-        355.0, 120.0,
-        355.0, 155.0,
-        240.0, 155.0
+        318.4, 175.2,
+        318.4, 139.0,
+        422.4, 139.0,
+        422.4, 175.2
     });
     setupStandardBlock(vipBlock, "VIP");
 
     Polygon block1 = new Polygon(new double[]{
-        296.0, 68.0,
-        492.0, 68.0,
-        492.0, 120.0,
-        355.0, 120.0,
-        355.0, 155.0,
-        296.0, 155.0
+        551.0, 96.0,
+        373.0, 96.0,
+        373.0, 137.6,
+        422.4, 137.6,
+        422.4, 174.4,
+        551.0, 174.4
     });
     setupStandardBlock(block1, "Block 1");
 
     Polygon block6 = new Polygon(new double[]{
-        52.0, 134.0,
-        108.0, 134.0, 
-        108.0, 314.0,
-        52.0, 314.0
+        140.8, 190.4,
+        198.4, 190.4,
+        198.4, 324.8,
+        140.8, 324.8
     });
     setupStandardBlock(block6, "Block 6");
 
     Polygon block5 = new Polygon(new double[]{
-        492.0, 134.0,
-        548.0, 134.0,
-        548.0, 314.0,
-        492.0, 314.0
+        541.6, 190.4,
+        600.8, 190.4,
+        600.8, 324.8,
+        541.6, 324.8
     });
     setupStandardBlock(block5, "Block 5");
 
     Polygon block3 = new Polygon(new double[]{
-        108.0, 328.0,
-        296.0, 328.0,
-        296.0, 415.0,
-        108.0, 415.0
+        190.4, 340.0,
+        370.4, 340.0,
+        370.4, 419.2,
+        190.4, 419.2
     });
     setupStandardBlock(block3, "Block 3");
 
     Polygon block4 = new Polygon(new double[]{
-        296.0, 328.0,
-        492.0, 328.0,
-        492.0, 415.0,
-        296.0, 415.0
+        372.8, 340.0,
+        552.8, 340.0,
+        552.8, 419.2,
+        372.8, 419.2
     });
     setupStandardBlock(block4, "Block 4");
 
@@ -656,14 +655,7 @@ private StackPane createGalaLayout() {
         // 2. Container für das Bild und die klickbaren Bereiche
        
 
-        /*
-        // Koordinaten für Polygone ausgeben lassen
-        mapContainer.setOnMouseClicked(e -> {
-            System.out.println("Punkt: " + e.getX() + ", " + e.getY() + ",");
-        });
-
-        mapContainer.getChildren().addAll(imageView, clickLayer);
-        */
+        
 
             //currentSelectedSection = findSectionByName("Innenraum (Stehplatz)");
             //if (currentSelectedSection != null) {
