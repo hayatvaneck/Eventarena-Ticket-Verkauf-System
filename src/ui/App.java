@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Polygon;
 import javafx.scene.paint.Color;
@@ -51,24 +52,188 @@ public class App extends Application {
 
     // --- SCREEN 1: HAUPTMENÜ ---
     private void showMainMenu() {
-        VBox root = new VBox(15);
+        VBox root = new VBox(20);
         root.setPadding(new Insets(30));
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #f5f5f7;");
 
+        Label title = new Label("ARENA TICKETSYSTEM");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label subtitle = new Label("Wählen Sie ein Event aus:");
+        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #7f8c8d");
+
+        DateTimeFormatter germanDateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+
+        javafx.scene.layout.FlowPane cardContainer = new javafx.scene.layout.FlowPane();
+        cardContainer.setHgap(20);
+        cardContainer.setVgap(20);
+        cardContainer.setPadding(new Insets(10));
+        cardContainer.setAlignment(Pos.CENTER);
+
+        List<Event> events = eventRepo.getAllEvents();
+        List<VBox> eventCards = new ArrayList<>();
+
+        for (Event event : events) {
+            VBox card = new VBox(10);
+            card.setPadding(new Insets(20));
+            card.setMinWidth(220);
+            card.setPrefWidth(220);
+            card.setMaxWidth(220);
+            card.setMinHeight(160);
+            card.setAlignment(Pos.TOP_LEFT);
+            card.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-border-color: #bdc3c7;" + 
+                "-fx-border-width: 1px;" +
+                "-fx-border-radius: 8px;" +
+                "-fx-background-radius: 8px;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);"
+            );
+
+            // Titel des Events
+            Label eventTitle = new Label(event.getTitle());
+            eventTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
+            eventTitle.setWrapText(true);
+            eventTitle.setMinHeight(Region.USE_PREF_SIZE);
+            eventTitle.setMaxHeight(Double.MAX_VALUE);
+            eventTitle.setAlignment(Pos.TOP_LEFT);
+
+            // Datum des Events
+            Label eventDate = new Label(event.getDateTime().format(germanDateTimeFormatter));
+            eventDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
+
+            // Eventtyp auf der Karte
+            Label eventTypeLabel = new Label(event.getEventType().toString());
+            eventTypeLabel.setStyle(
+                "-fx-background-color: #34495e;" + 
+                "-fx-text-fill: white;" +
+                "-fx-padding: 3px 8px;" +
+                "-fx-font-size: 10px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 4px;"
+            );
+
+            card.getChildren().addAll(eventTitle, eventDate, eventTypeLabel);
+
+            // Hover Effekt
+            card.setOnMouseEntered(e -> {
+                if (currentSelectedEvent != event) {
+                    card.setStyle(
+                        "-fx-background-color: #fdfdfd;" +
+                        "-fx-border-color: #2980b9;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 8px;" +
+                        "-fx-background-radius: 8px;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.2), 8, 0, 0, 4);"
+                    );
+                }
+            });
+
+            card.setOnMouseExited(e -> {
+                if (currentSelectedEvent != event) {
+                    card.setStyle(
+                        "-fx-background-color: white;" +
+                        "-fx-border-color: #bdc3c7;" + 
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 8px;" +
+                        "-fx-background-radius: 8px;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);"
+                    );
+                }
+            });
+
+            // Klick & Doppelklick
+            card.setOnMouseClicked(mouseEvent -> {
+                for (VBox otherCard : eventCards) {
+                    otherCard.setStyle(
+                        "-fx-background-color: white;" +
+                        "-fx-border-color: #bdc3c7;" + 
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 8px;" +
+                        "-fx-background-radius: 8px;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);"
+                    );
+                }
+
+                // Event als ausgewählt markieren
+                currentSelectedEvent = event;
+                card.setStyle(
+                    "-fx-background-color: #ebf5fb;" +
+                    "-fx-border-color: #2980b9;" +
+                    "-fx-border-width: 2px;" +
+                    "-fx-border-radius: 8px;" + 
+                    "-fx-background-radius: 8px;" +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.3), 10, 0, 0, 5);"
+                );
+
+                // Doppelklick
+                if (mouseEvent.getClickCount() == 2) {
+                    showGraphicSectionSelection();
+                }
+            });
+
+            eventCards.add(card);
+            cardContainer.getChildren().add(card);
+        }
+
+        scrollPane.setContent(cardContainer);
+
+        // Bestätigungs Button
+        Button nextButton = new Button("Blöcke anzeigen");
+        nextButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px;");
+        nextButton.setPrefWidth(200);
+
+        nextButton.setOnAction(e -> {
+            if (currentSelectedEvent != null) {
+                showGraphicSectionSelection();
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Auswahl fehlt", "Bitte wählen Sie zuerst ein Event aus!");
+            }
+        });
+
+        root.getChildren().addAll(title, subtitle, scrollPane, nextButton);
+        Scene scene = new Scene(root, 800, 700);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        /* 
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(30));
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #f5f5f7;");
+        
         Label title = new Label("ARENA TICEKETSYSTEM");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        
+        // Deutsches Datenformat einfügen
+        DateTimeFormatter germanDateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
         
         ListView<String> eventListView = new ListView<>();
         List<Event> events = eventRepo.getAllEvents();
         for (Event event : events) {
-            eventListView.getItems().add("ID: " + event.getId() + " | " + event.getTitle() + " (" + event.getBasePrice() + " EUR)");
+            eventListView.getItems().add(event.getTitle() + " | " + event.getDateTime().format(germanDateTimeFormatter));
         }
-
+        
+        // Doppelklick Event auf die Events
+        eventListView.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getClickCount() == 2) {
+                int selectedIndex = eventListView.getSelectionModel().getSelectedIndex();
+                if (selectedIndex >= 0) {
+                    currentSelectedEvent = events.get(selectedIndex);
+                    showGraphicSectionSelection();
+                }
+            }
+        });
+        
         Button nextButton = new Button("Blöcke anzeigen");
         nextButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px");
         nextButton.setPrefWidth(200);
-
+        
         nextButton.setOnAction(e -> {
             int selectedIndex = eventListView.getSelectionModel().getSelectedIndex();
             if (selectedIndex >= 0) {
@@ -77,14 +242,15 @@ public class App extends Application {
                 //showSectionSelection();
             } else {
                 showAlert(Alert.AlertType.WARNING, "Auswahl fehlt","Bitte wählen Sie zuerst ein Event aus!");
-            }
-        });
-
-        root.getChildren().addAll(title, new Label("Verfügbare Events:"), eventListView, nextButton);
-        Scene scene = new Scene(root, 800, 700);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+        }
+    });
+    
+    root.getChildren().addAll(title, new Label("Verfügbare Events:"), eventListView, nextButton);
+    Scene scene = new Scene(root, 800, 700);
+    primaryStage.setScene(scene);
+    primaryStage.show();
+    */
+}
 
     /*
     // --- SCREEN 1b: BLOCKAUSWAHL ---    ERSETZT DURCH GRAFISCHE DARSTELLUNG
