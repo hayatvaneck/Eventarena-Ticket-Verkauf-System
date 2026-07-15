@@ -1,6 +1,7 @@
 package ui;
 
 import domain.*;
+import domain.Event.EventType;
 import exceptions.SeatAlreadyBookedException;
 import repository.*;
 import service.BookingService;
@@ -373,36 +374,73 @@ public class App extends Application {
     }
 
     public void showGraphicSectionSelection() {
+        if (currentSelectedEvent == null) {
+            return;
+        }
+        
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #ebe4e4;");
 
-        Label title = new Label("Wählen Sie Ihren Wunschblock aus");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-font-color: #333333;");
+        Label title = new Label("Blockauswahl für: " + currentSelectedEvent.getTitle());
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;");
 
+        // Auswahl des Saalplans
+        StackPane mapContainer = null;
+        if (currentSelectedEvent.getEventType() == EventType.BASKETBALL) {
+            root.getChildren().add(createBasketballLayout());
+        } else if (currentSelectedEvent.getEventType() == EventType.CONCERT) {
+            root.getChildren().add(createConcertLayout());
+        } else {
+            root.getChildren().add(createGalaLayout());
+        }
+
+        Button backButton = new Button("Zurück zu den Events");
+        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
+        backButton.setOnAction(e -> showMainMenu());
+ 
+        if (mapContainer == null) {
+            System.err.println("KRITISCH: mapContainer ist null! Ein Fallback-Layout wird erzeugt.");
+            mapContainer = new StackPane(new Label("Fehler: Saalplan-Layout ist null!"));
+            mapContainer.setStyle("-fx-background-color: #ffcccc; -fx-border-color: red;");
+            mapContainer.setPrefSize(600, 400);
+        }
+
+        root.getChildren().add(title);
+        root.getChildren().add(mapContainer);
+        root.getChildren().add(backButton);
+
+        Scene scene = new Scene(root, 800, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private StackPane createConcertLayout() {
+        StackPane mapContainer = new StackPane();
+        Pane clickLayer = new Pane();
+        mapContainer.setStyle("-fx-border-color: rgba(0,0,0,0.1);");
+        
+        ImageView imageView = new ImageView();
+        try {
+            Image arenaMapImage = new Image(getClass().getResourceAsStream("/saalplan_stehplätze_innenraum.png"));
+            imageView.setImage(arenaMapImage);
+            imageView.setFitWidth(600);
+            imageView.setPreserveRatio(true);
+            mapContainer.getChildren().add(imageView);
+        } catch (Exception e) {
+            System.err.println("WARNUNG: Konzert-Bild konnte nicht geladen werden! Pfad prüfen.");
+            mapContainer.setStyle("-fx-background-color: #cccccc; -fx-border-color: red");
+            mapContainer.setPrefSize(600, 450);
+        }
+        /* 
         // 1. Hintergrundbild laden (Bilddatei muss im "resources" oder Hauptordner liegen)
         Image arenaMapImage = new Image(getClass().getResourceAsStream("/saalplan_stehplätze_innenraum.png"));
         ImageView imageView = new ImageView(arenaMapImage);
         imageView.setFitWidth(600);
         imageView.setPreserveRatio(true);
-
-        
-        // 2. Container für das Bild und die klickbaren Bereiche
-        StackPane mapContainer = new StackPane();
-        Pane clickLayer = new Pane();
-
-        mapContainer.setStyle("-fx-border-color: rgba(0,0,0,0.1);");
-
-        /*
-        // Koordinaten für Polygone ausgeben lassen
-        mapContainer.setOnMouseClicked(e -> {
-            System.out.println("Punkt: " + e.getX() + ", " + e.getY() + ",");
-        });
-
-        mapContainer.getChildren().addAll(imageView, clickLayer);
         */
-
+        
         // 3. Klickbare Bereiche für die Blöcke erstellen
         // Block 1
         Polygon block1 = new Polygon(new double[]{
@@ -413,23 +451,8 @@ public class App extends Application {
             423.2, 159.2,
             422.4, 124.0,
         });
-
-        block1.setFill(Color.rgb(56, 62, 66, 0.2)); 
-        block1.setStroke(Color.DARKGREY); // Rahmenlinie
-        block1.setStrokeWidth(1);
-
-        // Hover-Effekt:
-        block1.setOnMouseEntered(e -> block1.setFill(Color.rgb(55, 62, 66, 0.6)));
-        block1.setOnMouseExited(e -> block1.setFill(Color.rgb(55, 62, 66, 0.2)));
-
-        // Klick-Event:
-        block1.setOnMouseClicked(e -> {
-            currentSelectedSection = findSectionByName("Block 1");
-            if (currentSelectedSection != null) {
-                showSeatSelection();
-            }
-        });
-
+        setupStandardBlock(block1, "Block 1");
+    
         // Block 2
         Polygon block2 = new Polygon(new double[]{
             158.4, 160.0,
@@ -439,19 +462,8 @@ public class App extends Application {
             368.8, 68.0,
             158.4, 68.0
         });
-
-        block2.setFill(Color.rgb(56, 62, 66, 0.2)); 
-        block2.setStroke(Color.DARKGREY);
-        block2.setStrokeWidth(1);
-        block2.setOnMouseEntered(e -> block2.setFill(Color.rgb(56, 62, 66, 0.6)));
-        block2.setOnMouseExited(e -> block2.setFill(Color.rgb(56, 62, 66, 0.2)));
-        block2.setOnMouseClicked(e -> {
-            currentSelectedSection = findSectionByName("Block 2");
-            if (currentSelectedSection != null) {
-                showSeatSelection();
-            }
-        });
-
+        setupStandardBlock(block2, "Block 2");
+    
         // Block 3
         Polygon block3 = new Polygon(new double[]{
             155.2, 354.4,
@@ -459,18 +471,8 @@ public class App extends Application {
             369.6, 447.2,
             156.0, 447.2
         });
-        block3.setFill(Color.rgb(56, 62, 66, 0.2));
-        block3.setStroke(Color.DARKGREY);
-        block3.setStrokeWidth(1);
-        block3.setOnMouseEntered(e -> block3.setFill(Color.rgb(56, 62, 66, 0.6)));
-        block3.setOnMouseExited(e -> block3.setFill(Color.rgb(56, 62, 66, 0.2)));
-        block3.setOnMouseClicked(e -> {
-            currentSelectedSection = findSectionByName("Block 3");
-            if (currentSelectedSection != null) {
-                showSeatSelection();
-            }
-        });
-
+        setupStandardBlock(block3, "Block 3");
+    
         // Block 4
         Polygon block4 = new Polygon(new double[]{
             372.8, 354.4,
@@ -478,18 +480,8 @@ public class App extends Application {
             583.2, 447.2,
             372.8, 447.2
         });
-        block4.setFill(Color.rgb(56, 62, 66, 0.2));
-        block4.setStroke(Color.DARKGREY);
-        block4.setStrokeWidth(1);
-        block4.setOnMouseEntered(e -> block4.setFill(Color.rgb(56, 62, 66, 0.6)));
-        block4.setOnMouseExited(e -> block4.setFill(Color.rgb(56, 62, 66, 0.2)));
-        block4.setOnMouseClicked(e -> {
-            currentSelectedSection = findSectionByName("Block 4");
-            if (currentSelectedSection != null) {
-                showSeatSelection();
-            }
-        });
-
+        setupStandardBlock(block4, "Block 4");
+    
         // Block 6
         Polygon block6 = new Polygon(new double[]{
             97.6, 176.0,
@@ -497,18 +489,17 @@ public class App extends Application {
             165.6, 336.0,
             97.6, 336.0
         });
-        block6.setFill(Color.rgb(56, 62, 66, 0.2));
-        block6.setStroke(Color.DARKGREY);
-        block6.setStrokeWidth(1);
-        block6.setOnMouseEntered(e -> block6.setFill(Color.rgb(56, 62, 66, 0.6)));
-        block6.setOnMouseExited(e -> block6.setFill(Color.rgb(56, 62, 66, 0.2)));
-        block6.setOnMouseClicked(e -> {
-            currentSelectedSection = findSectionByName("Block 6");
-            if (currentSelectedSection != null) {
-                showSeatSelection();
-            }
+        setupStandardBlock(block6, "Block 6");
+        
+        // VIP Block
+        Polygon vipBlock = new Polygon(new double[]{
+            319.2, 160.0,
+            319.2, 124.0,
+            421.6, 124.0,
+            423.2, 160.0,
         });
-
+        setupStandardBlock(vipBlock, "VIP");
+    
         // Stehplätze
         Polygon standingArea = new Polygon(new double[]{
             185.6, 176.8,
@@ -527,51 +518,142 @@ public class App extends Application {
                 Seat virtualStandingSeat = new Seat(0,0);
                 List<Seat> chosenSeats = new ArrayList<>();
                 chosenSeats.add(virtualStandingSeat);
-
+                
                 showBookingForm(chosenSeats);
             }
-
+            
             if (currentSelectedSection != null) {
                 showStandingAreaSelection();
             }
+        });
+        
+        clickLayer.getChildren().addAll(block1, block2, block3, block4, block6, vipBlock, standingArea);
+        mapContainer.getChildren().addAll(clickLayer);
+        return mapContainer;
+}
+
+private StackPane createBasketballLayout() {
+    StackPane mapContainer = new StackPane();
+    Pane clickLayer = new Pane();
+    mapContainer.setStyle("-fx-border-color: rgba(0,0,0,0.1);");
+
+    Image arenaMapImage = new Image(getClass().getResourceAsStream("saalplan_basketball.png"));
+    ImageView imageView = new ImageView(arenaMapImage);
+    imageView.setFitWidth(600);
+    imageView.setPreserveRatio(true);
+
+    Polygon block2 = new Polygon(new double[]{
+        108.0, 68.0,
+        296.0, 68.0,
+        296.0, 155.0,
+        240.0, 155.0,
+        240.0, 120.0,
+        108.0, 120.0
+    });
+    setupStandardBlock(block2, "Block 2");
+
+    Polygon vipBlock = new Polygon(new double[]{
+        240.0, 120.0,
+        355.0, 120.0,
+        355.0, 155.0,
+        240.0, 155.0
+    });
+    setupStandardBlock(vipBlock, "VIP");
+
+    Polygon block1 = new Polygon(new double[]{
+        296.0, 68.0,
+        492.0, 68.0,
+        492.0, 120.0,
+        355.0, 120.0,
+        355.0, 155.0,
+        296.0, 155.0
+    });
+    setupStandardBlock(block1, "Block 1");
+
+    Polygon block6 = new Polygon(new double[]{
+        52.0, 134.0,
+        108.0, 134.0, 
+        108.0, 314.0,
+        52.0, 314.0
+    });
+    setupStandardBlock(block6, "Block 6");
+
+    Polygon block5 = new Polygon(new double[]{
+        492.0, 134.0,
+        548.0, 134.0,
+        548.0, 314.0,
+        492.0, 314.0
+    });
+    setupStandardBlock(block5, "Block 5");
+
+    Polygon block3 = new Polygon(new double[]{
+        108.0, 328.0,
+        296.0, 328.0,
+        296.0, 415.0,
+        108.0, 415.0
+    });
+    setupStandardBlock(block3, "Block 3");
+
+    Polygon block4 = new Polygon(new double[]{
+        296.0, 328.0,
+        492.0, 328.0,
+        492.0, 415.0,
+        296.0, 415.0
+    });
+    setupStandardBlock(block4, "Block 4");
+
+    clickLayer.getChildren().addAll(block1, block2, vipBlock, block3, block4, block5, block6);
+    mapContainer.getChildren().addAll(imageView, clickLayer);
+    return mapContainer;
+}
+
+// Hilfsmethode für das Stylen der Polygon um Code zu sparen
+private void setupStandardBlock(Polygon block, String sectionName) {
+    block.setFill(Color.rgb(56, 62, 66, 0.2));
+    block.setStroke(Color.DARKGREY);
+    block.setStrokeWidth(1);
+
+    block.setOnMouseEntered(e -> block.setFill(Color.rgb(56, 62, 66, 0.6)));
+    block.setOnMouseExited(e -> block.setFill(Color.rgb(56, 62, 66, 0.2)));
+
+    block.setOnMouseClicked(e -> {
+        currentSelectedSection = findSectionByName(sectionName);
+        if (currentSelectedSection != null) {
+            showSeatSelection();
+        }
+    });
+}
+
+private StackPane createGalaLayout() {
+    StackPane mapContainer = new StackPane();
+    mapContainer.setStyle("-fx-background-color: #34495e; -fx-border-color: gold;");
+    mapContainer.setPrefSize(600,400);
+
+    Label placeholder = new Label("Gala-Saalplan (Noch in Entwicklung)");
+    placeholder.setStyle("-fx-text-fill: white; -fx-font-size: 16px");
+
+    mapContainer.getChildren().add(placeholder);
+    return mapContainer;
+}
+
+        
+        // 2. Container für das Bild und die klickbaren Bereiche
+       
+
+        /*
+        // Koordinaten für Polygone ausgeben lassen
+        mapContainer.setOnMouseClicked(e -> {
+            System.out.println("Punkt: " + e.getX() + ", " + e.getY() + ",");
+        });
+
+        mapContainer.getChildren().addAll(imageView, clickLayer);
+        */
+
             //currentSelectedSection = findSectionByName("Innenraum (Stehplatz)");
             //if (currentSelectedSection != null) {
             //    showStandingAreaSelection();
             //}
-        });
 
-        // VIP Block
-        Polygon vipBlock = new Polygon(new double[]{
-            319.2, 160.0,
-            319.2, 124.0,
-            421.6, 124.0,
-            423.2, 160.0,
-        });
-        vipBlock.setFill(Color.rgb(56, 62, 66, 0.2));
-        vipBlock.setStroke(Color.DARKGREY);
-        vipBlock.setStrokeWidth(1);
-        vipBlock.setOnMouseEntered(e -> vipBlock.setFill(Color.rgb(56, 62, 66, 0.6)));
-        vipBlock.setOnMouseExited(e -> vipBlock.setFill(Color.rgb(56, 62, 66, 0.2)));
-        vipBlock.setOnMouseClicked(e -> {
-            currentSelectedSection = findSectionByName("VIP");
-            if (currentSelectedSection != null) {
-                showSeatSelection();
-            }
-        });
-
-        clickLayer.getChildren().addAll(block1, block2, block3, block4, block6, vipBlock, standingArea);
-
-        mapContainer.getChildren().addAll(imageView, clickLayer);
-
-        Button backButton = new Button("Zurück zu den Events");
-        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
-        backButton.setOnAction(e -> showMainMenu());
-
-        root.getChildren().addAll(title, mapContainer, backButton);
-        Scene scene = new Scene(root, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
 
     public Section findSectionByName(String name) {
         if (currentSelectedEvent == null || currentSelectedEvent.getSections() == null) {
