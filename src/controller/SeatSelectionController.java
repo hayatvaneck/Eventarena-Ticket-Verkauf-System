@@ -86,7 +86,7 @@ public class SeatSelectionController {
         } else {
             StringBuilder sb = new StringBuilder("Ausgewählt: ");
             for (Seat s : selectedSeats) {
-                sb.append(String.format("| Reihe: %d, Platz: %d |", s.getRowNumber(), s.getSeatNumber()));
+                sb.append(String.format("| Reihe: %d, Platz: %d ", s.getRowNumber(), s.getSeatNumber()));
             }
             mainApp.updateSelectionLabel(sb.toString());
         }

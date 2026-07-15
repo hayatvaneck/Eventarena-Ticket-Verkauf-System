@@ -424,7 +424,7 @@ public class App extends Application {
                 isStandingArea = true;
                 break;
             }
-            seatInfo.append(String.format("| Reihe: %d, Platz: %d ", s.getRowNumber(), s.getSeatNumber()));
+            seatInfo.append(String.format(" Reihe: %d, Platz: %d |", s.getRowNumber(), s.getSeatNumber()));
         }
 
         String seatDetails = isStandingArea ? "Freie Platzwahl" : seatInfo.toString();
