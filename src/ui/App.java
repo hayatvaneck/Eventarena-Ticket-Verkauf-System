@@ -103,6 +103,10 @@ public class App extends Application {
             eventTitle.setMaxHeight(Double.MAX_VALUE);
             eventTitle.setAlignment(Pos.TOP_LEFT);
 
+            // Flexibler Abstandshalter
+            javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+            javafx.scene.layout.VBox.setVgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
             // Datum des Events
             Label eventDate = new Label(event.getDateTime().format(germanDateTimeFormatter));
             eventDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
@@ -110,7 +114,7 @@ public class App extends Application {
             // Eventtyp auf der Karte
             Label eventTypeLabel = new Label(event.getEventType().toString());
             eventTypeLabel.setStyle(
-                "-fx-background-color: #34495e;" + 
+                "-fx-background-color: #2c3e50;" + 
                 "-fx-text-fill: white;" +
                 "-fx-padding: 3px 8px;" +
                 "-fx-font-size: 10px;" +
@@ -118,14 +122,14 @@ public class App extends Application {
                 "-fx-background-radius: 4px;"
             );
 
-            card.getChildren().addAll(eventTitle, eventDate, eventTypeLabel);
+            card.getChildren().addAll(eventTitle, spacer, eventDate, eventTypeLabel);
 
             // Hover Effekt
             card.setOnMouseEntered(e -> {
                 if (currentSelectedEvent != event) {
                     card.setStyle(
                         "-fx-background-color: #fdfdfd;" +
-                        "-fx-border-color: #2980b9;" +
+                        "-fx-border-color: #2c3e50;" +
                         "-fx-border-width: 1px;" +
                         "-fx-border-radius: 8px;" +
                         "-fx-background-radius: 8px;" +
@@ -164,7 +168,7 @@ public class App extends Application {
                 currentSelectedEvent = event;
                 card.setStyle(
                     "-fx-background-color: #ebf5fb;" +
-                    "-fx-border-color: #2980b9;" +
+                    "-fx-border-color: #2c3e50;" +
                     "-fx-border-width: 2px;" +
                     "-fx-border-radius: 8px;" + 
                     "-fx-background-radius: 8px;" +
@@ -529,7 +533,7 @@ public class App extends Application {
         });
 
         Button btnCancel = new Button("Abbrechen");
-        btnCancel.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
+        btnCancel.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
         btnCancel.setOnAction(e -> showGraphicSectionSelection());
 
         root.getChildren().addAll(title, infoLabel, new Label("Vorname:"), txtFirstName, new Label("Nachname:"), txtLastName,
@@ -689,6 +693,29 @@ public class App extends Application {
         standingArea.setFill(Color.web("#2c3e50", 0.15));
         standingArea.setStroke(Color.web("#2c3e50", 0.4));
         standingArea.setStrokeWidth(1);
+
+        // Tooltip für den Stehplatzbereich
+        Section standingSection = findSectionByName("Innenraum (Stehplatz)");
+        if (standingSection != null && currentSelectedEvent != null) {
+            double calculatedPrice = currentSelectedEvent.getBasePrice() * standingSection.getPriceFactor();
+
+            Tooltip standingTooltip = new Tooltip(String.format(
+                "Innenraum (Stehplatz)\n" +
+                "-----------------------\n"+
+                "Ticketpreis: %.2f €",
+                calculatedPrice
+            ));
+            standingTooltip.setStyle(
+                "-fx-font-size: 12px;" +
+                "-fx-background-color: #2c3e50;" +
+                "-fx-text-fill: white;" +
+                "-fx-padding: 8px;" +
+                "-fx-background-radius: 4px;"
+            );
+            standingTooltip.setShowDelay(javafx.util.Duration.millis(100));
+            Tooltip.install(standingArea, standingTooltip);
+        }
+
         standingArea.setOnMouseEntered(e -> standingArea.setFill(Color.web("#2c3e50", 0.5)));
         standingArea.setOnMouseExited(e -> standingArea.setFill(Color.web("#2c3e50", 0.15)));
         standingArea.setOnMouseClicked(e -> {
@@ -811,6 +838,32 @@ private void setupStandardBlock(Polygon block, String sectionName) {
             showSeatSelection();
         }
     });
+
+    Section section = findSectionByName(sectionName);
+
+    if (section != null && currentSelectedEvent != null) {
+        double calculatedPrice = currentSelectedEvent.getBasePrice() * section.getPriceFactor();
+
+        String tooltipText = String.format(
+            "%s\n" +
+            "-----------------------\n" +
+            "Ticketpreis: %.2f €",
+            sectionName,
+            calculatedPrice
+        );
+
+        Tooltip tooltip = new Tooltip(tooltipText);
+        tooltip.setStyle(
+            "-fx-font-size: 12px;" +
+            "-fx-background-color: #2c3e50;" +
+            "-fx-text-fill: white;" +
+            "-fx-padding: 8px;" +
+            "-fx-background-radius: 4px"
+        );
+        tooltip.setShowDelay(javafx.util.Duration.millis(100));
+
+        Tooltip.install(block, tooltip);
+    }
 }
 
 private StackPane createGalaLayout() {
