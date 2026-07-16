@@ -10,7 +10,6 @@ import controller.SeatSelectionController;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javafx.application.Application;
@@ -19,12 +18,14 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Polygon;
@@ -35,12 +36,19 @@ public class App extends Application {
     private Stage primaryStage;
     private final EventRepository eventRepo = EventRepository.getInstance();
     private final BookingService bookingService = new BookingService();
+    private final UserRepository userRepo = new UserRepository();
+    private User loggedInUser = null;
 
     // Globale Zustände für den Buchungsprozess
     private Event currentSelectedEvent = null;
     private Section currentSelectedSection = null;
     private Label selectionStatusLabel = new Label("Kein Platz ausgewählt");
     private long customerIdCounter = 1L;
+
+    // Methode, zum prüfen, ob jemand eingeloggt ist
+    public boolean isLoggedIn() {
+        return loggedInUser != null;
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -54,8 +62,45 @@ public class App extends Application {
     private void showMainMenu() {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30));
-        root.setAlignment(Pos.CENTER);
+        root.setAlignment(Pos.TOP_CENTER);
         root.setStyle("-fx-background-color: #f5f5f7;");
+
+        // Dynamische Header Bar
+        javafx.scene.layout.HBox headerBar = new javafx.scene.layout.HBox(15);
+        headerBar.setPadding(new Insets(10, 15, 10, 15));
+        headerBar.setAlignment(Pos.CENTER_RIGHT);
+        headerBar.setStyle(
+            "-fx-background-color: white;" +
+            "-fx-background-radius: 8px;" +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);"
+        );
+
+        if (isLoggedIn()) {
+            Label welcomeLabel = new Label("Angemeldet als: " + loggedInUser.getFirstName() + " " + loggedInUser.getLastName());
+            welcomeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+            Button myTicketsButton = new Button("Meine Tickets");
+            myTicketsButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px;");
+            myTicketsButton.setOnAction(e -> showMyTicketsView());
+
+            Button logoutButton = new Button("Abmelden");
+            logoutButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 4px;");
+            logoutButton.setOnAction(e -> {
+                loggedInUser = null;
+                showMainMenu();
+            });
+
+            headerBar.getChildren().addAll(welcomeLabel, myTicketsButton, logoutButton);
+        } else {
+            Label guestLabel = new Label("Sie sind als Gast unterwegs.");
+            guestLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
+
+            Button loginButton = new Button("Anmelden / Registrieren");
+            loginButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px;");
+            loginButton.setOnAction(e -> showLoginView());
+
+            headerBar.getChildren().addAll(guestLabel, loginButton);
+        }
 
         Label title = new Label("ARENA TICKETSYSTEM");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
@@ -200,7 +245,7 @@ public class App extends Application {
             }
         });
 
-        root.getChildren().addAll(title, subtitle, scrollPane, nextButton);
+        root.getChildren().addAll(headerBar, title, subtitle, scrollPane, nextButton);
         Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -309,6 +354,216 @@ public class App extends Application {
     }
     */
 
+
+    // TICKET VIEW
+    private void showMyTicketsView() {
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(30));
+        root.setAlignment(Pos.TOP_CENTER);
+        root.setStyle("-fx-background-color: #f5f5f7;");
+
+        Label title = new Label("MEINE TICKETS");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+
+        VBox ticketContainer = new VBox(15);
+        ticketContainer.setPadding(new Insets(10));
+        ticketContainer.setAlignment(Pos.TOP_CENTER);
+
+        List<Ticket> myTickets = loggedInUser.getPurchasedTickets();
+
+        if (myTickets == null || myTickets.isEmpty()) {
+            Label noTicketsLabel = new Label("Sie haben bisher noch keine Tickets gebucht.");
+            noTicketsLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px");
+            ticketContainer.getChildren().add(noTicketsLabel);
+        } else {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
+
+            for (Ticket ticket : myTickets) {
+                HBox ticketCard = new HBox(20);
+                ticketCard.setPadding(new Insets(15));
+                ticketCard.setAlignment(Pos.CENTER_LEFT);
+                ticketCard.setStyle(
+                    "-fx-background-color: white; " +
+                    "-fx-border-color: #2ecc71; " + 
+                    "-fx-border-width: 1px 1px 1px 5px; " + 
+                    "-fx-border-radius: 4px; " +
+                    "-fx-background-radius: 4px; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);"
+                );
+
+                VBox details = new VBox(5);
+
+                String eventTitle = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "Event-Ticket";
+                String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(dtf) : "";
+
+                Label lblEvent = new Label(eventTitle);
+                lblEvent.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
+
+                Label lblDate = new Label(eventDate);
+                lblDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
+
+                String seatInfo = "Bereich: " + ticket.getSection() + " | Platz: "; // MUSS NOCH BEFÜLLT WERDEN 
+                Label lblSeat = new Label(seatInfo);
+                lblSeat.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px;");
+
+                details.getChildren().addAll(lblEvent, lblDate, lblSeat);
+
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                Label lblPrice = new Label(String.format("%.2f €", ticket.getFinalPrice()));
+                lblPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+                ticketCard.getChildren().addAll(details, spacer, lblPrice);
+                ticketContainer.getChildren().add(ticketCard);
+            }
+        }
+
+        scrollPane.setContent(ticketContainer);
+
+        Button backButton = new Button("Zurück zum Hauptmenü");
+        backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px;");
+        backButton.setOnAction(e -> showMainMenu());
+
+        root.getChildren().addAll(title, scrollPane, backButton);
+
+        Scene scene = new Scene(root, 800, 700);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    // LOGIN SCREEN
+    private void showLoginView() {
+        VBox loginRoot = new VBox(15);
+        loginRoot.setPadding(new Insets(40));
+        loginRoot.setAlignment(Pos.CENTER);
+        loginRoot.setStyle("-fx-background-color: #f5f5f7");
+
+        Label title = new Label("KUNDEN LOGIN");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        TextField emailField = new TextField();
+        emailField.setPromptText("Benutzername");
+        emailField.setPrefWidth(250);
+        emailField.setMaxWidth(250);
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Passwort");
+        passwordField.setPrefWidth(250);
+        passwordField.setMaxWidth(250);
+
+        Button loginBtn = new Button("Einloggen");
+        loginBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;");
+        loginBtn.setPrefWidth(250);
+
+        Label registerLink = new Label("Noch kein Konto? Hier registrieren");
+        registerLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
+
+        // Login Logik
+        loginBtn.setOnAction(e -> {
+            String email = emailField.getText();
+            String password = passwordField.getText();
+
+            //Hilfsobjekt zur Verwaltung der registrierten Nutzer
+            User user = userRepo.validateUser(email, password);
+            if (user != null) {
+                this.loggedInUser = user;
+                showMainMenu();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Fehler", "Falscher Benutzername oder Passwort.");
+            }
+        });
+
+        registerLink.setOnMouseClicked(e -> showRegisterView());
+
+        loginRoot.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink);
+        primaryStage.setScene(new Scene(loginRoot, 800, 700));
+    }
+
+    // REGISTRIERUNGS SCREEN
+    private void showRegisterView() {
+        VBox registerRoot = new VBox(15);
+        registerRoot.setPadding(new Insets(40));
+        registerRoot.setAlignment(Pos.CENTER);
+        registerRoot.setStyle("-fx-background-color: #f5f5f7;");
+
+        Label title = new Label("NEUES KONTO ERSTELLEN");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        TextField firstNameField = new TextField();
+        firstNameField.setPromptText("Vorname");
+        firstNameField.setPrefWidth(250);
+        firstNameField.setMaxWidth(250);
+
+        TextField lastNameField = new TextField();
+        lastNameField.setPromptText("Nachname");
+        lastNameField.setPrefWidth(250);
+        lastNameField.setMaxWidth(250);
+
+        TextField emailField = new TextField();
+        emailField.setPromptText("E-Mail-Adresse");
+        emailField.setPrefWidth(250);
+        emailField.setMaxWidth(250);
+
+        TextField passwordField = new TextField();
+        passwordField.setPromptText("Passwort");
+        passwordField.setPrefWidth(250);
+        passwordField.setMaxWidth(250);
+
+        Button registerBtn = new Button("Registrieren");
+        registerBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;");
+        registerBtn.setPrefWidth(250);
+
+        Label backToLoginLink = new Label("Bereits ein Konto? Zum Login");
+        backToLoginLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
+
+        registerBtn.setOnAction(e -> {
+            String firstName = firstNameField.getText().trim();
+            String lastName = lastNameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = passwordField.getText().trim();
+
+            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte füllen Sie alle Felder aus.");
+                return;
+            }
+
+            if (!email.contains("@") || !email.contains(".")) {
+                showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte geben Sie eine gültige E-Mail-Adresse ein.");
+                return;
+            }
+
+            User newUser = new User(firstName, lastName, email, password);
+
+            boolean success = userRepo.registerUser(newUser);
+
+            if(success) {
+                showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Registrierung erfolgreich!");
+                showLoginView();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Fehler", "Diese E-Mail-Adresse ist bereits registriert.");
+            }
+        });
+
+        backToLoginLink.setOnMouseClicked(e -> showLoginView());
+
+        registerRoot.getChildren().addAll(
+            title,
+            firstNameField,
+            lastNameField,
+            emailField,
+            passwordField,
+            registerBtn,
+            backToLoginLink
+        );
+
+        primaryStage.setScene(new Scene(registerRoot, 800, 700));
+    }
+
     // --- SCREEN 2: SITZAUSWAHL ---
     public void showSeatSelection() {
         if (!(currentSelectedSection instanceof SeatedSection)) {
@@ -388,7 +643,7 @@ public class App extends Application {
         ticketSpinner.setPrefWidth(100);
 
         Button confirmButton = new Button("Auswahl bestätigen");
-        confirmButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
+        confirmButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
         confirmButton.setPrefWidth(200);
 
         confirmButton.setOnAction(e -> {
@@ -449,6 +704,14 @@ public class App extends Application {
         txtFirstName.setMaxWidth(250);
         txtLastName.setMaxWidth(250);
 
+        if (isLoggedIn()) {
+            txtFirstName.setText(loggedInUser.getFirstName());
+            txtLastName.setText(loggedInUser.getLastName());
+
+            txtFirstName.setDisable(true);
+            txtLastName.setDisable(true);
+        }
+
         ComboBox<String> cbCustomerType = new ComboBox<>();
         cbCustomerType.getItems().addAll("REGULAR", "STUDENT", "RENTNER");
         cbCustomerType.setPromptText("Kundentyp auswählen");
@@ -459,61 +722,63 @@ public class App extends Application {
         btnFinalBook.setPrefWidth(200);
 
         btnFinalBook.setOnAction(e -> {
-            String firstName = txtFirstName.getText().trim();
-            String lastName = txtLastName.getText().trim();
+            String firstName;
+            String lastName;
+            String customerType = cbCustomerType.getValue();
 
-            if (firstName.isBlank() || lastName.isBlank()) {
-                showAlert(Alert.AlertType.ERROR, "Fehler", "Bitte füllen Sie alle Namensfelder aus!");
-                return;
-            }
+            // Prüfen ob ein User eingelogged ist
+            if (loggedInUser != null) {
+                firstName = loggedInUser.getFirstName();
+                lastName = loggedInUser.getLastName();
+            } else {
+                firstName = txtFirstName.getText().trim();
+                lastName = txtLastName.getText().trim();
 
-            String nameRegex = "^[a-zA-ZäöüÄÖÜß\\s\\-]+$";
-
-            if (!firstName.matches(nameRegex) || !lastName.matches(nameRegex)) {
-                showAlert(Alert.AlertType.WARNING,
-                    "Ungültige Namenseingabe",
-                    "Die Namensfelder dürfen keine Zahlen oder Sonderzeichen enthalten. Bitte korrigieren Sie Ihre Eingabe.");
+                if (firstName.isBlank() || lastName.isBlank()) {
+                    showAlert(Alert.AlertType.ERROR, "Fehler", "Bitte füllen Sie alle Namensfelder aus.");
                     return;
+                }
+
+                String nameRegex = "^[a-zA-ZäöüÄÖÜß\\s\\-]+$";
+                if (!firstName.matches(nameRegex) || !lastName.matches(nameRegex)) {
+                    showAlert(Alert.AlertType.WARNING, "Ungültige Namenseingabe", "Die Namensfelder dürfen keine Zahlen oder Sonderzeichen enthalten.");
+                    return;
+                }
             }
 
-            Customer customer = new Customer(customerIdCounter++, txtFirstName.getText(), txtLastName.getText(), cbCustomerType.getValue());
+            Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
 
             List<Ticket> generatedTickets = new ArrayList<>();
             double totalExtendedPrice = 0.0;
 
             try {
                 if (currentSelectedSection instanceof SeatedSection) {
-
-                    // Ausführung der Buchung im Service
                     for (Seat seat : chosenSeats) {
-                        Ticket ticket = bookingService.bookSpecificTicket(
-                            currentSelectedEvent.getId(),
-                            currentSelectedSection.getName(),
-                            seat.getRowNumber(),
-                            seat.getSeatNumber(),
-                            customer
-                        );
+                        Ticket ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer);
                         generatedTickets.add(ticket);
                         totalExtendedPrice += ticket.getFinalPrice();
                     }
                 } else if (currentSelectedSection instanceof StandingSection) {
-
                     for (Seat seat : chosenSeats) {
-                        Ticket ticket = bookingService.bookTicket(
-                            currentSelectedEvent.getId(), 
-                            currentSelectedSection.getName(), 
-                            customer
-                        );
+                        Ticket ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer);
                         generatedTickets.add(ticket);
                         totalExtendedPrice += ticket.getFinalPrice();
                     }
-
                 }
-                    
-                // Erfolgsmeldung
+
+                // Tickets dem Profil des users hinzufügen
+                if (loggedInUser != null) {
+                    for (Ticket ticket : generatedTickets) {
+                        loggedInUser.addTicket(ticket);
+                    }
+                    userRepo.saveUsersToFile();
+                }
+
+                //Erfolgsmeldung
                 StringBuilder successMessage = new StringBuilder();
-                successMessage.append(String.format("Kunde: %s\nGesamtpreis: %.2f EUR\n\nGenerierte Ticket-IDs:\n",
-                        customer.getFullName(), totalExtendedPrice));
+                successMessage.append(String.format("Kunde: %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n",
+                        customer.getFullName(), totalExtendedPrice
+                ));
                 for (Ticket t : generatedTickets) {
                     successMessage.append("- ").append(t.getTicketId()).append("\n");
                 }
@@ -524,11 +789,9 @@ public class App extends Application {
                 successAlert.setContentText(successMessage.toString());
                 successAlert.showAndWait();
 
-                // Zurück zum Hauptmenü
                 showMainMenu();
-
-            } catch (SeatAlreadyBookedException ex) {
-                showAlert(Alert.AlertType.ERROR, "Buchung fehlgeschlagen", ex.getMessage());
+            } catch (Exception ex) {
+                showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
             }
         });
 
