@@ -1,3 +1,6 @@
 ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice;seatInfo;userEmail
 T-1001;1;Innenraum (Stehplatz);1;Gian-Luca;Levels;REGULAR;100.0;Freie Platzwahl (Stehplatz);gian-luca.levels@bsr.de
 T-1002;1;Innenraum (Stehplatz);1;Gian-Luca;Levels;REGULAR;100.0;Freie Platzwahl (Stehplatz);gian-luca.levels@bsr.de
+T-1003;1;Innenraum (Stehplatz);1;Gian-Luca;Levels;REGULAR;100.0;Freie Platzwahl (Stehplatz);gian-luca.levels@bsr.de
+T-1004;1;VIP;1;Gian-Luca;Levels;REGULAR;250.0;Reihe 1, Platz 7;gian-luca.levels@bsr.de
+T-1005;1;VIP;1;Gian-Luca;Levels;REGULAR;250.0;Reihe 1, Platz 8;gian-luca.levels@bsr.de

@@ -39,6 +39,7 @@ public class App extends Application {
     private final BookingService bookingService = new BookingService();
     private final UserRepository userRepo = new UserRepository();
     private User loggedInUser = null;
+    private Runnable postLoginAction = null; // Merkt sich was nach dem Login passieren soll
 
     // Globale Zustände für den Buchungsprozess
     private Event currentSelectedEvent = null;
@@ -491,13 +492,23 @@ public class App extends Application {
             User user = userRepo.validateUser(email, password);
             if (user != null) {
                 this.loggedInUser = user;
-                showMainMenu();
+
+                if (this.postLoginAction != null) {
+                    Runnable action = this.postLoginAction;
+                    this.postLoginAction = null;
+                    action.run();
+                } else {
+                    showMainMenu();
+                }
             } else {
                 showAlert(Alert.AlertType.ERROR, "Fehler", "Falscher Benutzername oder Passwort.");
             }
         });
 
-        btnBackToMain.setOnAction(e -> showMainMenu());
+        btnBackToMain.setOnAction(e -> {
+            this.postLoginAction = null;
+            showMainMenu();
+        });
 
         registerLink.setOnMouseClicked(e -> showRegisterView());
 
@@ -634,7 +645,7 @@ public class App extends Application {
         confirmButton.setOnAction(e -> {
             List<Seat> chosenSeats = controller.getSelectedSeats();
             if (!chosenSeats.isEmpty()) {
-                showBookingForm(chosenSeats);
+                ensureLoggedIn(() -> showBookingForm(chosenSeats));
             } else {
                 showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz", "Bitte wählen Sie einen freien Sitzplatz aus!");
             }
@@ -678,7 +689,7 @@ public class App extends Application {
                 virtualSeats.add(new Seat(0, i));
             }
 
-            showBookingForm(virtualSeats);
+            ensureLoggedIn(() -> showBookingForm(virtualSeats));
         });
 
         Button backButton = new Button("Zurück zum Saalplan");
@@ -746,78 +757,8 @@ public class App extends Application {
         btnFinalBook.setPrefWidth(200);
 
         btnFinalBook.setOnAction(e -> {
-            String firstName;
-            String lastName;
-            String customerType = cbCustomerType.getValue();
-
-            // Prüfen ob ein User eingelogged ist
-            if (loggedInUser != null) {
-                firstName = loggedInUser.getFirstName();
-                lastName = loggedInUser.getLastName();
-            } else {
-                firstName = txtFirstName.getText().trim();
-                lastName = txtLastName.getText().trim();
-
-                if (firstName.isBlank() || lastName.isBlank()) {
-                    showAlert(Alert.AlertType.ERROR, "Fehler", "Bitte füllen Sie alle Namensfelder aus.");
-                    return;
-                }
-
-                String nameRegex = "^[a-zA-ZäöüÄÖÜß\\s\\-]+$";
-                if (!firstName.matches(nameRegex) || !lastName.matches(nameRegex)) {
-                    showAlert(Alert.AlertType.WARNING, "Ungültige Namenseingabe", "Die Namensfelder dürfen keine Zahlen oder Sonderzeichen enthalten.");
-                    return;
-                }
-            }
-
-            Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
-
-            List<Ticket> generatedTickets = new ArrayList<>();
-            double totalExtendedPrice = 0.0;
-            String userEmail = (loggedInUser != null) ? loggedInUser.getEmail() : null;
-
-            try {
-                if (currentSelectedSection instanceof SeatedSection) {
-                    for (Seat seat : chosenSeats) {
-                        Ticket ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
-                        generatedTickets.add(ticket);
-                        totalExtendedPrice += ticket.getFinalPrice();
-                    }
-                } else if (currentSelectedSection instanceof StandingSection) {
-                    for (Seat seat : chosenSeats) {
-                        Ticket ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer, userEmail);
-                        generatedTickets.add(ticket);
-                        totalExtendedPrice += ticket.getFinalPrice();
-                    }
-                }
-
-                // Tickets dem Profil des users hinzufügen
-                if (loggedInUser != null) {
-                    for (Ticket ticket : generatedTickets) {
-                        loggedInUser.addTicket(ticket);
-                    }
-                    userRepo.saveUsersToFile();
-                }
-
-                //Erfolgsmeldung
-                StringBuilder successMessage = new StringBuilder();
-                successMessage.append(String.format("Kunde: %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n",
-                        customer.getFullName(), totalExtendedPrice
-                ));
-                for (Ticket t : generatedTickets) {
-                    successMessage.append("- ").append(t.getTicketId()).append("\n");
-                }
-
-                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                successAlert.setTitle("Buchung erfolgreich!");
-                successAlert.setHeaderText("Tickets erfolgreich gebucht.");
-                successAlert.setContentText(successMessage.toString());
-                successAlert.showAndWait();
-
-                showMainMenu();
-            } catch (Exception ex) {
-                showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
-            }
+            String selectedType = cbCustomerType.getValue();
+            ensureLoggedIn(() -> executeBooking(selectedType, chosenSeats));
         });
 
         Button btnCancel = new Button("Abbrechen");
@@ -828,6 +769,57 @@ public class App extends Application {
                 new Label("Kundentyp:"), cbCustomerType, btnFinalBook, btnCancel);
         Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
+    }
+
+    private void executeBooking(String customerType, List<Seat> chosenSeats) {
+        String firstName = loggedInUser.getFirstName();
+        String lastName = loggedInUser.getLastName();
+        
+        Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
+
+        List<Ticket> generatedTickets = new ArrayList<>();
+        double totalExtendedPrice = 0.0;
+        String userEmail = loggedInUser.getEmail();
+
+        try {
+            if (currentSelectedSection instanceof SeatedSection) {
+                for (Seat seat : chosenSeats) {
+                    Ticket ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
+                    generatedTickets.add(ticket);
+                    totalExtendedPrice += ticket.getFinalPrice();
+                }
+            } else if (currentSelectedSection instanceof StandingSection) {
+                for (Seat seat : chosenSeats) {
+                    Ticket ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer, userEmail);
+                    generatedTickets.add(ticket);
+                    totalExtendedPrice += ticket.getFinalPrice();
+                }
+            }
+
+            for (Ticket ticket : generatedTickets) {
+                loggedInUser.addTicket(ticket);
+            }
+            userRepo.saveUsersToFile();
+
+            // Erfolgsmeldung
+            StringBuilder successMessage = new StringBuilder();
+            successMessage.append(String.format("Kunde: %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n",
+                    customer.getFullName(), totalExtendedPrice
+            ));
+            for (Ticket t : generatedTickets) {
+                successMessage.append("- ").append(t.getTicketId()).append("\n");
+            }
+
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            successAlert.setTitle("Buchung erfolgreich!");
+            successAlert.setHeaderText("Tickets erfolgreich gebucht.");
+            successAlert.setContentText(successMessage.toString());
+            successAlert.showAndWait();
+
+            showMainMenu();
+        } catch (Exception ex) {
+            showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
+        }
     }
 
     public void updateSelectionLabel(String text) {
@@ -1111,6 +1103,18 @@ private StackPane createBasketballLayout() {
     return mapContainer;
 }
 
+private StackPane createGalaLayout() {
+    StackPane mapContainer = new StackPane();
+    mapContainer.setStyle("-fx-background-color: #34495e; -fx-border-color: gold;");
+    mapContainer.setPrefSize(600,400);
+
+    Label placeholder = new Label("Gala-Saalplan (Noch in Entwicklung)");
+    placeholder.setStyle("-fx-text-fill: white; -fx-font-size: 16px");
+
+    mapContainer.getChildren().add(placeholder);
+    return mapContainer;
+}
+
 // Hilfsmethode für das Stylen der Polygon um Code zu sparen
 private void setupStandardBlock(Polygon block, String sectionName) {
     block.setFill(Color.web("#2c3e50", 0.15));
@@ -1154,17 +1158,6 @@ private void setupStandardBlock(Polygon block, String sectionName) {
     }
 }
 
-private StackPane createGalaLayout() {
-    StackPane mapContainer = new StackPane();
-    mapContainer.setStyle("-fx-background-color: #34495e; -fx-border-color: gold;");
-    mapContainer.setPrefSize(600,400);
-
-    Label placeholder = new Label("Gala-Saalplan (Noch in Entwicklung)");
-    placeholder.setStyle("-fx-text-fill: white; -fx-font-size: 16px");
-
-    mapContainer.getChildren().add(placeholder);
-    return mapContainer;
-}
 
         
         // 2. Container für das Bild und die klickbaren Bereiche
@@ -1188,6 +1181,18 @@ private StackPane createGalaLayout() {
             }
         }
         return null;
+    }
+
+    private void ensureLoggedIn(Runnable onLoggedInAction) {
+        if (this.loggedInUser != null) {
+            onLoggedInAction.run();
+        } else {
+            this.postLoginAction = onLoggedInAction;
+
+            showAlert(Alert.AlertType.INFORMATION, "Anmeldung erforderlich", "Bitte logge dich ein oder erstelle ein Konto, um die Buchung abzuschließen.");
+        
+            showLoginView();
+        }
     }
 
     public static void main(String[] args) {
