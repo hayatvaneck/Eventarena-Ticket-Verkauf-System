@@ -2,7 +2,7 @@ package ui;
 
 import domain.*;
 import domain.Event.EventType;
-import exceptions.SeatAlreadyBookedException;
+//import exceptions.SeatAlreadyBookedException;
 import repository.*;
 import service.BookingService;
 import controller.SeatSelectionController;
@@ -645,7 +645,7 @@ public class App extends Application {
         confirmButton.setOnAction(e -> {
             List<Seat> chosenSeats = controller.getSelectedSeats();
             if (!chosenSeats.isEmpty()) {
-                ensureLoggedIn(() -> showBookingForm(chosenSeats));
+                showBookingForm(chosenSeats);
             } else {
                 showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz", "Bitte wählen Sie einen freien Sitzplatz aus!");
             }
@@ -689,7 +689,7 @@ public class App extends Application {
                 virtualSeats.add(new Seat(0, i));
             }
 
-            ensureLoggedIn(() -> showBookingForm(virtualSeats));
+            showBookingForm(virtualSeats);
         });
 
         Button backButton = new Button("Zurück zum Saalplan");
@@ -703,97 +703,93 @@ public class App extends Application {
 
     // --- SCREEN 3: BUCHUNGSFORMULAR ---
     private void showBookingForm(List<Seat> chosenSeats) {
-        VBox root = new VBox(12);
-        root.setPadding(new Insets(25));
-        root.setAlignment(Pos.CENTER);
+        ensureLoggedIn(() ->{
+            VBox root = new VBox(15);
+            root.setPadding(new Insets(30));
+            root.setAlignment(Pos.CENTER);
+            root.setStyle("-fx-background-color: #f5f5f7");
 
-        Label title = new Label("Personalisierung & Zahlung");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-filling: #2c3e50");
+            Label title = new Label("Personalisierung & Zahlung");
+            title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-filling: #2c3e50");
 
-        StringBuilder seatInfo = new StringBuilder();
-        boolean isStandingArea = false;
+            Label lblBuyer = new Label("Käufer: " + loggedInUser.getFirstName() + " " + loggedInUser.getLastName());
+            lblBuyer.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e");
 
-        for (Seat s : chosenSeats) {
-            if (s.getRowNumber() == 0) {
-                isStandingArea = true;
-                break;
+            VBox formContainer = new VBox(10);
+            formContainer.setAlignment(Pos.CENTER);
+
+            List<ComboBox<String>> typeComboBoxes = new ArrayList<>();
+
+            for (int i = 0; i < chosenSeats.size(); i++) {
+                Seat seat = chosenSeats.get(i);
+
+                HBox row = new HBox(15);
+                row.setAlignment(Pos.CENTER);
+
+                String seatLabelText = (seat != null)
+                    ? "Sitzplatz: Reihe " + seat.getRowNumber() + ", Platz " + seat.getSeatNumber()
+                    : "Ticket " + (i + 1);
+                Label lblSeat = new Label(seatLabelText);
+                lblSeat.setStyle("-fx-pref-width: 180px; -fx-alignemnt: center-left;");
+
+                ComboBox<String> cbType = new ComboBox<>();
+                cbType.getItems().addAll("Standard","Student","Rentner");
+                cbType.setValue("Standard");
+                cbType.setPrefWidth(120);
+
+                row.getChildren().addAll(lblSeat, cbType);
+                formContainer.getChildren().add(row);
+
+                typeComboBoxes.add(cbType);
             }
-            seatInfo.append(String.format(" Reihe: %d, Platz: %d |", s.getRowNumber(), s.getSeatNumber()));
-        }
 
-        String seatDetails = isStandingArea ? "Freie Platzwahl" : seatInfo.toString();
+            ScrollPane scrollPane = new ScrollPane(formContainer);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setStyle("-fx-background-color: transparent; -fx-background: #f5f5f7;");
+            scrollPane.setPrefHeight(300);
 
-        // Deutsches Datenformat einfügen
-        DateTimeFormatter germanDateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
-        String formatiertesDatum = currentSelectedEvent.getDateTime().format(germanDateTimeFormatter);
+            Button btnFinalBook = new Button("Jetzt kostenpflichtig buchen");
+            btnFinalBook.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;");
+            btnFinalBook.setPrefWidth(250);
 
-        Label infoLabel = new Label(String.format("Event: %s\nDatum: %s\nBlock: %s\nDetails: %s",
-                currentSelectedEvent.getTitle(), formatiertesDatum, currentSelectedSection.getName(), seatDetails));
-        infoLabel.setStyle("-fx-background-color: #ecf0f1; -fx-padding: 10;");
+            btnFinalBook.setOnAction(e -> {
+                List<String> chosenTypes = new ArrayList<>();
+                for (ComboBox<String> cb : typeComboBoxes) {
+                    chosenTypes.add(cb.getValue());
+                }
 
-        TextField txtFirstName = new TextField();
-        txtFirstName.setPromptText("Vorname");
-        TextField txtLastName = new TextField();
-        txtLastName.setPromptText("Nachname");
+                executeBooking(chosenSeats, chosenTypes);
+            });
 
-        txtFirstName.setMaxWidth(250);
-        txtLastName.setMaxWidth(250);
-
-        if (isLoggedIn()) {
-            txtFirstName.setText(loggedInUser.getFirstName());
-            txtLastName.setText(loggedInUser.getLastName());
-
-            txtFirstName.setDisable(true);
-            txtLastName.setDisable(true);
-        }
-
-        ComboBox<String> cbCustomerType = new ComboBox<>();
-        cbCustomerType.getItems().addAll("REGULAR", "STUDENT", "RENTNER");
-        cbCustomerType.setPromptText("Kundentyp auswählen");
-        cbCustomerType.getSelectionModel().selectFirst();
-
-        Button btnFinalBook = new Button("Kostenpflichtig buchen (" + chosenSeats.size() + " Tickets)");
-        btnFinalBook.setStyle("-fx-background-color: #d4af37; -fx-text-fill: white; -fx-font-weight: bold;");
-        btnFinalBook.setPrefWidth(200);
-
-        btnFinalBook.setOnAction(e -> {
-            String selectedType = cbCustomerType.getValue();
-            ensureLoggedIn(() -> executeBooking(selectedType, chosenSeats));
+            root.getChildren().addAll(title, lblBuyer, scrollPane, btnFinalBook);
+            primaryStage.setScene(new Scene(root, 800, 700));
         });
+    }   
 
-        Button btnCancel = new Button("Abbrechen");
-        btnCancel.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
-        btnCancel.setOnAction(e -> showGraphicSectionSelection());
-
-        root.getChildren().addAll(title, infoLabel, new Label("Vorname:"), txtFirstName, new Label("Nachname:"), txtLastName,
-                new Label("Kundentyp:"), cbCustomerType, btnFinalBook, btnCancel);
-        Scene scene = new Scene(root, 800, 700);
-        primaryStage.setScene(scene);
-    }
-
-    private void executeBooking(String customerType, List<Seat> chosenSeats) {
+    private void executeBooking(List<Seat> chosenSeats, List<String> chosenTypes) {
         String firstName = loggedInUser.getFirstName();
         String lastName = loggedInUser.getLastName();
-        
-        Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
+        String userEmail = loggedInUser.getEmail();
 
         List<Ticket> generatedTickets = new ArrayList<>();
         double totalExtendedPrice = 0.0;
-        String userEmail = loggedInUser.getEmail();
 
         try {
-            if (currentSelectedSection instanceof SeatedSection) {
-                for (Seat seat : chosenSeats) {
-                    Ticket ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
-                    generatedTickets.add(ticket);
-                    totalExtendedPrice += ticket.getFinalPrice();
+            for (int i = 0; i < chosenSeats.size(); i++) {
+                Seat seat = chosenSeats.get(i);
+                String currentType = chosenTypes.get(i);
+
+                Customer customer = new Customer(customerIdCounter++, firstName, lastName, currentType);
+
+                Ticket ticket;
+                if (currentSelectedSection instanceof SeatedSection) {
+                    ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
+                } else {
+                    ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer, userEmail);
                 }
-            } else if (currentSelectedSection instanceof StandingSection) {
-                for (Seat seat : chosenSeats) {
-                    Ticket ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer, userEmail);
-                    generatedTickets.add(ticket);
-                    totalExtendedPrice += ticket.getFinalPrice();
-                }
+
+                generatedTickets.add(ticket);
+                totalExtendedPrice += ticket.getFinalPrice();
             }
 
             for (Ticket ticket : generatedTickets) {
@@ -801,13 +797,23 @@ public class App extends Application {
             }
             userRepo.saveUsersToFile();
 
-            // Erfolgsmeldung
             StringBuilder successMessage = new StringBuilder();
-            successMessage.append(String.format("Kunde: %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n",
-                    customer.getFullName(), totalExtendedPrice
-            ));
+            successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n", firstName, lastName, totalExtendedPrice));
+
             for (Ticket t : generatedTickets) {
-                successMessage.append("- ").append(t.getTicketId()).append("\n");
+                if (currentSelectedSection instanceof StandingSection) {
+                    successMessage.append(String.format("- Stehplatz %s (%s) - %.2f EUR\n", 
+                        t.getTicketId(), 
+                        t.getCustomer().getCustomerType(), 
+                        t.getFinalPrice()
+                    ));
+                } else {
+                    successMessage.append(String.format("- Sitzplatz %s (%s) - %.2f EUR\n",
+                        t.getTicketId(),
+                        t.getCustomer().getCustomerType(),
+                        t.getFinalPrice()
+                    ));
+                }
             }
 
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -817,10 +823,10 @@ public class App extends Application {
             successAlert.showAndWait();
 
             showMainMenu();
-        } catch (Exception ex) {
-            showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
-        }
+    } catch (Exception ex) {
+        showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
     }
+}
 
     public void updateSelectionLabel(String text) {
         selectionStatusLabel.setText(text);
@@ -1001,15 +1007,9 @@ public class App extends Application {
         standingArea.setOnMouseClicked(e -> {
             currentSelectedSection = findSectionByName("Innenraum (Stehplatz)");
             if (currentSelectedSection instanceof StandingSection) {
-                Seat virtualStandingSeat = new Seat(0,0);
-                List<Seat> chosenSeats = new ArrayList<>();
-                chosenSeats.add(virtualStandingSeat);
-                
-                showBookingForm(chosenSeats);
-            }
-            
-            if (currentSelectedSection != null) {
                 showStandingAreaSelection();
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Fehler", "Der Stehplatzbereich konnte nicht geladen werden.");
             }
         });
         
