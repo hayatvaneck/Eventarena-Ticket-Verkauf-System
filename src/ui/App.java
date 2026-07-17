@@ -20,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import javafx.scene.image.Image;
@@ -406,7 +407,7 @@ public class App extends Application {
                 Label lblDate = new Label(eventDate);
                 lblDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
 
-                String seatInfo = "Bereich: " + ticket.getSection() + " | Platz: "; // MUSS NOCH BEFÜLLT WERDEN 
+                String seatInfo = "Bereich: " + ticket.getSection().getName() + ", Platz: " + ticket.getSeatInfo(); 
                 Label lblSeat = new Label(seatInfo);
                 lblSeat.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px;");
 
@@ -438,10 +439,13 @@ public class App extends Application {
 
     // LOGIN SCREEN
     private void showLoginView() {
+        BorderPane mainRoot = new BorderPane();
+        mainRoot.setStyle("-fx-background-color: #f5f5f7");
+
         VBox loginRoot = new VBox(15);
         loginRoot.setPadding(new Insets(40));
         loginRoot.setAlignment(Pos.CENTER);
-        loginRoot.setStyle("-fx-background-color: #f5f5f7");
+        loginRoot.setStyle("-fx-background-color: transparent");
 
         Label title = new Label("KUNDEN LOGIN");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
@@ -457,11 +461,26 @@ public class App extends Application {
         passwordField.setMaxWidth(250);
 
         Button loginBtn = new Button("Einloggen");
-        loginBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;");
+        loginBtn.setDefaultButton(true);
+        loginBtn.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold;");
         loginBtn.setPrefWidth(250);
 
+        
         Label registerLink = new Label("Noch kein Konto? Hier registrieren");
         registerLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
+        
+        loginRoot.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink);
+        
+        Button btnBackToMain = new Button("Zurück zum Hauptmenü");
+        btnBackToMain.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand;");
+        btnBackToMain.setPrefWidth(150);
+
+        HBox bottomBar = new HBox(btnBackToMain);
+        bottomBar.setPadding(new Insets(20));
+        bottomBar.setAlignment(Pos.BOTTOM_LEFT);
+
+        mainRoot.setCenter(loginRoot);
+        mainRoot.setBottom(bottomBar);
 
         // Login Logik
         loginBtn.setOnAction(e -> {
@@ -478,14 +497,18 @@ public class App extends Application {
             }
         });
 
+        btnBackToMain.setOnAction(e -> showMainMenu());
+
         registerLink.setOnMouseClicked(e -> showRegisterView());
 
-        loginRoot.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink);
-        primaryStage.setScene(new Scene(loginRoot, 800, 700));
+        primaryStage.setScene(new Scene(mainRoot, 800, 700));
     }
 
     // REGISTRIERUNGS SCREEN
     private void showRegisterView() {
+        BorderPane mainRoot = new BorderPane();
+        mainRoot.setStyle("-fx-background-color: #f5f5f7");
+
         VBox registerRoot = new VBox(15);
         registerRoot.setPadding(new Insets(40));
         registerRoot.setAlignment(Pos.CENTER);
@@ -515,7 +538,8 @@ public class App extends Application {
         passwordField.setMaxWidth(250);
 
         Button registerBtn = new Button("Registrieren");
-        registerBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;");
+        registerBtn.setDefaultButton(true);
+        registerBtn.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold;");
         registerBtn.setPrefWidth(250);
 
         Label backToLoginLink = new Label("Bereits ein Konto? Zum Login");
@@ -750,17 +774,18 @@ public class App extends Application {
 
             List<Ticket> generatedTickets = new ArrayList<>();
             double totalExtendedPrice = 0.0;
+            String userEmail = (loggedInUser != null) ? loggedInUser.getEmail() : null;
 
             try {
                 if (currentSelectedSection instanceof SeatedSection) {
                     for (Seat seat : chosenSeats) {
-                        Ticket ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer);
+                        Ticket ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
                         generatedTickets.add(ticket);
                         totalExtendedPrice += ticket.getFinalPrice();
                     }
                 } else if (currentSelectedSection instanceof StandingSection) {
                     for (Seat seat : chosenSeats) {
-                        Ticket ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer);
+                        Ticket ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer, userEmail);
                         generatedTickets.add(ticket);
                         totalExtendedPrice += ticket.getFinalPrice();
                     }

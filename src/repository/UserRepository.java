@@ -1,6 +1,6 @@
 package repository;
 
-import domain.User;
+import domain.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +35,20 @@ public class UserRepository {
 
     public User validateUser(String email, String password) {
         User user = findUserByEmail(email);
-        if (user != null && user.getPassword().equals(password)) {
-            return user;
+
+        if (user == null || !user.getPassword().equals(password)) {
+            return null;
         }
-        return null;
+        user.getPurchasedTickets().clear();
+
+        List<Ticket> allTickets = TicketRepository.getInstance().findAll();
+
+        for (Ticket ticket : allTickets) {
+            if (ticket.getUserEmail() != null && ticket.getUserEmail().equalsIgnoreCase(user.getEmail())) {
+                user.addTicket(ticket);
+            }
+        }
+        return user;
     }
 
     public User findUserByEmail(String email) {

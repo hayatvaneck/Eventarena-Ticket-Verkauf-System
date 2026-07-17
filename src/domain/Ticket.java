@@ -6,13 +6,17 @@ public class Ticket {
     private final Section section;
     private final Customer customer;
     private final double finalPrice;
+    private final String seatInfo;
+    private String userEmail;
 
-    public Ticket(String ticketId, Event event, Section section, Customer customer, double finalPrice) {
+    public Ticket(String ticketId, Event event, Section section, Customer customer, double finalPrice, String seatInfo, String userEmail) {
         this.ticketId = ticketId;
         this.event = event;
         this.section = section;
         this.customer = customer;
         this.finalPrice = finalPrice;
+        this.seatInfo = seatInfo;
+        this.userEmail = userEmail;
     }
 
     // Anzeige des Tickets in der Konsole
@@ -24,6 +28,7 @@ public class Ticket {
         System.out.printf(" Event:         %s%n", event.getTitle());
         System.out.printf(" Datum/Zeit:    %s%n", event.getDateTime());
         System.out.printf(" Bereich:       %s%n", section.getName());
+        System.out.printf(" Platz:         %s%n", seatInfo);
         System.out.printf(" Kunde:         %s (%s)%n", customer.getFullName(), customer.getCustomerType());
         System.out.println("-------------------------------------------------------");
         System.out.printf(" Endpreis:      %.2f EUR%n", finalPrice);
@@ -45,5 +50,11 @@ public class Ticket {
     }
     public double getFinalPrice() {
         return finalPrice;
+    }
+    public String getSeatInfo() {
+        return seatInfo;
+    }
+    public String getUserEmail() {
+        return userEmail;
     }
 }

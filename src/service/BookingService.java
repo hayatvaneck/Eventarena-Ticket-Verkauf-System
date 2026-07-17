@@ -9,16 +9,18 @@ import java.util.List;
 public class BookingService {
     
     private final EventRepository eventRepo;
+    private final TicketRepository ticketRepo;
     private final List<Ticket> activeTickets;
     private long ticketIdCounter;
 
     public BookingService() {
         this.eventRepo = EventRepository.getInstance();
+        this.ticketRepo = TicketRepository.getInstance();
         this.activeTickets = new ArrayList<>();
-        this.ticketIdCounter = 1000L; // Ticketnummern starten bei 1000.
+        this.ticketIdCounter = 1000L + ticketRepo.findAll().size(); // Ticketnummern starten bei 1000.
     }
 
-    public Ticket bookTicket (Long eventId, String sectionName, Customer customer) throws SeatAlreadyBookedException{
+    public Ticket bookTicket (Long eventId, String sectionName, Customer customer, String userEmail) throws SeatAlreadyBookedException{
         // 1. Event suchen
         Event event = eventRepo.findById(eventId);
         if(event == null) {
@@ -41,17 +43,18 @@ public class BookingService {
         // 4. Ticket-ID generieren und Preis berechnen
         ticketIdCounter++;
         String generatedTicektId = "T-" + ticketIdCounter;
-
         double finalPrice = event.getBasePrice() * section.getPriceFactor();
+        String seatInfo = "Freie Platzwahl (Stehplatz)";
 
         // 5. Ticket Objekt erstellen und im Service speichern
-        Ticket newTicket = new Ticket(generatedTicektId, event, section, customer, finalPrice);
+        Ticket newTicket = new Ticket(generatedTicektId, event, section, customer, finalPrice, seatInfo, userEmail);
         activeTickets.add(newTicket);
+        ticketRepo.save(newTicket);
 
         return newTicket;
     }
 
-    public Ticket bookSpecificTicket(Long eventId, String sectionName, int row, int seatNumber, Customer customer) throws SeatAlreadyBookedException {
+    public Ticket bookSpecificTicket(Long eventId, String sectionName, int row, int seatNumber, Customer customer, String userEmail) throws SeatAlreadyBookedException {
         // 1. Event und Section suchen
         Event event = eventRepo.findById(eventId);
         if (event == null) {
@@ -83,9 +86,11 @@ public class BookingService {
         ticketIdCounter++;
         String generatedTicketId = "T-" + ticketIdCounter;
         double finalPrice = event.getBasePrice() * section.getPriceFactor();
+        String seatInfo = "Reihe " + row + ", Platz " + seatNumber;
 
-        Ticket newTicket = new Ticket(generatedTicketId, event, section, customer, finalPrice);
+        Ticket newTicket = new Ticket(generatedTicketId, event, section, customer, finalPrice, seatInfo, userEmail);
         activeTickets.add(newTicket);
+        ticketRepo.save(newTicket);
 
         return newTicket;
     }
