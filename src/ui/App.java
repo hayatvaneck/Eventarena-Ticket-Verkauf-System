@@ -78,17 +78,40 @@ public class App extends Application {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);"
         );
 
+        Label dateTimeLabel = new Label();
+        dateTimeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-size: 13px;");
+
+        DateTimeFormatter clockFormatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy | HH:mm:ss", java.util.Locale.GERMAN);
+
+        javafx.animation.Timeline clockTimer = new javafx.animation.Timeline(
+            new javafx.animation.KeyFrame(javafx.util.Duration.ZERO, e -> 
+                dateTimeLabel.setText(java.time.LocalDateTime.now().format(clockFormatter))
+            ),
+            new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1))
+        );
+        clockTimer.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        clockTimer.play();
+
+        Region headSpacer = new Region();
+        HBox.setHgrow(headSpacer, Priority.ALWAYS);
+
+        headerBar.getChildren().addAll(dateTimeLabel, headSpacer);
+
         if (isLoggedIn()) {
             Label welcomeLabel = new Label("Angemeldet als: " + loggedInUser.getFirstName() + " " + loggedInUser.getLastName());
             welcomeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
             Button myTicketsButton = new Button("Meine Tickets");
-            myTicketsButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px;");
-            myTicketsButton.setOnAction(e -> showMyTicketsView());
+            myTicketsButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
+            myTicketsButton.setOnAction(e -> {
+                clockTimer.stop();
+                showMyTicketsView();
+            });
 
             Button logoutButton = new Button("Abmelden");
-            logoutButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 4px;");
+            logoutButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 4px; -fx-cursor: hand;");
             logoutButton.setOnAction(e -> {
+                clockTimer.stop();
                 loggedInUser = null;
                 showMainMenu();
             });
@@ -99,8 +122,11 @@ public class App extends Application {
             guestLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
 
             Button loginButton = new Button("Anmelden / Registrieren");
-            loginButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px;");
-            loginButton.setOnAction(e -> showLoginView());
+            loginButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
+            loginButton.setOnAction(e -> {
+                clockTimer.stop();
+                showLoginView();
+            });
 
             headerBar.getChildren().addAll(guestLabel, loginButton);
         }
@@ -181,6 +207,7 @@ public class App extends Application {
                         "-fx-border-width: 1px;" +
                         "-fx-border-radius: 8px;" +
                         "-fx-background-radius: 8px;" +
+                        "-fx-cursor: hand;" +
                         "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.2), 8, 0, 0, 4);"
                     );
                 }
@@ -248,7 +275,21 @@ public class App extends Application {
             }
         });
 
-        root.getChildren().addAll(headerBar, title, subtitle, scrollPane, nextButton);
+        Label teamLabel = new Label("Entwickelt von: Lukas Beck, Maren Bohlig, Gian-Luca Levels, Hayat van Eck");
+        teamLabel.setStyle(
+            "-fx-font-site: 4px;" +
+            "-fx-text-fill: #2c3e50;" +
+            "-fx-font-style: italic;"
+        );
+
+        HBox footerBar = new HBox(teamLabel);
+        footerBar.setAlignment(Pos.BOTTOM_RIGHT);
+        footerBar.setPadding(new Insets(10,0,0,0));
+
+        Region bottomSpacer = new Region();
+        VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
+
+        root.getChildren().addAll(headerBar, title, subtitle, scrollPane, nextButton, bottomSpacer, footerBar);
         Scene scene = new Scene(root, 800, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -738,7 +779,7 @@ public class App extends Application {
         ticketSpinner.setPrefWidth(100);
 
         Button confirmButton = new Button("Auswahl bestätigen");
-        confirmButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
+        confirmButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
         confirmButton.setPrefWidth(200);
 
         confirmButton.setOnAction(e -> {
@@ -819,9 +860,17 @@ public class App extends Application {
                 lblPrice.setStyle("-fx-pref-width: 80px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
 
                 ComboBox<String> cbType = new ComboBox<>();
-                cbType.getItems().addAll("Standard","Student","Rentner");
+                cbType.getItems().addAll("Standard","Student","Rentner","Kind");
                 cbType.setValue("Standard");
                 cbType.setPrefWidth(110);
+
+                cbType.setOnAction(e -> {
+                    String selectedType = cbType.getValue();
+                    double discount = getDiscountFactor(selectedType);
+                    double finalPrice = singleTicketPrice * discount;
+
+                    lblPrice.setText(String.format("%.2f €", finalPrice));
+                });
 
                 Button btnDelete = new Button("X");
                 btnDelete.setStyle(
@@ -893,7 +942,24 @@ public class App extends Application {
 
         root.getChildren().addAll(title, scrollPane, buttonBox);
         primaryStage.setScene(new Scene(root, 800, 700));
-}
+    }
+
+    private double getDiscountFactor(String customerType) {
+        if (customerType == null) {
+            return 1.0;
+        }
+
+        switch (customerType) {
+            case "Student":
+                return 0.8;
+            case "Rentner":
+                return 0.7;
+            case "Kind":
+                return 0.5;
+            default:
+                return 1.0;
+        }
+    }
 
     private void executeBooking(List<Seat> chosenSeats, List<String> chosenTypes) {
         String firstName = loggedInUser.getFirstName();
@@ -934,20 +1000,30 @@ public class App extends Application {
             successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n", firstName, lastName, totalExtendedPrice));
 
             for (Ticket t : generatedTickets) {
+                successMessage.append(String.format("- %s | %s (%s) - %.2f EUR\n",
+                    t.getSection() != null ? t.getSection().getName() : "Bereicht",
+                    t.getSeatInfo(),
+                    t.getCustomer().getCustomerType(),
+                    t.getFinalPrice()
+                ));
+            }
+                
+                /* 
                 if (currentSelectedSection instanceof StandingSection) {
                     successMessage.append(String.format("- Stehplatz %s (%s) - %.2f EUR\n", 
-                        t.getTicketId(), 
-                        t.getCustomer().getCustomerType(), 
-                        t.getFinalPrice()
-                    ));
-                } else {
-                    successMessage.append(String.format("- Sitzplatz %s (%s) - %.2f EUR\n",
-                        t.getTicketId(),
-                        t.getCustomer().getCustomerType(),
-                        t.getFinalPrice()
-                    ));
-                }
-            }
+                    t.getTicketId(), 
+                    t.getCustomer().getCustomerType(), 
+                    t.getFinalPrice()
+                ));
+            } else {
+                successMessage.append(String.format("- Sitzplatz %s (%s) - %.2f EUR\n",
+            t.getTicketId(),
+            t.getCustomer().getCustomerType(),
+            t.getFinalPrice()
+        ));
+    }
+}
+*/
 
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
             successAlert.setTitle("Buchung erfolgreich!");
@@ -955,6 +1031,7 @@ public class App extends Application {
             successAlert.setContentText(successMessage.toString());
             successAlert.showAndWait();
 
+            cartSeats.clear();
             showMainMenu();
     } catch (Exception ex) {
         showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
@@ -1109,6 +1186,7 @@ public class App extends Application {
             548.8, 336.0,
             185.6, 336.0
         });
+        standingArea.setStyle("-fx-cursor: hand;");
         standingArea.setFill(Color.web("#2c3e50", 0.15));
         standingArea.setStroke(Color.web("#2c3e50", 0.4));
         standingArea.setStrokeWidth(1);
@@ -1250,6 +1328,7 @@ private StackPane createGalaLayout() {
 
 // Hilfsmethode für das Stylen der Polygon um Code zu sparen
 private void setupStandardBlock(Polygon block, String sectionName) {
+    block.setStyle("-fx-cursor: hand;");
     block.setFill(Color.web("#2c3e50", 0.15));
     block.setStroke(Color.web("#2c3e50", 0.4));
     block.setStrokeWidth(1);

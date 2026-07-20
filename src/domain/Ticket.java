@@ -8,8 +8,10 @@ public class Ticket {
     private final double finalPrice;
     private final String seatInfo;
     private String userEmail;
+    private String customerType;
+    private double price;
 
-    public Ticket(String ticketId, Event event, Section section, Customer customer, double finalPrice, String seatInfo, String userEmail) {
+    public Ticket(String ticketId, Event event, Section section, Customer customer, double finalPrice, String seatInfo, String userEmail, String customerType, double price) {
         this.ticketId = ticketId;
         this.event = event;
         this.section = section;
@@ -17,6 +19,13 @@ public class Ticket {
         this.finalPrice = finalPrice;
         this.seatInfo = seatInfo;
         this.userEmail = userEmail;
+        this.customerType = customerType;
+        this.price = price;
+    }
+
+    public Ticket(String ticketId, Event event, Section section, Customer customer, double finalPrice, String seatInfo, String userEmail) {
+        this(ticketId, event, section, customer, finalPrice, seatInfo, userEmail,
+            (customer != null ? customer.getCustomerType() : "Standard"), finalPrice);
     }
 
     // Anzeige des Tickets in der Konsole
@@ -57,4 +66,18 @@ public class Ticket {
     public String getUserEmail() {
         return userEmail;
     }
+    public String getCustomerType() {
+        return customerType;
+    }
+    public double getPrice() {
+        return price;
+    }
+    public void setCustomerType(String customerType) {
+        this.customerType = customerType;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+
 }
