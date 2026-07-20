@@ -9,7 +9,7 @@ import controller.SeatSelectionController;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 import java.time.format.DateTimeFormatter;
 
 import javafx.application.Application;
@@ -40,6 +40,7 @@ public class App extends Application {
     private final UserRepository userRepo = new UserRepository();
     private User loggedInUser = null;
     private Runnable postLoginAction = null; // Merkt sich was nach dem Login passieren soll
+    private List<Seat> cartSeats = new ArrayList<>();
 
     // Globale Zustände für den Buchungsprozess
     private Event currentSelectedEvent = null;
@@ -359,83 +360,139 @@ public class App extends Application {
 
     // TICKET VIEW
     private void showMyTicketsView() {
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(30));
-        root.setAlignment(Pos.TOP_CENTER);
-        root.setStyle("-fx-background-color: #f5f5f7;");
+        ensureLoggedIn(() -> {
+            VBox root = new VBox(20);
+            root.setPadding(new Insets(30));
+            root.setAlignment(Pos.TOP_CENTER);
+            root.setStyle("-fx-background-color: #f5f5f7;");
 
-        Label title = new Label("MEINE TICKETS");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+            Label title = new Label("MEINE TICKETS");
+            title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setFitToWidth(true);
+            scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
 
-        VBox ticketContainer = new VBox(15);
-        ticketContainer.setPadding(new Insets(10));
-        ticketContainer.setAlignment(Pos.TOP_CENTER);
+            VBox ticketContainer = new VBox(15);
+            ticketContainer.setPadding(new Insets(10));
+            ticketContainer.setAlignment(Pos.TOP_CENTER);
 
-        List<Ticket> myTickets = loggedInUser.getPurchasedTickets();
+            List<Ticket> myTickets = loggedInUser.getPurchasedTickets();
 
-        if (myTickets == null || myTickets.isEmpty()) {
-            Label noTicketsLabel = new Label("Sie haben bisher noch keine Tickets gebucht.");
-            noTicketsLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px");
-            ticketContainer.getChildren().add(noTicketsLabel);
-        } else {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
+            if (myTickets == null || myTickets.isEmpty()) {
+                Label noTicketsLabel = new Label("Sie haben bisher noch keine Tickets gebucht.");
+                noTicketsLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px");
+                ticketContainer.getChildren().add(noTicketsLabel);
+            } else {
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
 
-            for (Ticket ticket : myTickets) {
-                HBox ticketCard = new HBox(20);
-                ticketCard.setPadding(new Insets(15));
-                ticketCard.setAlignment(Pos.CENTER_LEFT);
-                ticketCard.setStyle(
-                    "-fx-background-color: white; " +
-                    "-fx-border-color: #2ecc71; " + 
-                    "-fx-border-width: 1px 1px 1px 5px; " + 
-                    "-fx-border-radius: 4px; " +
-                    "-fx-background-radius: 4px; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);"
-                );
+                for (Ticket ticket : myTickets) {
+                    HBox ticketCard = new HBox(20);
+                    ticketCard.setPadding(new Insets(15));
+                    ticketCard.setAlignment(Pos.CENTER_LEFT);
+                    ticketCard.setStyle(
+                        "-fx-background-color: white; " +
+                        "-fx-border-color: #2ecc71; " + 
+                        "-fx-border-width: 1px 1px 1px 5px; " + 
+                        "-fx-border-radius: 4px; " +
+                        "-fx-background-radius: 4px; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);"
+                    );
 
-                VBox details = new VBox(5);
+                    VBox details = new VBox(5);
 
-                String eventTitle = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "Event-Ticket";
-                String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(dtf) : "";
+                    String eventTitle = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "Event-Ticket";
+                    String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(dtf) : "";
 
-                Label lblEvent = new Label(eventTitle);
-                lblEvent.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
+                    Label lblEvent = new Label(eventTitle);
+                    lblEvent.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
 
-                Label lblDate = new Label(eventDate);
-                lblDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
+                    Label lblDate = new Label(eventDate);
+                    lblDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
 
-                String seatInfo = "Bereich: " + ticket.getSection().getName() + ", Platz: " + ticket.getSeatInfo(); 
-                Label lblSeat = new Label(seatInfo);
-                lblSeat.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px;");
+                    String seatInfo;
+                    if (ticket.getSection() instanceof StandingSection) {
+                        seatInfo = ticket.getSection().getName();
+                    } else if (ticket.getSection() instanceof SeatedSection) {
+                        int[] rowAndSeat = parseRowAndSeat(ticket.getSeatInfo());
+                        if (rowAndSeat[0] > 0 && rowAndSeat[1] > 0){
+                            seatInfo = String.format("%s | Reihe %d | Sitz %d",
+                                    ticket.getSection().getName(),
+                                    rowAndSeat[0],
+                                    rowAndSeat[1]
+                            );
+                        } else {
+                            seatInfo = "Bereich: " + ticket.getSection().getName() + " | " + ticket.getSeatInfo();
+                        }
+                    } else {
+                        seatInfo = "Bereich: " + ticket.getSection().getName();
+                    }
+                    Label lblSeat = new Label(seatInfo);
+                    lblSeat.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px;");
 
-                details.getChildren().addAll(lblEvent, lblDate, lblSeat);
+                    details.getChildren().addAll(lblEvent, lblDate, lblSeat);
 
-                Region spacer = new Region();
-                HBox.setHgrow(spacer, Priority.ALWAYS);
+                    Region spacer = new Region();
+                    HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                Label lblPrice = new Label(String.format("%.2f €", ticket.getFinalPrice()));
-                lblPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+                    Label lblPrice = new Label(String.format("%.2f €", ticket.getFinalPrice()));
+                    lblPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-                ticketCard.getChildren().addAll(details, spacer, lblPrice);
-                ticketContainer.getChildren().add(ticketCard);
+                    Button btnCancel = new Button("Stornieren");
+                    btnCancel.setStyle(
+                        "-fx-background-color: #e74c3c;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-background-radius: 4px;" +
+                        "-fx-padding: 6px 12px;"
+                    );
+
+                    btnCancel.setOnAction(e -> {
+                        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                        confirmAlert.setTitle("Ticket stornieren");
+                        confirmAlert.setHeaderText("Möchten Sie dieses Ticket wirklich stornieren?");
+                        String placeText = (ticket.getSection() instanceof StandingSection)
+                                ? "Bereich: " + ticket.getSection().getName()
+                                : "Platz: " + ticket.getSeatInfo();
+                        confirmAlert.setContentText(
+                            "Event: " + eventTitle + "\n" + 
+                            placeText + "\n" +
+                            "Preis: " + String.format("%.2f €", ticket.getFinalPrice())
+                        );
+
+                        Optional<ButtonType> result = confirmAlert.showAndWait();
+                        if (result.isPresent() && result.get() == ButtonType.OK) {
+                            boolean success = bookingService.cancelTicket(ticket, loggedInUser);
+
+                            if (success) {
+                                userRepo.saveUsersToFile();
+
+                                showAlert(Alert.AlertType.INFORMATION, "Storniert", "Das Ticket wurde erfolgreich storniert.");
+                                showMyTicketsView();
+                            } else {
+                                showAlert(Alert.AlertType.ERROR, "Fehler", "Das Ticket konnte leider nicht storniert werden.");
+                            }
+                        }
+                    });
+
+                    ticketCard.getChildren().addAll(details, spacer, lblPrice, btnCancel);
+                    ticketContainer.getChildren().add(ticketCard);
+                }
             }
-        }
 
-        scrollPane.setContent(ticketContainer);
+            scrollPane.setContent(ticketContainer);
 
-        Button backButton = new Button("Zurück zum Hauptmenü");
-        backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px;");
-        backButton.setOnAction(e -> showMainMenu());
+            Button backButton = new Button("Zurück zum Hauptmenü");
+            backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px;");
+            backButton.setOnAction(e -> showMainMenu());
 
-        root.getChildren().addAll(title, scrollPane, backButton);
+            root.getChildren().addAll(title, scrollPane, backButton);
 
-        Scene scene = new Scene(root, 800, 700);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            Scene scene = new Scene(root, 800, 700);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        });
     }
 
     // LOGIN SCREEN
@@ -634,7 +691,7 @@ public class App extends Application {
         );
 
         SeatSelectionController controller = new SeatSelectionController(seatGrid, this);
-        controller.populateSeatPlan(currentSelectedSection);
+        controller.populateSeatPlan(currentSelectedSection, cartSeats);
 
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         selectionStatusLabel.setText("Kein Platz ausgewählt");
@@ -643,9 +700,12 @@ public class App extends Application {
         confirmButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: #2c3e50;");
 
         confirmButton.setOnAction(e -> {
-            List<Seat> chosenSeats = controller.getSelectedSeats();
-            if (!chosenSeats.isEmpty()) {
-                showBookingForm(chosenSeats);
+            List<Seat> newSeats = controller.getSelectedSeats();
+            if (!newSeats.isEmpty()) {
+                cartSeats.addAll(newSeats);
+                showCartView();
+            } else if (!cartSeats.isEmpty()) {
+                showCartView();
             } else {
                 showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz", "Bitte wählen Sie einen freien Sitzplatz aus!");
             }
@@ -683,13 +743,12 @@ public class App extends Application {
 
         confirmButton.setOnAction(e -> {
             int count = ticketSpinner.getValue();
-            List<Seat> virtualSeats = new ArrayList<>();
-
             for (int i = 1; i <= count; i++) {
-                virtualSeats.add(new Seat(0, i));
+                Seat seat = new Seat(0, i);
+                seat.setSection(currentSelectedSection);
+                cartSeats.add(seat);
             }
-
-            showBookingForm(virtualSeats);
+            showCartView();
         });
 
         Button backButton = new Button("Zurück zum Saalplan");
@@ -701,70 +760,140 @@ public class App extends Application {
         primaryStage.setScene(scene);
     }
 
-    // --- SCREEN 3: BUCHUNGSFORMULAR ---
-    private void showBookingForm(List<Seat> chosenSeats) {
-        ensureLoggedIn(() ->{
-            VBox root = new VBox(15);
-            root.setPadding(new Insets(30));
-            root.setAlignment(Pos.CENTER);
-            root.setStyle("-fx-background-color: #f5f5f7");
+    // --- SCREEN 3: WARENKORB ANSICHT ---
+    private void showCartView() {
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(30));
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #f5f5f7");
 
-            Label title = new Label("Personalisierung & Zahlung");
-            title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-filling: #2c3e50");
+        Label title = new Label("WARENKORB");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50");
 
-            Label lblBuyer = new Label("Käufer: " + loggedInUser.getFirstName() + " " + loggedInUser.getLastName());
-            lblBuyer.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e");
+        VBox formContainer = new VBox(10);
+        formContainer.setAlignment(Pos.CENTER);
 
-            VBox formContainer = new VBox(10);
-            formContainer.setAlignment(Pos.CENTER);
+        List<ComboBox<String>> typeComboBoxes = new ArrayList<>();
 
-            List<ComboBox<String>> typeComboBoxes = new ArrayList<>();
+        double basePrice = (currentSelectedEvent != null) ? currentSelectedEvent.getBasePrice() : 0.0;
 
-            for (int i = 0; i < chosenSeats.size(); i++) {
-                Seat seat = chosenSeats.get(i);
+        if (cartSeats == null || cartSeats.isEmpty()) {
+            Label emptyLabel = new Label("Ihr Warenkorb ist derzeit leer.");
+            emptyLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px;");
+            formContainer.getChildren().add(emptyLabel);
+        } else {
+            for (int i = 0; i < cartSeats.size(); i++) {
+                final int index = i;
+                Seat seat = cartSeats.get(i);
+
+                Section seatSection = (seat != null && seat.getSection() != null)
+                                    ? seat.getSection()
+                                    : currentSelectedSection;
+
+                double sectionFactor = (seatSection != null) ? seatSection.getPriceFactor() : 1.0;
+                double singleTicketPrice = basePrice * sectionFactor;
 
                 HBox row = new HBox(15);
                 row.setAlignment(Pos.CENTER);
+                row.setPadding(new Insets(5,10,5,10));
+                row.setStyle(
+                    "-fx-background-color: white;" +
+                    "-fx-border-color: #dcdde1;" +
+                    "-fx-border-radius: 4px;" +
+                    "-fx-background-radius: 4px;"
+                );
 
-                String seatLabelText = (seat != null)
-                    ? "Sitzplatz: Reihe " + seat.getRowNumber() + ", Platz " + seat.getSeatNumber()
-                    : "Ticket " + (i + 1);
+                String seatLabelText;
+                if (seatSection instanceof StandingSection) {
+                    seatLabelText = "Innenraum (Stehplatz)";
+                } else if (seat != null) {
+                    seatLabelText = seatSection.getName() + ", Reihe " + seat.getRowNumber() + ", Platz " + seat.getSeatNumber();
+                } else {
+                    seatLabelText = "Ticket " + (i + 1);
+                }
+
                 Label lblSeat = new Label(seatLabelText);
-                lblSeat.setStyle("-fx-pref-width: 180px; -fx-alignemnt: center-left;");
+                lblSeat.setStyle("-fx-pref-width: 180px; -fx-alignment: center-left;");
+
+                Label lblPrice = new Label(String.format("%.2f €", singleTicketPrice));
+                lblPrice.setStyle("-fx-pref-width: 80px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
 
                 ComboBox<String> cbType = new ComboBox<>();
                 cbType.getItems().addAll("Standard","Student","Rentner");
                 cbType.setValue("Standard");
-                cbType.setPrefWidth(120);
+                cbType.setPrefWidth(110);
 
-                row.getChildren().addAll(lblSeat, cbType);
+                Button btnDelete = new Button("X");
+                btnDelete.setStyle(
+                    "-fx-background-color: #e74c3c;" + 
+                    "-fx-text-fill: white;" +
+                    "-fx-font-weight: bold;" +
+                    "-fx-background-radius: 4px;" +
+                    "-fx-cursor: hand"
+                );
+
+                btnDelete.setOnAction(e -> {
+                    cartSeats.remove(index);
+                    showCartView();
+                });
+
+                row.getChildren().addAll(lblSeat, lblPrice, cbType, btnDelete);
                 formContainer.getChildren().add(row);
 
                 typeComboBoxes.add(cbType);
             }
+        }
 
-            ScrollPane scrollPane = new ScrollPane(formContainer);
-            scrollPane.setFitToWidth(true);
-            scrollPane.setStyle("-fx-background-color: transparent; -fx-background: #f5f5f7;");
-            scrollPane.setPrefHeight(300);
+        ScrollPane scrollPane = new ScrollPane(formContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: #f5f5f7;");
+        scrollPane.setPrefHeight(300);
 
-            Button btnFinalBook = new Button("Jetzt kostenpflichtig buchen");
-            btnFinalBook.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;");
-            btnFinalBook.setPrefWidth(250);
+        VBox buttonBox = new VBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
 
-            btnFinalBook.setOnAction(e -> {
+        Button btnAddMore = new Button("Weitere Tickets hinzufügen");
+        btnAddMore.setStyle(
+            "-fx-background-color: #413f3ff7;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-cursor: hand;" +
+            "-fx-pref-width: 250px;" +
+            "-fx-pref-height: 35px;"
+        );
+        btnAddMore.setOnAction(e -> showGraphicSectionSelection());
+
+        Button btnFinalBook = new Button("Jetzt kostenpflichtig buchen");
+        btnFinalBook.setStyle(
+            "-fx-background-color: #2c3e50;" + 
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-cursor: hand;" +
+            "-fx-pref-width: 250px;" +
+            "-fx-pref-height: 35px;"
+        );
+
+        if (cartSeats == null || cartSeats.isEmpty()) {
+            btnFinalBook.setDisable(true);
+        }
+
+        btnFinalBook.setOnAction(e -> {
+            ensureLoggedIn(() -> {
                 List<String> chosenTypes = new ArrayList<>();
                 for (ComboBox<String> cb : typeComboBoxes) {
                     chosenTypes.add(cb.getValue());
                 }
-
-                executeBooking(chosenSeats, chosenTypes);
+    
+                executeBooking(cartSeats, chosenTypes);
+                cartSeats.clear();
             });
-
-            root.getChildren().addAll(title, lblBuyer, scrollPane, btnFinalBook);
-            primaryStage.setScene(new Scene(root, 800, 700));
         });
-    }   
+
+        buttonBox.getChildren().addAll(btnFinalBook, btnAddMore);
+
+        root.getChildren().addAll(title, scrollPane, buttonBox);
+        primaryStage.setScene(new Scene(root, 800, 700));
+}
 
     private void executeBooking(List<Seat> chosenSeats, List<String> chosenTypes) {
         String firstName = loggedInUser.getFirstName();
@@ -779,13 +908,17 @@ public class App extends Application {
                 Seat seat = chosenSeats.get(i);
                 String currentType = chosenTypes.get(i);
 
+                Section seatSection = (seat != null && seat.getSection() != null)
+                                        ? seat.getSection()
+                                        : currentSelectedSection;
+
                 Customer customer = new Customer(customerIdCounter++, firstName, lastName, currentType);
 
                 Ticket ticket;
-                if (currentSelectedSection instanceof SeatedSection) {
-                    ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
+                if (seatSection instanceof SeatedSection) {
+                    ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), seatSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
                 } else {
-                    ticket = bookingService.bookTicket(currentSelectedEvent.getId(), currentSelectedSection.getName(), customer, userEmail);
+                    ticket = bookingService.bookTicket(currentSelectedEvent.getId(), seatSection.getName(), customer, userEmail);
                 }
 
                 generatedTickets.add(ticket);
@@ -1193,6 +1326,23 @@ private void setupStandardBlock(Polygon block, String sectionName) {
         
             showLoginView();
         }
+    }
+
+    private int[] parseRowAndSeat(String seatInfoStr) {
+        int[] result = new int[]{0,0};
+        if (seatInfoStr == null) {
+            return result;
+        }
+        try {
+            String[] numbers = seatInfoStr.replaceAll("[^0-9]+", " ").trim().split("\\s+");
+            if (numbers.length >= 2) {
+                result[0] = Integer.parseInt(numbers[0]);
+                result[1] = Integer.parseInt(numbers[1]);
+            }
+        } catch (Exception e) {
+
+        }
+        return result;
     }
 
     public static void main(String[] args) {

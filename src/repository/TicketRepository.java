@@ -117,6 +117,10 @@ public class TicketRepository {
                 }
 
                 Section section = event.findSectionByName(sectionName);
+                if (section instanceof StandingSection) {
+                    ((StandingSection) section).incrementSoldTickets();
+                }
+                
                 if (section == null) {
                     System.err.println("Bereich " + sectionName + " für Ticket " + ticketId + " existiert nicht mehr. Ticket übersprungen.");
                     continue;
@@ -130,6 +134,50 @@ public class TicketRepository {
         } catch (IOException | NumberFormatException e) {
             System.err.println("Fehler beim Laden der CSV-Datei: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public synchronized boolean deleteTickets(String ticketId) {
+        if (ticketId == null) {
+            return false;
+        }
+
+        boolean removed = this.tickets.removeIf(t -> t.getTicketId().equals(ticketId));
+
+        if (removed) {
+            rewriteTicketsCSV();
+        }
+        return removed;
+    }
+
+    private void rewriteTicketsCSV() {
+        File file = new File(CSV_FILE_PATH);
+        try (FileOutputStream fos = new FileOutputStream(file, false);
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+             BufferedWriter writer = new BufferedWriter(osw)) {
+            
+            writer.write("ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice,seatInfo;userEmail");
+            writer.newLine();
+
+            for (Ticket ticket : this.tickets) {
+                Customer customer = ticket.getCustomer();
+                String csvLine = String.join(CSV_SEPARATOR,
+                        ticket.getTicketId(),
+                        String.valueOf(ticket.getEvent().getId()),
+                        ticket.getSection().getName(),
+                        String.valueOf(ticket.getCustomer().getId()),
+                        customer.getFirstName(),
+                        customer.getLastName(),
+                        customer.getCustomerType(),
+                        String.valueOf(ticket.getFinalPrice()),
+                        ticket.getSeatInfo(),
+                        ticket.getUserEmail()
+                );
+                writer.write(csvLine);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Fehler beim Aktualisieren der ticets.csv: " + e.getMessage());
         }
     }
 }

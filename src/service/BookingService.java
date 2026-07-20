@@ -99,4 +99,57 @@ public class BookingService {
     public List<Ticket> getActiveTickets() {
         return new ArrayList<>(this.activeTickets);
     }
+
+    public boolean cancelTicket(Ticket ticket, User user) {
+        if (ticket == null || user == null) {
+            return false;
+        }
+
+        Section section = ticket.getSection();
+        if (section == null) {
+            return false;
+        }
+
+        boolean seatReleased = false;
+
+        if (section instanceof SeatedSection) {
+            SeatedSection seatedSection = (SeatedSection) section;
+
+            int[] rowAndSeat = parseRowAndSeat(ticket.getSeatInfo());
+
+            if (rowAndSeat[0] > 0 && rowAndSeat[1] > 0) {
+                seatedSection.releaseSeat(rowAndSeat[0], rowAndSeat[1]);
+                seatReleased = true;
+            }
+
+        } else if (section instanceof StandingSection) {
+            StandingSection standingSection = (StandingSection) section;
+            seatReleased = standingSection.releaseStandingTicket();
+        }
+
+        if (seatReleased) {
+            user.removeTicket(ticket);
+            TicketRepository.getInstance().deleteTickets(ticket.getTicketId());
+            return true;
+        }
+
+        return false;
+    }
+
+    private int[] parseRowAndSeat (String seatInfo) {
+        if (seatInfo == null) {
+            return new int[]{0, 0};
+        }
+        try {
+            String[] numbers = seatInfo.replaceAll("[^0-9]+", " ").trim().split("\\s+");
+            if (numbers.length >= 2) {
+                int row = Integer.parseInt(numbers[0]);
+                int seat = Integer.parseInt(numbers[1]);
+                return new int[]{row, seat};
+            }
+        } catch (Exception e) {
+            System.err.println("Fehler beim Parsen der Sitzplatz-Info: " + seatInfo);
+        }
+        return new int[]{0, 0};
+    }
 }

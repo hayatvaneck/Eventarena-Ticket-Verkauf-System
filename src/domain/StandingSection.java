@@ -46,6 +46,20 @@ public class StandingSection extends Section {
         System.out.println("]\n");
     }
 
+    public boolean releaseStandingTicket() {
+        if (this.soldTickets > 0) {
+            this.soldTickets--;
+            return true;
+        }
+        return false;
+    }
+
+    public void incrementSoldTickets() {
+        if (this.soldTickets < this.capacity) {
+            this.soldTickets++;
+        }
+    }
+
     public int getCapacity() {
         return capacity;
     }

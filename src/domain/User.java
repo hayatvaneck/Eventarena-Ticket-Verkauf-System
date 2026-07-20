@@ -42,6 +42,12 @@ public class User {
         this.purchasedTickets.add(ticket);
     }
 
+    public void removeTicket(Ticket ticket) {
+        if (this.purchasedTickets != null && ticket != null) {
+            this.purchasedTickets.removeIf(t -> t.getTicketId().equals(ticket.getTicketId()));
+        }
+    }
+
     
     
     
