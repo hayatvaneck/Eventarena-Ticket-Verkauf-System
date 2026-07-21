@@ -2,7 +2,7 @@ package ui;
 
 import domain.*;
 import domain.Event.EventType;
-//import exceptions.SeatAlreadyBookedException;
+import exceptions.*;
 import repository.*;
 import service.BookingService;
 import controller.SeatSelectionController;
@@ -740,7 +740,7 @@ public class App extends Application {
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         Label stageLabel = new Label("--- BÜHNE / SPIELFELD ---");
-        stageLabel.setStyle("-fx-background-color: #2c3e50; -fx-padding: 5 50 5 50; -fx-text-fill: white;");
+        stageLabel.setStyle("-fx-background-color: #ff0000; -fx-padding: 5 50 5 50; -fx-text-fill: white;");
 
         GridPane seatGrid = new GridPane();
         seatGrid.setHgap(6);
