@@ -9,7 +9,7 @@ public class SeatedSection extends Section {
         this.seats = new Seat[rows][seatsPerRow];
         for (int r = 0; r < rows; r++) {
             for (int s = 0; s < seatsPerRow; s++) {
-                this.seats[r][s] = new Seat(r+1, s+1);
+                this.seats[r][s] = new Seat(r+1, s+1, this);
             }
         }
     }
@@ -55,6 +55,13 @@ public class SeatedSection extends Section {
                 }
             }
             System.out.println();
+        }
+    }
+
+    public void releaseSeat (int rowNumber, int seatNumber) {
+        Seat seat = getSeat(rowNumber, seatNumber);
+        if (seat != null) {
+            seat.release();
         }
     }
 
