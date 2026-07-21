@@ -166,6 +166,7 @@ public class App extends Application {
                 "-fx-border-width: 1px;" +
                 "-fx-border-radius: 8px;" +
                 "-fx-background-radius: 8px;" +
+                "-fx-cursor: Hand;" +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);"
             );
 
@@ -235,6 +236,7 @@ public class App extends Application {
                         "-fx-border-width: 1px;" +
                         "-fx-border-radius: 8px;" +
                         "-fx-background-radius: 8px;" +
+                        "-fx-cursor: Hand;" +
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);"
                     );
                 }
@@ -247,6 +249,7 @@ public class App extends Application {
                     "-fx-border-width: 2px;" +
                     "-fx-border-radius: 8px;" + 
                     "-fx-background-radius: 8px;" +
+                    "-fx-cursor: Hand;" +
                     "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.3), 10, 0, 0, 5);"
                 );
 
@@ -471,7 +474,14 @@ public class App extends Application {
                     Label lblSeat = new Label(seatInfo);
                     lblSeat.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px;");
 
-                    details.getChildren().addAll(lblEvent, lblDate, lblSeat);
+                    String customerType = (ticket.getCustomer() != null && ticket.getCustomerType() != null)
+                            ? ticket.getCustomerType()
+                            : (ticket.getCustomerType() != null ? ticket.getCustomerType() : "Standard");
+
+                    Label lblType = new Label("Typ: " + customerType);
+                    lblType.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
+
+                    details.getChildren().addAll(lblEvent, lblDate, lblSeat, lblType);
 
                     Region spacer = new Region();
                     HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -486,7 +496,8 @@ public class App extends Application {
                         "-fx-font-weight: bold;" +
                         "-fx-font-size: 12px;" +
                         "-fx-background-radius: 4px;" +
-                        "-fx-padding: 6px 12px;"
+                        "-fx-padding: 6px 12px;" +
+                        "-fx-cursor: Hand;"
                     );
 
                     btnCancel.setOnAction(e -> {
@@ -525,7 +536,7 @@ public class App extends Application {
             scrollPane.setContent(ticketContainer);
 
             Button backButton = new Button("Zurück zum Hauptmenü");
-            backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px;");
+            backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px; -fx-cursor: Hand;");
             backButton.setOnAction(e -> showMainMenu());
 
             root.getChildren().addAll(title, scrollPane, backButton);
@@ -561,7 +572,7 @@ public class App extends Application {
 
         Button loginBtn = new Button("Einloggen");
         loginBtn.setDefaultButton(true);
-        loginBtn.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold;");
+        loginBtn.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         loginBtn.setPrefWidth(250);
 
         
@@ -641,14 +652,19 @@ public class App extends Application {
         emailField.setPrefWidth(250);
         emailField.setMaxWidth(250);
 
-        TextField passwordField = new TextField();
+        PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Passwort");
         passwordField.setPrefWidth(250);
         passwordField.setMaxWidth(250);
 
+        PasswordField confirmPasswordField = new PasswordField();
+        confirmPasswordField.setPromptText("Passwort bestätigen");
+        confirmPasswordField.setPrefWidth(250);
+        confirmPasswordField.setMaxWidth(250);
+
         Button registerBtn = new Button("Registrieren");
         registerBtn.setDefaultButton(true);
-        registerBtn.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold;");
+        registerBtn.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         registerBtn.setPrefWidth(250);
 
         Label backToLoginLink = new Label("Bereits ein Konto? Zum Login");
@@ -659,14 +675,22 @@ public class App extends Application {
             String lastName = lastNameField.getText().trim();
             String email = emailField.getText().trim();
             String password = passwordField.getText().trim();
+            String confirmPassword = confirmPasswordField.getText().trim();
 
-            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte füllen Sie alle Felder aus.");
                 return;
             }
 
             if (!email.contains("@") || !email.contains(".")) {
                 showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte geben Sie eine gültige E-Mail-Adresse ein.");
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                showAlert(Alert.AlertType.ERROR, "Fehler", "Die eingegebenen Passwörter stimmen nicht überein!");
+                passwordField.clear();
+                confirmPasswordField.clear();
                 return;
             }
 
@@ -690,6 +714,7 @@ public class App extends Application {
             lastNameField,
             emailField,
             passwordField,
+            confirmPasswordField,
             registerBtn,
             backToLoginLink
         );
@@ -932,8 +957,12 @@ public class App extends Application {
                 for (ComboBox<String> cb : typeComboBoxes) {
                     chosenTypes.add(cb.getValue());
                 }
+
+                if (chosenTypes.size() != cartSeats.size()) {
+                    showAlert(Alert.AlertType.ERROR, "Fehler", "Fehler bei der Zuordnung der Ticket-Typen.");
+                }
     
-                executeBooking(cartSeats, chosenTypes);
+                executeBooking(new ArrayList<>(cartSeats), chosenTypes);
                 cartSeats.clear();
             });
         });
@@ -1000,9 +1029,9 @@ public class App extends Application {
             successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n", firstName, lastName, totalExtendedPrice));
 
             for (Ticket t : generatedTickets) {
-                successMessage.append(String.format("- %s | %s (%s) - %.2f EUR\n",
-                    t.getSection() != null ? t.getSection().getName() : "Bereicht",
-                    t.getSeatInfo(),
+                successMessage.append(String.format("- %s | (%s) - %.2f EUR\n",
+                    t.getSection() != null ? t.getSection().getName() : "Bereich",
+                    //t.getSeatInfo(),
                     t.getCustomer().getCustomerType(),
                     t.getFinalPrice()
                 ));
@@ -1126,8 +1155,8 @@ public class App extends Application {
             373.6, 124.0,
             373.6, 68.0,
             583.2, 68.0,
-            583.2, 159.2,
-            423.2, 159.2,
+            583.2, 160.0,
+            423.2, 160.0,
             422.4, 124.0,
         });
         setupStandardBlock(block1, "Block 1");
@@ -1244,18 +1273,17 @@ private StackPane createBasketballLayout() {
     mapContainer.setOnMouseClicked(e -> {
         System.out.println("Punkt: " + e.getX() + ", " + e.getY() + ",");
     });
-    
     mapContainer.getChildren().addAll(imageView, clickLayer);
     */
     
 
     Polygon block2 = new Polygon(new double[]{
         191.0, 96.0,
-        369.6, 96.0,
-        369.6, 137.6,
-        318.4, 138.4,
-        318.4, 174.4,
-        191.0, 174.4
+        369.0, 96.0,
+        369.0, 137.0,
+        318.0, 138.0,
+        318.0, 174.0,
+        191.0, 174.0
     });
     setupStandardBlock(block2, "Block 2");
 
@@ -1268,12 +1296,12 @@ private StackPane createBasketballLayout() {
     setupStandardBlock(vipBlock, "VIP");
 
     Polygon block1 = new Polygon(new double[]{
+        372.0, 96.0,
         551.0, 96.0,
-        373.0, 96.0,
-        373.0, 137.6,
-        422.4, 137.6,
-        422.4, 174.4,
-        551.0, 174.4
+        551.0, 174.0,
+        422.0, 174.0,
+        422.0, 138.0,
+        372.0, 138.0
     });
     setupStandardBlock(block1, "Block 1");
 

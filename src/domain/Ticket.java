@@ -24,9 +24,36 @@ public class Ticket {
     }
 
     public Ticket(String ticketId, Event event, Section section, Customer customer, double finalPrice, String seatInfo, String userEmail) {
-        this(ticketId, event, section, customer, finalPrice, seatInfo, userEmail,
-            (customer != null ? customer.getCustomerType() : "Standard"), finalPrice);
+        this(
+            ticketId, 
+            event, 
+            section, 
+            customer, 
+            finalPrice,
+            seatInfo, 
+            userEmail,
+            (customer != null ? customer.getCustomerType() : "Standard"),
+            (event != null && section != null ? event. getBasePrice() * section.getPriceFactor() : finalPrice)
+        );
     }
+
+    /* 
+    private static double calculateDiscountPrice(double basePrice, String customerType) {
+        if (customerType == null) {
+            return basePrice;
+        }
+        switch (customerType) {
+            case "Student":
+                return basePrice * 0.80;
+                case "Rentner":
+                    return basePrice * 0.7;
+                    case "Kind":
+                        return basePrice * 0.5;
+                        default:
+                            return basePrice;
+                        }
+                    }
+                    */
 
     // Anzeige des Tickets in der Konsole
     public void printTicketDetails() {

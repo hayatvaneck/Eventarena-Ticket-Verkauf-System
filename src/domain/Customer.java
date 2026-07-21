@@ -23,7 +23,7 @@ public class Customer {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.customerType = customerType;
+        this.customerType = (customerType != null) ? customerType : "Standard";
     }
 
     public long getId() {
