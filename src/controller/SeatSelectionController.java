@@ -39,8 +39,8 @@ public class SeatSelectionController {
             for (int r = 0; r < totalRows; r++) {
                 for (int s = 0; s < seatsPerRow; s++) {
 
-                    int rowNum = r + 1;
-                    int seatNum = s + 1;
+                    int rowNum = r ;
+                    int seatNum = s;
 
                     Seat seat = seatedSection.getSeat(r, s);
                     if (seat == null) {
@@ -81,7 +81,7 @@ public class SeatSelectionController {
                     } else {
                         seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
 
-                        Tooltip tooltip = new Tooltip("Reihe " + rowNum + ", Platz " + seatNum);
+                        Tooltip tooltip = new Tooltip("Reihe " + (rowNum + 1) + ", Platz " + (seatNum + 1));
                         tooltip.setShowDelay(Duration.millis(100));
                         Tooltip.install(seatButton, tooltip);
                         
@@ -125,7 +125,7 @@ public class SeatSelectionController {
         } else {
             StringBuilder sb = new StringBuilder("Ausgewählt: ");
             for (Seat s : selectedSeats) {
-                sb.append(String.format("| Reihe: %d, Platz: %d ", s.getRowNumber(), s.getSeatNumber()));
+                sb.append(String.format("| Reihe: %d, Platz: %d ", (s.getRowNumber() + 1), (s.getSeatNumber() + 1)));
             }
             mainApp.updateSelectionLabel(sb.toString());
         }
