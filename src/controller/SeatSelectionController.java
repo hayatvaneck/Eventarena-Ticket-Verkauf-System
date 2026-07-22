@@ -35,10 +35,11 @@ public class SeatSelectionController {
             int seatsPerRow = seatedSection.getSeatsPerRow();
 
             for (int r = 0; r < rows; r++) {
-
+                // Text-Label für die Reihe (r + 1, da r bei 0 startet)
                 javafx.scene.control.Label rowLabel = new javafx.scene.control.Label("Reihe " + (r + 1) + ": ");
                 rowLabel.setStyle("-fx-font-weight: bold; -fx-padding: 0 10 0 0;");
-
+                
+                // Füge das Label in Spalte 0 der aktuellen Reihe ein
                 seatGrid.add(rowLabel, 0, r);
 
                 for (int s = 0; s < seatsPerRow; s++) {
