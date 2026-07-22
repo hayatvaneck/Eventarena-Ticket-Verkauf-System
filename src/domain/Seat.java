@@ -5,11 +5,17 @@ public class Seat {
     private final int rowNumber;
     private final int seatNumber;
     private boolean isBooked;
+    private Section section;
 
     public Seat(int rowNumber, int seatNumber) {
         this.rowNumber = rowNumber;
         this.seatNumber = seatNumber;
         this.isBooked = false;
+    }
+
+    public Seat(int rowNumber, int seatNumber, Section section) {
+        this(rowNumber, seatNumber);
+        this.section = section;
     }
 
     public void book() throws SeatAlreadyBookedException {
@@ -32,5 +38,11 @@ public class Seat {
     }
     public int getSeatNumber() {
         return seatNumber;
+    }
+    public Section getSection() {
+        return section;
+    }
+    public void setSection(Section section) {
+        this.section = section;
     }
 }

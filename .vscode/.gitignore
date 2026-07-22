@@ -1,0 +1,11 @@
+# Kompilierte Klassen
+bin/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db

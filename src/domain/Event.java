@@ -8,13 +8,15 @@ public class Event {
     private LocalDateTime dateTime;
     private double basePrice;
     private List<Section> sections;
+    private EventType eventType;
 
-    public Event(Long id, String title, LocalDateTime dateTime, double basePrice) {
+    public Event(Long id, String title, LocalDateTime dateTime, double basePrice, EventType eventType) {
         this.id = id;
         this.title = title;
         this.dateTime = dateTime;
         this.basePrice = basePrice;
         this.sections = new ArrayList<>();
+        this.eventType = eventType;
     }
 
     public void addSection(Section section) {
@@ -40,6 +42,10 @@ public class Event {
         return totalSeats;
     }
 
+    public enum EventType {
+        CONCERT, BASKETBALL, GALA
+    }
+
     public boolean isSoldOut() {
         return getTotalAvailableSeats() == 0;
     }
@@ -58,5 +64,8 @@ public class Event {
     }
     public List<Section> getSections() {
         return sections;
+    }
+    public EventType getEventType() {
+        return eventType;
     }
 }

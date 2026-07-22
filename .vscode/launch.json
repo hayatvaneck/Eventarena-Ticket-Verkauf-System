@@ -6,8 +6,12 @@
             "name": "App",
             "request": "launch",
             "mainClass": "ui.App",
+<<<<<<< HEAD
             "projectName": "Eventarena-Ticket-Verkauf-System_c75422ee",
             "vmArgs": "--module-path \"C:\\Users\\Hayat\\Documents\\java\\javafx-sdk-17.0.19\\lib\" --add-modules javafx.controls,javafx.fxml"
+=======
+            "vmArgs": "--module-path \"${workspaceFolder}\\lib\\javafx-sdk\\lib\" --add-modules javafx.controls,javafx.fxml"
+>>>>>>> origin/gian-luca
         }
     ]
 }

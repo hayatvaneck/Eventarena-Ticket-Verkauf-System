@@ -4,7 +4,9 @@ import domain.Seat;
 import domain.SeatedSection;
 import domain.Section;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
+import javafx.util.Duration;
 import ui.App;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class SeatSelectionController {
         this.mainApp = mainApp;
     }
 
-    public void populateSeatPlan(Section section) {
+    public void populateSeatPlan(Section section, List<Seat> cartSeats) {
         seatGrid.getChildren().clear();
         selectedSeats.clear();
         selectedButtons.clear();
@@ -31,40 +33,70 @@ public class SeatSelectionController {
         if (section instanceof SeatedSection) {
             SeatedSection seatedSection = (SeatedSection) section;
             
-            int rows = seatedSection.getRowCount();
+            int totalRows = seatedSection.getRowCount();
             int seatsPerRow = seatedSection.getSeatsPerRow();
 
-            for (int r = 0; r < rows; r++) {
-                // Text-Label für die Reihe (r + 1, da r bei 0 startet)
-                javafx.scene.control.Label rowLabel = new javafx.scene.control.Label("Reihe " + (r + 1) + ": ");
-                rowLabel.setStyle("-fx-font-weight: bold; -fx-padding: 0 10 0 0;");
-                
-                // Füge das Label in Spalte 0 der aktuellen Reihe ein
-                seatGrid.add(rowLabel, 0, r);
-
+            for (int r = 0; r < totalRows; r++) {
                 for (int s = 0; s < seatsPerRow; s++) {
-                    Seat seat = seatedSection.getSeat(r + 1, s + 1);
 
-                    Button seatButton = new Button((s + 1) + "");
+                    int rowNum = r ;
+                    int seatNum = s;
+
+                    Seat seat = seatedSection.getSeat(r, s);
+                    if (seat == null) {
+                        seat = new Seat (rowNum, seatNum);
+                    }
+
+                    boolean isBookedInRepo = seat.isBooked();
+
+                    boolean isInCart = false;
+                    if (cartSeats != null) {
+                        for (Seat cartSeat : cartSeats) {
+                            if (cartSeat.getRowNumber() == rowNum && cartSeat.getSeatNumber() == seatNum) {
+                                isInCart = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    Button seatButton = new Button();
                     seatButton.setPrefSize(40,5);
 
-                    // 1. Bereits gebuchte Sitze rot markieren und deaktivieren
-                    if (seat.isBooked()) {
-                        seatButton.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white");
+                    if (isBookedInRepo) {
+                        seatButton.setStyle("-fx-background-color: #e74c3c;");
                         seatButton.setDisable(true);
+
+                        Tooltip tooltip = new Tooltip("Verkauft (Reihe " + rowNum + ", Platz " + seatNum + ")");
+                        tooltip.setShowDelay(Duration.millis(100));
+                        Tooltip.install(seatButton, tooltip);
+
+                    } else if (isInCart) {
+                        seatButton.setStyle("-fx-background-color: #f1c40f; -fx-text-fill: black;");
+                        seatButton.setDisable(true);
+
+                        Tooltip tooltip = new Tooltip("Bereits im Warenkorb (Reihe " +  rowNum + ", Platz " + seatNum + ")");
+                        tooltip.setShowDelay(Duration.millis(100));
+                        Tooltip.install(seatButton, tooltip);
+
                     } else {
-                        // 2. Freie Plätze grün markieren und auswählbar machen
-                        seatButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white");
+                        seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
+
+                        Tooltip tooltip = new Tooltip("Reihe " + (rowNum + 1) + ", Platz " + (seatNum + 1));
+                        tooltip.setShowDelay(Duration.millis(100));
+                        Tooltip.install(seatButton, tooltip);
+                        
+                        final Seat finalSeat = seat;
 
                         seatButton.setOnAction(event -> {
-                            // Deselektieren des zuvor ausgewählten Sitzes
-                            if (selectedSeats.contains(seat)) {
-                                seatButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white");
-                                selectedSeats.remove(seat);
-                                selectedButtons.remove(seatButton);
+                            Seat existingSeat = findSelectedSeat(rowNum, seatNum);
+
+                            if (existingSeat != null) {
+                                seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
+                                selectedSeats.remove(existingSeat);
+                                selectedButtons.remove(existingSeat);
                             } else {
-                                seatButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white");
-                                selectedSeats.add(seat);
+                                seatButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: black;");
+                                selectedSeats.add(finalSeat);
                                 selectedButtons.add(seatButton);
                             }
 
@@ -72,12 +104,19 @@ public class SeatSelectionController {
                         });
                     }
 
-                    seatGrid.add(seatButton, s+1, r);
+                    seatGrid.add(seatButton, s, r);
                 }
             }
-
         }
+    }
 
+    private Seat findSelectedSeat(int row, int seat) {
+        for (Seat s : selectedSeats) {
+            if (s.getRowNumber() == row && s.getSeatNumber() == seat) {
+                return s;
+            }
+        }
+        return null;
     }
 
     private void updateStatusLabel() {
@@ -86,7 +125,7 @@ public class SeatSelectionController {
         } else {
             StringBuilder sb = new StringBuilder("Ausgewählt: ");
             for (Seat s : selectedSeats) {
-                sb.append(String.format("[R:%d, P:%d] ", s.getRowNumber(), s.getSeatNumber()));
+                sb.append(String.format("| Reihe: %d, Platz: %d ", (s.getRowNumber() + 1), (s.getSeatNumber() + 1)));
             }
             mainApp.updateSelectionLabel(sb.toString());
         }

@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "c:\\Users\\Hayat\\Documents\\java\\javafx-sdk-17.0.19\\lib\\javafx.base.jar",
@@ -10,4 +11,14 @@
         "c:\\Users\\Hayat\\Documents\\java\\javafx-sdk-17.0.19\\lib\\javafx.web.jar",
         "c:\\Users\\Hayat\\Documents\\java\\javafx-sdk-17.0.19\\lib\\javafx-swt.jar"
     ]
+=======
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar"
+    ],
+    "java.launch.config.vmArgs": "--module-path \"${workspaceFolder}\\lib\\javafx-sdk\\lib\" --add-modules javafx.controls,javafx.fxml"
+>>>>>>> origin/gian-luca
 }
