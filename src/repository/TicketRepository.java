@@ -60,7 +60,7 @@ public class TicketRepository {
                     String.valueOf(ticket.getCustomer().getId()),
                     customer.getFirstName(),
                     customer.getLastName(),
-                    customer.getCustomerType(),
+                    customer.getCustomerType().name(),
                     String.valueOf(ticket.getFinalPrice()),
                     ticket.getSeatInfo(),
                     ticket.getUserEmail()
@@ -110,7 +110,7 @@ public class TicketRepository {
                 Long customerId = Long.parseLong(data[3]);
                 String customerFirstName = data[4];
                 String customerLastName = data[5];
-                String customerType = data[6];
+                String customerTypeRaw = data[6];
                 double finalPrice = Double.parseDouble(data[7]);
                 String seatInfo = data[8];
                 String userEmail = data[9];
@@ -131,6 +131,7 @@ public class TicketRepository {
                     continue;
                 }
 
+                CustomerType customerType = parseCustomerType(customerTypeRaw);
                 Customer customer = new Customer(customerId, customerFirstName, customerLastName, customerType);
 
                 Ticket ticket = new Ticket(ticketId, event, section, customer, finalPrice, seatInfo, userEmail);
@@ -161,7 +162,7 @@ public class TicketRepository {
              OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
              BufferedWriter writer = new BufferedWriter(osw)) {
             
-            writer.write("ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice,seatInfo;userEmail");
+            writer.write("ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice;seatInfo;userEmail");
             writer.newLine();
 
             for (Ticket ticket : this.tickets) {
@@ -173,7 +174,7 @@ public class TicketRepository {
                         String.valueOf(ticket.getCustomer().getId()),
                         customer.getFirstName(),
                         customer.getLastName(),
-                        customer.getCustomerType(),
+                        customer.getCustomerType().name(),
                         String.valueOf(ticket.getFinalPrice()),
                         ticket.getSeatInfo(),
                         ticket.getUserEmail()
@@ -183,6 +184,30 @@ public class TicketRepository {
             }
         } catch (IOException e) {
             System.err.println("Fehler beim Aktualisieren der ticets.csv: " + e.getMessage());
+        }
+    }
+
+    private CustomerType parseCustomerType(String rawType) {
+        if (rawType == null) {
+            return CustomerType.STANDARD;
+        }
+
+        String normalized = rawType.trim().toLowerCase();
+        switch (normalized) {
+            case "student":
+            case "stud":
+            case "studentin":
+                return CustomerType.STUDENT;
+            case "rentner":
+            case "senior":
+                return CustomerType.SENIOR;
+            case "vip":
+                return CustomerType.VIP;
+            case "kind":
+                return CustomerType.KIND;
+            case "standard":
+            default:
+                return CustomerType.STANDARD;
         }
     }
 }

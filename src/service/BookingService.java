@@ -51,7 +51,9 @@ public class BookingService {
         ticketIdCounter++;
         String generatedTicektId = "T-" + ticketIdCounter;
         double basePrice = event.getBasePrice() * section.getPriceFactor();
-        String customerType = (customer != null) ? customer.getCustomerType() : "Standard";
+        CustomerType customerType = (customer != null && customer.getCustomerType() != null)
+            ? customer.getCustomerType()
+            : CustomerType.STANDARD;
         double discountFactor = calculateDiscountFactor(customerType);
         double finalPrice = basePrice * discountFactor;
         String seatInfo = "Freie Platzwahl (Stehplatz)";
@@ -65,7 +67,7 @@ public class BookingService {
             finalPrice, 
             seatInfo, 
             userEmail,
-            customerType,
+            customerType.name(),
             basePrice
         );
         activeTickets.add(newTicket);
@@ -106,7 +108,9 @@ public class BookingService {
         ticketIdCounter++;
         String generatedTicketId = "T-" + ticketIdCounter;
         double basePrice = event.getBasePrice() * section.getPriceFactor();
-        String customerType = (customer != null) ? customer.getCustomerType() : "Standard";
+        CustomerType customerType = (customer != null && customer.getCustomerType() != null)
+            ? customer.getCustomerType()
+            : CustomerType.STANDARD;
         double discountFactor = calculateDiscountFactor(customerType);
         double finalPrice = basePrice * discountFactor;
         String seatInfo = "Reihe " + row + ", Platz " + seatNumber;
@@ -119,7 +123,7 @@ public class BookingService {
             finalPrice, 
             seatInfo, 
             userEmail,
-            customerType,
+            customerType.name(),
             basePrice
         );
         activeTickets.add(newTicket);
@@ -128,16 +132,16 @@ public class BookingService {
         return newTicket;
     }
 
-    private double calculateDiscountFactor(String customerType) {
+    private double calculateDiscountFactor(CustomerType customerType) {
         if (customerType == null) {
             return 1.0;
         }
         switch (customerType) {
-            case "Student":
+            case STUDENT:
                 return 0.80;
-            case "Rentner":
+            case SENIOR:
                 return 0.7;
-            case "Kind":
+            case KIND:
                 return 0.5;
             default:
                 return 1.0;

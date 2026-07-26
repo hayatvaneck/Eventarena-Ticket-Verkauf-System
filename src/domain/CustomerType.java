@@ -4,6 +4,7 @@ public enum CustomerType {
     STANDARD,
     STUDENT,
     SENIOR,
-    VIP
+    VIP,
+    KIND
 }
 

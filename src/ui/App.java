@@ -278,12 +278,13 @@ public class App extends Application {
             for (int i = 0; i < chosenSeats.size(); i++) {
                 Seat seat = chosenSeats.get(i);
                 String currentType = chosenTypes.get(i);
+                CustomerType customerType = mapCustomerType(currentType);
 
                 Section seatSection = (seat != null && seat.getSection() != null)
                                         ? seat.getSection()
                                         : currentSelectedSection;
 
-                Customer customer = new Customer(customerIdCounter++, firstName, lastName, currentType);
+                Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
 
                 Ticket ticket;
                 if (seatSection instanceof SeatedSection) {
@@ -409,6 +410,26 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private CustomerType mapCustomerType(String typeLabel) {
+        if (typeLabel == null) {
+            return CustomerType.STANDARD;
+        }
+
+        switch (typeLabel.trim().toLowerCase()) {
+            case "student":
+                return CustomerType.STUDENT;
+            case "rentner":
+            case "senior":
+                return CustomerType.SENIOR;
+            case "vip":
+                return CustomerType.VIP;
+            case "kind":
+                return CustomerType.KIND;
+            default:
+                return CustomerType.STANDARD;
+        }
     }
 }
 
