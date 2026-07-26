@@ -17,6 +17,11 @@ import ui.ScreenManager;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Die Klasse BookingConfirmationScreen zeigt die erfolgreiche Buchung inklusive aller neu erhaltenen Tickets.
+
+ */
+
 public class BookingConfirmationScreen extends BaseScreen {
 
     private final App app;
@@ -137,3 +142,6 @@ public class BookingConfirmationScreen extends BaseScreen {
         return card;
     }
 }
+
+
+

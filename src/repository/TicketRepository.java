@@ -6,11 +6,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse TicketRepository verwaltet die Persistenz von Tickets in der CSV-Datei.
+
+ */
+
 public class TicketRepository {
 
     private static TicketRepository instance;
     private final List<Ticket> tickets;
-    private static final String CSV_FILE_PATH = "tickets.csv";
+    private static final String CSV_FILE_PATH = "data/tickets.csv";
     private static final String CSV_SEPARATOR = ";";
 
     private TicketRepository() {
@@ -112,7 +117,7 @@ public class TicketRepository {
 
                 Event event = eventRepo.findById(eventId);
                 if (event == null) {
-                    System.err.println("Event mit ID " + eventId + " für Ticket " + ticketId + "existiert nicht mehr. Ticket übersprungen.");
+                    System.err.println("Event mit ID " + eventId + " fÃ¼r Ticket " + ticketId + "existiert nicht mehr. Ticket Ã¼bersprungen.");
                     continue;
                 }
 
@@ -122,7 +127,7 @@ public class TicketRepository {
                 }
                 
                 if (section == null) {
-                    System.err.println("Bereich " + sectionName + " für Ticket " + ticketId + " existiert nicht mehr. Ticket übersprungen.");
+                    System.err.println("Bereich " + sectionName + " fÃ¼r Ticket " + ticketId + " existiert nicht mehr. Ticket Ã¼bersprungen.");
                     continue;
                 }
 
@@ -181,3 +186,6 @@ public class TicketRepository {
         }
     }
 }
+
+
+

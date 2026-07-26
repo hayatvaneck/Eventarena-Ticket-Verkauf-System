@@ -1,4 +1,4 @@
-package ui.screens;
+﻿package ui.screens;
 
 import domain.Event;
 import domain.User;
@@ -27,6 +27,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+/**
+ * Die Klasse MainMenuScreen zeigt die Eventauswahl und den Einstieg in den Buchungsprozess.
+ */
 
 public class MainMenuScreen extends BaseScreen {
 
@@ -212,6 +216,14 @@ public class MainMenuScreen extends BaseScreen {
         Label eventDate = new Label(event.getDateTime().format(formatter));
         eventDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
 
+        String eventDescription = event.getDescription() != null ? event.getDescription().trim() : "";
+        if (eventDescription.isEmpty()) {
+            eventDescription = "Keine Beschreibung vorhanden.";
+        }
+        Label eventDescriptionLabel = new Label(eventDescription);
+        eventDescriptionLabel.setWrapText(true);
+        eventDescriptionLabel.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 12px;");
+
         Label eventTypeLabel = new Label(event.getEventType().toString());
         eventTypeLabel.setStyle(
             "-fx-background-color: #2c3e50;" +
@@ -222,7 +234,7 @@ public class MainMenuScreen extends BaseScreen {
             "-fx-background-radius: 4px;"
         );
 
-        card.getChildren().addAll(eventTitle, spacer, eventDate, eventTypeLabel);
+        card.getChildren().addAll(eventTitle, eventDescriptionLabel, spacer, eventDate, eventTypeLabel);
 
         card.setOnMouseEntered(e -> {
             if (app.getCurrentSelectedEvent() != event) {
@@ -252,3 +264,6 @@ public class MainMenuScreen extends BaseScreen {
         return card;
     }
 }
+
+
+

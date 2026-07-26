@@ -16,13 +16,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Die Klasse ReceiptRepository verwaltet das Speichern und Laden von Quittungen.
+
+ */
+
 public class ReceiptRepository {
 
     private static ReceiptRepository instance;
     private final List<Receipt> receipts;
     private long receiptCounter;
 
-    private static final String CSV_FILE_PATH = "receipts.csv";
+    private static final String CSV_FILE_PATH = "data/receipts.csv";
     private static final String CSV_SEPARATOR = ";";
 
     private ReceiptRepository() {
@@ -135,3 +140,6 @@ public class ReceiptRepository {
         }
     }
 }
+
+
+

@@ -1,4 +1,9 @@
-package ui;
+﻿package ui.*;
+
+/**
+ * Die Klasse archivApp dient als Archiv fuer einen frueheren Entwicklungsstand der Anwendung.
+
+ */
 
 public class archivApp {
     package unused;
@@ -36,6 +41,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Polygon;
 import javafx.scene.paint.Color;
 
+/**
+ * Die Klasse App startet die JavaFX-Anwendung, verwaltet die Navigation und haelt den globalen Buchungszustand.
+ */
 public class App extends Application {
     
     private Stage primaryStage;
@@ -771,7 +779,7 @@ public class App extends Application {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);"
         );
 
-        SeatSelectionController controller = new SeatSelectionController(seatGrid, this);
+        SeatSelectionController controller = new SeatSelectionController(seatGrid, this::updateSelectionLabel);
         controller.populateSeatPlan(currentSelectedSection, cartSeats);
 
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
@@ -1474,3 +1482,6 @@ private void setupStandardBlock(Polygon block, String sectionName) {
 
 
 }
+
+
+

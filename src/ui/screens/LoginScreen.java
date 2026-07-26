@@ -14,6 +14,11 @@ import javafx.scene.layout.HBox;
 import ui.App;
 import ui.ScreenManager;
 
+/**
+ * Die Klasse LoginScreen stellt die Benutzeranmeldung inklusive Ruecksprung in den Buchungsfluss bereit.
+
+ */
+
 public class LoginScreen extends BaseScreen {
 
     private final App app;
@@ -89,3 +94,6 @@ public class LoginScreen extends BaseScreen {
         return createDefaultScene(mainRoot);
     }
 }
+
+
+

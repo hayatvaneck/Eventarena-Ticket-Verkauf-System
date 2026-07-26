@@ -1,4 +1,4 @@
-package controller;
+﻿package controller;
 
 import domain.Seat;
 import domain.SeatedSection;
@@ -7,22 +7,26 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
-import ui.App;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * Die Klasse SeatSelectionController steuert die Sitzplatzauswahl im Saalplan und synchronisiert den Auswahlstatus.
+ */
 
 public class SeatSelectionController {
 
     private final GridPane seatGrid;
-    private final App mainApp;
+    private final Consumer<String> statusUpdater;
 
     private final List<Seat> selectedSeats = new ArrayList<>();
     private final List<Button> selectedButtons = new ArrayList<>();
 
-    public SeatSelectionController(GridPane seatGrid, App mainApp) {
+    public SeatSelectionController(GridPane seatGrid, Consumer<String> statusUpdater) {
         this.seatGrid = seatGrid;
-        this.mainApp = mainApp;
+        this.statusUpdater = statusUpdater;
     }
 
     public void populateSeatPlan(Section section, List<Seat> cartSeats) {
@@ -93,7 +97,7 @@ public class SeatSelectionController {
                             if (existingSeat != null) {
                                 seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
                                 selectedSeats.remove(existingSeat);
-                                selectedButtons.remove(existingSeat);
+                                selectedButtons.remove(seatButton);
                             } else {
                                 seatButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: black;");
                                 selectedSeats.add(finalSeat);
@@ -121,13 +125,13 @@ public class SeatSelectionController {
 
     private void updateStatusLabel() {
         if (selectedSeats.isEmpty()) {
-            mainApp.updateSelectionLabel("Keine Plätze ausgewählt");
+            statusUpdater.accept("Keine PlÃ¤tze ausgewÃ¤hlt");
         } else {
-            StringBuilder sb = new StringBuilder("Ausgewählt: ");
+            StringBuilder sb = new StringBuilder("AusgewÃ¤hlt: ");
             for (Seat s : selectedSeats) {
                 sb.append(String.format("| Reihe: %d, Platz: %d ", s.getRowNumber(), s.getSeatNumber()));
             }
-            mainApp.updateSelectionLabel(sb.toString());
+            statusUpdater.accept(sb.toString());
         }
     }
 
@@ -135,3 +139,5 @@ public class SeatSelectionController {
         return selectedSeats;
     }
 }
+
+

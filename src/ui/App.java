@@ -1,35 +1,20 @@
 ﻿package ui;
 
 import domain.*;
-import domain.Event.EventType;
 import repository.*;
 import service.BookingService;
-import controller.SeatSelectionController;
+import ui.dialogs.ReceiptDialog;
+import ui.dialogs.ReceiptHistoryDialog;
+import ui.dialogs.TicketDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Polygon;
-import javafx.scene.paint.Color;
 import ui.screens.LoginScreen;
 import ui.screens.MainMenuScreen;
 import ui.screens.MyTicketsScreen;
@@ -39,6 +24,10 @@ import ui.screens.BookingConfirmationScreen;
 import ui.screens.GraphicSectionSelectionScreen;
 import ui.screens.SeatSelectionScreen;
 import ui.screens.StandingAreaSelectionScreen;
+
+/**
+ * Die Klasse App startet die JavaFX-Anwendung, verwaltet die Navigation und haelt den globalen Buchungszustand.
+ */
 
 public class App extends Application {
     
@@ -188,114 +177,15 @@ public class App extends Application {
 
     public void openReceiptHistoryWindow() {
         List<Receipt> receipts = getReceiptsForLoggedInUser();
-
-        Stage stage = new Stage();
-        stage.initOwner(primaryStage);
-        stage.setTitle("Gespeicherte Quittungen");
-
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(15));
-
-        Label title = new Label("Quittungen");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        ListView<String> receiptList = new ListView<>();
-        receiptList.setPrefHeight(250);
-
-        if (receipts.isEmpty()) {
-            receiptList.getItems().add("Keine Quittungen gefunden.");
-            receiptList.setDisable(true);
-        } else {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-            for (Receipt receipt : receipts) {
-                receiptList.getItems().add(
-                    receipt.getReceiptId() + " | " +
-                    receipt.getCreatedAt().format(dtf) + " | " +
-                    String.format("%.2f EUR", receipt.getTotalAmount())
-                );
-            }
-        }
-
-        Button openButton = new Button("Quittung oeffnen");
-        openButton.setDisable(receipts.isEmpty());
-        openButton.setOnAction(e -> {
-            int selectedIndex = receiptList.getSelectionModel().getSelectedIndex();
-            if (selectedIndex >= 0 && selectedIndex < receipts.size()) {
-                openReceiptWindow(receipts.get(selectedIndex));
-            }
-        });
-
-        root.getChildren().addAll(title, receiptList, openButton);
-        stage.setScene(new Scene(root, 500, 350));
-        stage.show();
+        ReceiptHistoryDialog.show(primaryStage, receipts, this::openReceiptWindow);
     }
 
     public void openTicketWindow(Ticket ticket) {
-        if (ticket == null) {
-            return;
-        }
-
-        Stage stage = new Stage();
-        stage.initOwner(primaryStage);
-        stage.setTitle("Event / Ticket");
-
-        VBox root = new VBox(8);
-        root.setPadding(new Insets(15));
-
-        Label title = new Label("Ticket " + ticket.getTicketId());
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        String eventName = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "-";
-        String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) : "-";
-        String sectionName = ticket.getSection() != null ? ticket.getSection().getName() : "-";
-        String customerType = ticket.getCustomerType() != null ? ticket.getCustomerType() : "Standard";
-
-        root.getChildren().addAll(
-            title,
-            new Label("Event: " + eventName),
-            new Label("Datum: " + eventDate),
-            new Label("Bereich: " + sectionName),
-            new Label("Platz: " + ticket.getSeatInfo()),
-            new Label("Typ: " + customerType),
-            new Label(String.format("Preis: %.2f EUR", ticket.getFinalPrice()))
-        );
-
-        stage.setScene(new Scene(root, 420, 280));
-        stage.show();
+        TicketDialog.show(primaryStage, ticket);
     }
 
     public void openReceiptWindow(Receipt receipt) {
-        if (receipt == null) {
-            return;
-        }
-
-        Stage stage = new Stage();
-        stage.initOwner(primaryStage);
-        stage.setTitle("Quittung " + receipt.getReceiptId());
-
-        VBox root = new VBox(8);
-        root.setPadding(new Insets(15));
-
-        Label title = new Label("Quittung " + receipt.getReceiptId());
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-
-        root.getChildren().addAll(
-            title,
-            new Label("Kunde: " + receipt.getCustomerName()),
-            new Label("E-Mail: " + receipt.getUserEmail()),
-            new Label("Zeitpunkt: " + receipt.getCreatedAt().format(dtf)),
-            new Label(String.format("Gesamtbetrag: %.2f EUR", receipt.getTotalAmount())),
-            new Label("Tickets:")
-        );
-
-        for (String ticketId : receipt.getTicketIds()) {
-            root.getChildren().add(new Label("- " + ticketId));
-        }
-
-        stage.setScene(new Scene(root, 460, 340));
-        stage.show();
+        ReceiptDialog.show(primaryStage, receipt);
     }
 
     public boolean hasLastBookingInfo() {
@@ -331,60 +221,6 @@ public class App extends Application {
             showAlert(Alert.AlertType.INFORMATION, "Kein Ticket", "Es ist kein aktuelles Ticket vorhanden.");
         }
     }
-
-    /*
-    // --- SCREEN 1b: BLOCKAUSWAHL ---    ERSETZT DURCH GRAFISCHE DARSTELLUNG
-    private void showSectionSelection() {
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(30));
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #f5f6fa;");
-
-        Label title = new Label("Blockauswahl");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
-        Label eventInfo = new Label("Event: " + currentSelectedEvent.getTitle());
-        eventInfo.setStyle("-fx-font-style: italic;");
-
-        ListView<String> sectionListView = new ListView<>();
-        // Filtern der Blöcke mit Sitzplätzen
-        List<SeatedSection> seatedSections = new ArrayList<>();
-        for (Section section : currentSelectedEvent.getSections()) {
-            if (section instanceof SeatedSection) {
-                seatedSections.add((SeatedSection) section);
-                sectionListView.getItems().add(section.getName() + " (Faktor: x" + section.getPriceFactor() + ")");
-            }
-        }
-
-        Button nextButton = new Button("Sitzplätze anzeigen");
-        nextButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 14px;");
-        nextButton.setPrefWidth(200);
-
-        nextButton.setOnAction(e -> {
-            int selectedIndex = sectionListView.getSelectionModel().getSelectedIndex();
-            if (selectedIndex >= 0) {
-                currentSelectedSection = seatedSections.get(selectedIndex);
-                showSeatSelection();
-            } else {
-                showAlert(Alert.AlertType.WARNING, "Auswahl fehlt", "Bitte wählen Sie einen Sitzplatz-Block aus!");
-            }
-        });
-
-        Button backButton = new Button("Zurück zu den Events");
-        backButton.setOnAction(e -> showMainMenu());
-
-        // Falls das Event keine Sitzplätze hat
-        if (seatedSections.isEmpty()) {
-            sectionListView.setPlaceholder(new Label("Keine Sitzplatz-Blöcke für dieses Event verfügbar."));
-            nextButton.setDisable(true);
-        }
-
-        root.getChildren().addAll(title, eventInfo, new Label("Verfügbare Blöcke:"), sectionListView, nextButton, backButton);
-        Scene scene = new Scene(root, 600, 500);
-        primaryStage.setScene(scene);
-    }
-    */
-
 
     // TICKET VIEW
     private void showMyTicketsView() {
@@ -571,24 +407,9 @@ public class App extends Application {
         }
     }
 
-    private int[] parseRowAndSeat(String seatInfoStr) {
-        int[] result = new int[]{0,0};
-        if (seatInfoStr == null) {
-            return result;
-        }
-        try {
-            String[] numbers = seatInfoStr.replaceAll("[^0-9]+", " ").trim().split("\\s+");
-            if (numbers.length >= 2) {
-                result[0] = Integer.parseInt(numbers[0]);
-                result[1] = Integer.parseInt(numbers[1]);
-            }
-        } catch (Exception e) {
-
-        }
-        return result;
-    }
-
     public static void main(String[] args) {
         launch(args);
     }
 }
+
+

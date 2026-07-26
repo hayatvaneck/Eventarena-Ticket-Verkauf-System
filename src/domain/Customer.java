@@ -1,4 +1,8 @@
-package domain;
+﻿package domain;
+
+/**
+ * Die Klasse Customer repräsentiert eine Ticketinhaberin oder einen Ticketinhaber mit Typ und Stammdaten.
+ */
 
 public class Customer {
     private final long id;
@@ -8,7 +12,7 @@ public class Customer {
 
     public Customer(long id, String firstName, String lastName, String customerType) {
         if (id <= 0) {
-            throw new IllegalArgumentException("ID muss größer als 0 sein.");
+            throw new IllegalArgumentException("ID muss grÃ¶ÃŸer als 0 sein.");
         }
         if (firstName == null || firstName.trim().isEmpty()) {
             throw new IllegalArgumentException("Vorname darf nicht leer sein.");
@@ -46,3 +50,5 @@ public class Customer {
         return firstName + " " + lastName;
     }
 }
+
+

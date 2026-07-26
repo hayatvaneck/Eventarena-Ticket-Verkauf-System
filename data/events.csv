@@ -1,0 +1,4 @@
+event_id,title,description,date_time,base_price,event_type,interior_mode
+1,"Don Toliver Octane Tour Leg 2","Hip-Hop-Liveshow mit Stehplatz-Innenraum und energiegeladener Konzertatmosphaere.",2026-11-02T19:00,100.0,CONCERT,STANDING
+2,"Klassik Gala","Festlicher Konzertabend mit klassischem Programm im bestuhlten Innenraum.",2026-12-15T20:00,150.0,GALA,SEATED
+3,"Alba Berlin vs. FC Bayern München","Topspiel der Basketball-Bundesliga mit freier Sicht auf das Spielfeld.",2026-08-11T18:00,80.0,BASKETBALL,EMPTY

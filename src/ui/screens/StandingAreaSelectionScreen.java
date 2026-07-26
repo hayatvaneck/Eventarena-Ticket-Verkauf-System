@@ -12,6 +12,11 @@ import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
 
+/**
+ * Die Klasse StandingAreaSelectionScreen erfasst die Anzahl von Stehplatz-Tickets fuer den Warenkorb.
+
+ */
+
 public class StandingAreaSelectionScreen extends BaseScreen {
 
     private final App app;
@@ -58,3 +63,6 @@ public class StandingAreaSelectionScreen extends BaseScreen {
         return createDefaultScene(root);
     }
 }
+
+
+

@@ -20,6 +20,11 @@ import javafx.scene.shape.Polygon;
 import ui.App;
 import ui.ScreenManager;
 
+/**
+ * Die Klasse GraphicSectionSelectionScreen zeigt den grafischen Saalplan und ermoeglicht die Bereichsauswahl.
+
+ */
+
 public class GraphicSectionSelectionScreen extends BaseScreen {
 
     private final App app;
@@ -72,7 +77,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
         ImageView imageView = new ImageView();
         try {
-            Image arenaMapImage = new Image(getClass().getResourceAsStream("/saalplan_stehplätze_innenraum.png"));
+            Image arenaMapImage = new Image(getClass().getResourceAsStream("/ui/resources/images/saalplan_stehplaetze_innenraum.png"));
             imageView.setImage(arenaMapImage);
             imageView.setFitWidth(600);
             imageView.setPreserveRatio(true);
@@ -106,10 +111,10 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         standingArea.setStroke(Color.web("#2c3e50", 0.4));
         standingArea.setStrokeWidth(1);
 
-        Section standingSection = app.findSectionByName("Innenraum (Stehplatz)");
+        Section standingSection = app.findSectionByName("Innenraum");
         if (standingSection != null && app.getCurrentSelectedEvent() != null) {
             double calculatedPrice = app.getCurrentSelectedEvent().getBasePrice() * standingSection.getPriceFactor();
-            Tooltip standingTooltip = new Tooltip(String.format("Innenraum (Stehplatz)\n-----------------------\nTicketpreis: %.2f €", calculatedPrice));
+            Tooltip standingTooltip = new Tooltip(String.format("Innenraum (Stehplatz)\n-----------------------\nTicketpreis: %.2f â‚¬", calculatedPrice));
             standingTooltip.setStyle(
                 "-fx-font-size: 12px;" +
                 "-fx-background-color: #2c3e50;" +
@@ -124,7 +129,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         standingArea.setOnMouseEntered(e -> standingArea.setFill(Color.web("#2c3e50", 0.5)));
         standingArea.setOnMouseExited(e -> standingArea.setFill(Color.web("#2c3e50", 0.15)));
         standingArea.setOnMouseClicked(e -> {
-            app.setCurrentSelectedSection(app.findSectionByName("Innenraum (Stehplatz)"));
+            app.setCurrentSelectedSection(app.findSectionByName("Innenraum"));
             if (app.getCurrentSelectedSection() instanceof StandingSection) {
                 app.navigateTo(ScreenManager.Screen.STANDING_AREA_SELECTION);
             } else {
@@ -142,7 +147,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         Pane clickLayer = new Pane();
         mapContainer.setStyle("-fx-border-color: rgba(0,0,0,0.1);");
 
-        Image arenaMapImage = new Image(getClass().getResourceAsStream("/saalplan_basketball.png"));
+        Image arenaMapImage = new Image(getClass().getResourceAsStream("/ui/resources/images/saalplan_basketball.png"));
         ImageView imageView = new ImageView(arenaMapImage);
         imageView.setFitWidth(600);
         imageView.setPreserveRatio(true);
@@ -204,7 +209,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         Section section = app.findSectionByName(sectionName);
         if (section != null && app.getCurrentSelectedEvent() != null) {
             double calculatedPrice = app.getCurrentSelectedEvent().getBasePrice() * section.getPriceFactor();
-            String tooltipText = String.format("%s\n-----------------------\nTicketpreis: %.2f €", sectionName, calculatedPrice);
+            String tooltipText = String.format("%s\n-----------------------\nTicketpreis: %.2f â‚¬", sectionName, calculatedPrice);
 
             Tooltip tooltip = new Tooltip(tooltipText);
             tooltip.setStyle(
@@ -219,3 +224,6 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         }
     }
 }
+
+
+

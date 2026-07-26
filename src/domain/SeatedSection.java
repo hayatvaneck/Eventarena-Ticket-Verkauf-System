@@ -1,6 +1,11 @@
 package domain;
 import exceptions.SeatAlreadyBookedException;
 
+/**
+ * Die Klasse SeatedSection verwaltet einen Bereich mit festen Sitzreihen und konkreten Sitzplaetzen.
+
+ */
+
 public class SeatedSection extends Section {
     private final Seat[][] seats;
 
@@ -25,7 +30,7 @@ public class SeatedSection extends Section {
                 }
             }
         }
-        return false; // Keine verfügbaren Plätze mehr
+        return false; // Keine verfÃ¼gbaren PlÃ¤tze mehr
     }
 
     @Override
@@ -43,7 +48,7 @@ public class SeatedSection extends Section {
 
     @Override
     public void printLayout() {
-        System.out.println("\nSitzplan für Block: " + getName());
+        System.out.println("\nSitzplan fÃ¼r Block: " + getName());
         System.out.println("[O] = frei, [X] = besetzt\n");
         for(int r = 0; r < seats.length; r++) {
             System.out.printf("Reihe %02d: ", r + 1);
@@ -84,3 +89,6 @@ public class SeatedSection extends Section {
     }
     
 }
+
+
+

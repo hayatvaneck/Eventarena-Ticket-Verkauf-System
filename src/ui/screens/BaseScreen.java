@@ -11,6 +11,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+/**
+ * Die abstrakte Klasse BaseScreen stellt gemeinsame UI-Helfer fuer alle JavaFX-Screens bereit.
+
+ */
+
 public abstract class BaseScreen {
 
     protected static final double DEFAULT_WIDTH = 800;
@@ -110,3 +115,6 @@ public abstract class BaseScreen {
         return new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 }
+
+
+

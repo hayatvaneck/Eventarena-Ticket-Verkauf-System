@@ -1,6 +1,11 @@
 package domain;
 import exceptions.SeatAlreadyBookedException;
 
+/**
+ * Die Klasse Seat repraesentiert einen einzelnen Sitzplatz mit Position, Bereich und Buchungsstatus.
+
+ */
+
 public class Seat {
     private final int rowNumber;
     private final int seatNumber;
@@ -46,3 +51,6 @@ public class Seat {
         this.section = section;
     }
 }
+
+
+

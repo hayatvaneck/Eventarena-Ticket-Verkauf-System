@@ -17,6 +17,11 @@ import ui.ScreenManager;
 
 import java.util.List;
 
+/**
+ * Die Klasse SeatSelectionScreen zeigt den Sitzplan eines Blocks und uebernimmt ausgewaehlte Sitze in den Warenkorb.
+
+ */
+
 public class SeatSelectionScreen extends BaseScreen {
 
     private final App app;
@@ -58,7 +63,7 @@ public class SeatSelectionScreen extends BaseScreen {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);"
         );
 
-        SeatSelectionController controller = new SeatSelectionController(seatGrid, app);
+        SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartSeats());
 
         Label selectionStatusLabel = app.getSelectionStatusLabel();
@@ -87,3 +92,6 @@ public class SeatSelectionScreen extends BaseScreen {
         return createDefaultScene(root);
     }
 }
+
+
+

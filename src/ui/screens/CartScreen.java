@@ -18,6 +18,11 @@ import ui.ScreenManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse CartScreen zeigt den Warenkorb, die Tickettypen und startet den kostenpflichtigen Buchungsvorgang.
+
+ */
+
 public class CartScreen extends BaseScreen {
 
     private final App app;
@@ -78,7 +83,7 @@ public class CartScreen extends BaseScreen {
                 Label lblSeat = new Label(seatLabelText);
                 lblSeat.setStyle("-fx-pref-width: 180px; -fx-alignment: center-left;");
 
-                Label lblPrice = new Label(String.format("%.2f €", singleTicketPrice));
+                Label lblPrice = new Label(String.format("%.2f â‚¬", singleTicketPrice));
                 lblPrice.setStyle("-fx-pref-width: 80px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
 
                 ComboBox<String> cbType = new ComboBox<>();
@@ -90,7 +95,7 @@ public class CartScreen extends BaseScreen {
                     String selectedType = cbType.getValue();
                     double discount = getDiscountFactor(selectedType);
                     double finalPrice = singleTicketPrice * discount;
-                    lblPrice.setText(String.format("%.2f €", finalPrice));
+                    lblPrice.setText(String.format("%.2f â‚¬", finalPrice));
                 });
 
                 javafx.scene.control.Button btnDelete = new javafx.scene.control.Button("X");
@@ -176,3 +181,6 @@ public class CartScreen extends BaseScreen {
         }
     }
 }
+
+
+

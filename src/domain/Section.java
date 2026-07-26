@@ -2,6 +2,11 @@ package domain;
 
 import exceptions.SeatAlreadyBookedException;
 
+/**
+ * Die abstrakte Klasse Section definiert die gemeinsame Basis fuer alle buchbaren und nicht buchbaren Bereiche.
+
+ */
+
 public abstract class Section {
     private final String name;
     private final double priceFactor;
@@ -30,3 +35,5 @@ public abstract class Section {
         return priceFactor;
     }
 }
+
+

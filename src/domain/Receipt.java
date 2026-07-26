@@ -4,6 +4,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse Receipt repraesentiert eine Buchungsquittung mit Betrag, Zeitstempel und Ticketreferenzen.
+
+ */
+
 public class Receipt {
 
     private final String receiptId;
@@ -46,3 +51,6 @@ public class Receipt {
         return new ArrayList<>(ticketIds);
     }
 }
+
+
+

@@ -6,6 +6,11 @@ import repository.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse BookingService kapselt die zentrale Buchungslogik fuer Tickets, Preise und Stornierungen.
+
+ */
+
 public class BookingService {
     
     private final EventRepository eventRepo;
@@ -32,7 +37,7 @@ public class BookingService {
         // 2. Sections im Event suchen
         Section section = event.findSectionByName(sectionName);
         if(section == null) {
-            throw new IllegalArgumentException("Der Block '" + sectionName + "' existiert für dieses Event nicht.");
+            throw new IllegalArgumentException("Der Block '" + sectionName + "' existiert fÃ¼r dieses Event nicht.");
         }
 
         // 3. Platz reservieren
@@ -225,8 +230,11 @@ public class BookingService {
                     section.bookNextAvailableTicket();
                 }
             } catch (SeatAlreadyBookedException e) {
-                System.err.println("Warnung beim Wiederherstellen der Plätze: " + e.getMessage());
+                System.err.println("Warnung beim Wiederherstellen der PlÃ¤tze: " + e.getMessage());
             }
         }
     }
 }
+
+
+

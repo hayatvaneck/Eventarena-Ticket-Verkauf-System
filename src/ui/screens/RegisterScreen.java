@@ -13,6 +13,11 @@ import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
 
+/**
+ * Die Klasse RegisterScreen erfasst neue Benutzerkonten und fuehrt zur Anmeldung zurueck.
+
+ */
+
 public class RegisterScreen extends BaseScreen {
 
     private final App app;
@@ -114,3 +119,6 @@ public class RegisterScreen extends BaseScreen {
         return createDefaultScene(registerRoot);
     }
 }
+
+
+

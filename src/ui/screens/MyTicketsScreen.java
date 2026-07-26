@@ -25,6 +25,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Die Klasse MyTicketsScreen zeigt gebuchte Tickets, ermoeglicht Oeffnen und Stornieren sowie Quittungszugriff.
+
+ */
+
 public class MyTicketsScreen extends BaseScreen {
 
     private final App app;
@@ -105,6 +110,17 @@ public class MyTicketsScreen extends BaseScreen {
         Label lblDate = new Label(eventDate);
         lblDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
 
+        String eventDescription = (ticket.getEvent() != null && ticket.getEvent().getDescription() != null)
+            ? ticket.getEvent().getDescription().trim()
+            : "";
+        if (eventDescription.isEmpty()) {
+            eventDescription = "Keine Eventbeschreibung vorhanden.";
+        }
+        Label lblDescription = new Label(eventDescription);
+        lblDescription.setWrapText(true);
+        lblDescription.setMaxWidth(380);
+        lblDescription.setStyle("-fx-text-fill: #566573; -fx-font-size: 12px;");
+
         String seatInfo;
         if (ticket.getSection() instanceof StandingSection) {
             seatInfo = ticket.getSection().getName();
@@ -129,12 +145,12 @@ public class MyTicketsScreen extends BaseScreen {
         Label lblType = new Label("Typ: " + customerType);
         lblType.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
 
-        details.getChildren().addAll(lblEvent, lblDate, lblSeat, lblType);
+        details.getChildren().addAll(lblEvent, lblDate, lblDescription, lblSeat, lblType);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label lblPrice = new Label(String.format("%.2f €", ticket.getFinalPrice()));
+        Label lblPrice = new Label(String.format("%.2f â‚¬", ticket.getFinalPrice()));
         lblPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
         Button btnCancel = createDangerButton("Stornieren");
@@ -182,7 +198,7 @@ public class MyTicketsScreen extends BaseScreen {
         confirmAlert.setContentText(
             "Event: " + eventTitle + "\n" +
             placeText + "\n" +
-            "Preis: " + String.format("%.2f €", ticket.getFinalPrice())
+            "Preis: " + String.format("%.2f â‚¬", ticket.getFinalPrice())
         );
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
@@ -215,3 +231,6 @@ public class MyTicketsScreen extends BaseScreen {
         return result;
     }
 }
+
+
+
