@@ -1,7 +1,8 @@
 package domain;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Die Klasse Event repräsentiert eine Veranstaltung mit Basispreis, Termin und Bereichen.
  */
@@ -9,23 +10,25 @@ public class Event {
     private Long id;
     private String title;
     private String description;
+    private EventType eventType;
     private LocalDateTime dateTime;
     private double basePrice;
     private List<Section> sections;
     private MapType mapType;
 
-    public Event(Long id, String title, String description, LocalDateTime dateTime, double basePrice, MapType mapType) {
+    public Event(Long id, String title, String description, EventType eventType, LocalDateTime dateTime, double basePrice, MapType mapType) {
         this.id = id;
         this.title = title;
         this.description = description != null ? description : "";
+        this.eventType = eventType;
         this.dateTime = dateTime;
         this.basePrice = basePrice;
         this.sections = new ArrayList<>();
         this.mapType = mapType;
     }
 
-    public Event(Long id, String title, LocalDateTime dateTime, double basePrice, MapType mapType) {
-        this(id, title, "", dateTime, basePrice, mapType);
+    public Event(Long id, String title, EventType eventType, LocalDateTime dateTime, double basePrice, MapType mapType) {
+        this(id, title, "", eventType, dateTime, basePrice, mapType);
     }
 
     public void addSection(Section section) {
@@ -55,6 +58,10 @@ public class Event {
         STAGE_SEATED, ARENA, STAGE_STANDING
     }
 
+    public enum EventType {
+        KONZERT, THEATER, SPORTS, COMEDY, GALA, TANZ, FIRMENEVENT, MUSICAL, OTHER
+    }
+
 
     public boolean isSoldOut() {
         return getTotalAvailableSeats() == 0;
@@ -80,6 +87,10 @@ public class Event {
     }
     public MapType getMapType() {
         return mapType;
+    }
+
+    public EventType getEventType() {
+        return eventType;
     }
 }
 

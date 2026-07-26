@@ -30,7 +30,6 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
     private static final String ROOT_STYLE = "-fx-background-color: #f5f5f7;";
     private static final String CARD_STYLE = "-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-border-color: #cbd5e1; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 8, 0, 0, 2);";
-    private static final String SIMPLE_CARD_STYLE = "-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-border-color: #cbd5e1; -fx-border-radius: 16;";
     private static final String BLOCK_BUTTON_STYLE = "-fx-background-color: %s; -fx-border-color: %s; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 4, 0, 0, 1);";
 
     private final App app;
@@ -70,8 +69,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
             mapContainer.setPrefSize(600, 400);
         }
 
-        Button backButton = new Button("Zurück zu den Events");
-        backButton.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
+        Button backButton = createBackButton("Zurück zu den Events");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
         root.getChildren().addAll(title, mapContainer, backButton);

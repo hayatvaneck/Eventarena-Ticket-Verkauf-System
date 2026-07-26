@@ -4,6 +4,7 @@ import domain.Seat;
 import domain.SeatedSection;
 import domain.Section;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
@@ -40,15 +41,31 @@ public class SeatSelectionController {
             int totalRows = seatedSection.getRowCount();
             int seatsPerRow = seatedSection.getSeatsPerRow();
 
-            for (int r = 0; r < totalRows; r++) {
-                for (int s = 0; s < seatsPerRow; s++) {
+            double horizontalGap = seatsPerRow > 18 ? 4 : 6;
+            double verticalGap = totalRows > 12 ? 4 : 6;
+            double seatButtonWidth = seatsPerRow > 18 ? 28 : 40;
+            double seatButtonHeight = totalRows > 12 ? 18 : 22;
 
-                    int rowNum = r + 1;
+            seatGrid.setHgap(horizontalGap);
+            seatGrid.setVgap(verticalGap);
+
+            Label rowHeader = new Label("Reihe");
+            rowHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+            seatGrid.add(rowHeader, 0, 0);
+
+            for (int r = 0; r < totalRows; r++) {
+                int rowNum = r + 1;
+
+                Label rowLabel = new Label(String.valueOf(rowNum));
+                rowLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+                seatGrid.add(rowLabel, 0, r + 1);
+
+                for (int s = 0; s < seatsPerRow; s++) {
                     int seatNum = s + 1;
 
-                    Seat seat = seatedSection.getSeat(r, s);
+                    Seat seat = seatedSection.getSeat(rowNum, seatNum);
                     if (seat == null) {
-                        seat = new Seat (rowNum, seatNum);
+                        seat = new Seat(rowNum, seatNum);
                     }
 
                     boolean isBookedInRepo = seat.isBooked();
@@ -64,10 +81,10 @@ public class SeatSelectionController {
                     }
 
                     Button seatButton = new Button();
-                    seatButton.setPrefSize(40,5);
+                    seatButton.setPrefSize(seatButtonWidth, seatButtonHeight);
 
                     if (isBookedInRepo) {
-                        seatButton.setStyle("-fx-background-color: #e74c3c;");
+                        seatButton.setStyle("-fx-background-color: #e74c3c");
                         seatButton.setDisable(true);
 
                         Tooltip tooltip = new Tooltip("Verkauft (Reihe " + rowNum + ", Platz " + seatNum + ")");
@@ -75,7 +92,7 @@ public class SeatSelectionController {
                         Tooltip.install(seatButton, tooltip);
 
                     } else if (isInCart) {
-                        seatButton.setStyle("-fx-background-color: #f1c40f; -fx-text-fill: black;");
+                        seatButton.setStyle("-fx-background-color: #f1c40f; -fx-text-fill: black");
                         seatButton.setDisable(true);
 
                         Tooltip tooltip = new Tooltip("Bereits im Warenkorb (Reihe " +  rowNum + ", Platz " + seatNum + ")");
@@ -83,7 +100,7 @@ public class SeatSelectionController {
                         Tooltip.install(seatButton, tooltip);
 
                     } else {
-                        seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
+                        seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white");
 
                         Tooltip tooltip = new Tooltip("Reihe " + rowNum + ", Platz " + seatNum);
                         tooltip.setShowDelay(Duration.millis(100));
@@ -95,11 +112,11 @@ public class SeatSelectionController {
                             Seat existingSeat = findSelectedSeat(rowNum, seatNum);
 
                             if (existingSeat != null) {
-                                seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
+                                seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white");
                                 selectedSeats.remove(existingSeat);
                                 selectedButtons.remove(seatButton);
                             } else {
-                                seatButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: black;");
+                                seatButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: black");
                                 selectedSeats.add(finalSeat);
                                 selectedButtons.add(seatButton);
                             }
@@ -108,7 +125,7 @@ public class SeatSelectionController {
                         });
                     }
 
-                    seatGrid.add(seatButton, s, r);
+                    seatGrid.add(seatButton, s + 1, r + 1);
                 }
             }
         }

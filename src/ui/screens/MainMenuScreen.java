@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 import repository.EventRepository;
 import ui.App;
@@ -105,8 +106,8 @@ public class MainMenuScreen extends BaseScreen {
 
         scrollPane.setContent(cardContainer);
 
-        Button nextButton = createPrimaryButton("Blöcke anzeigen");
-        nextButton.setPrefWidth(200);
+        Button nextButton = createConfirmButton("Blöcke anzeigen");
+        nextButton.setPrefWidth(300);
         nextButton.setOnAction(e -> {
             if (app.getCurrentSelectedEvent() != null) {
                 app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION);
@@ -159,14 +160,14 @@ public class MainMenuScreen extends BaseScreen {
             welcomeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
             Button myTicketsButton = new Button("Meine Tickets");
-            myTicketsButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
+            myTicketsButton.setStyle("-fx-background-color: #4b9c6de1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
             myTicketsButton.setOnAction(e -> {
                 clockTimer.stop();
                 app.navigateTo(ScreenManager.Screen.MY_TICKETS);
             });
 
             Button logoutButton = new Button("Abmelden");
-            logoutButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 4px; -fx-cursor: hand;");
+            logoutButton.setStyle("-fx-background-color: #af645bea; -fx-text-fill: white; -fx-background-radius: 4px; -fx-cursor: hand;");
             logoutButton.setOnAction(e -> {
                 clockTimer.stop();
                 app.logoutUser();
@@ -178,8 +179,8 @@ public class MainMenuScreen extends BaseScreen {
             Label guestLabel = new Label("Sie sind als Gast unterwegs.");
             guestLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
 
-            Button loginButton = new Button("Anmelden / Registrieren");
-            loginButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
+            Button loginButton = new Button("Zum Login");
+            loginButton.setStyle("-fx-background-color: #aee8f0; -fx-text-fill: black; -fx-background-radius: 6px; -fx-cursor: hand; -fx-border-color: #2c3e50; -fx-border-width: 1px; -fx-border-radius: 6px;");
             loginButton.setOnAction(e -> {
                 clockTimer.stop();
                 app.navigateTo(ScreenManager.Screen.LOGIN);
@@ -191,38 +192,58 @@ public class MainMenuScreen extends BaseScreen {
         return headerBar;
     }
 
+    //Erstellt die Event-Karten für die Eventauswahl. Jede Karte zeigt den Titel, das Datum und die Beschreibung des Events an. Außerdem wird der Typ des Events angezeigt.
     private VBox createEventCard(Event event, DateTimeFormatter formatter, List<VBox> eventCards) {
-        VBox card = new VBox(10);
-        card.setPadding(new Insets(20));
-        card.setMinWidth(220);
-        card.setPrefWidth(220);
-        card.setMaxWidth(220);
-        card.setMinHeight(160);
-        card.setAlignment(Pos.TOP_LEFT);
+        VBox card = createVBox(8, Pos.TOP_LEFT);
+        card.setPadding(new Insets(10));
+        card.setMinWidth(320);
+        card.setPrefWidth(320);
+        card.setMaxWidth(320);
+        card.setMinHeight(150);
         card.setStyle(CARD_DEFAULT_STYLE);
-
-        Label eventTitle = new Label(event.getTitle());
-        eventTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
-        eventTitle.setWrapText(true);
-        eventTitle.setMinHeight(Region.USE_PREF_SIZE);
-        eventTitle.setMaxHeight(Double.MAX_VALUE);
-        eventTitle.setAlignment(Pos.TOP_LEFT);
 
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        Label eventDate = new Label(event.getDateTime().format(formatter));
-        eventDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
+        // Header-Bereich der Karte mit Titel und Datum
+        VBox header = createVBox(2, Pos.TOP_LEFT);
+        header.setStyle("-fx-background-color: #2c3e50; -fx-background-radius: 10 10 0 0; -fx-padding: 15;");
+        header.setPadding(new Insets(10,5,10,5));
 
-        String eventDescription = event.getDescription() != null ? event.getDescription().trim() : "";
-        if (eventDescription.isEmpty()) {
-            eventDescription = "Keine Beschreibung vorhanden.";
+        Label eventTitle = new Label(event.getTitle().toUpperCase());
+        eventTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #f3f6f8;");
+        eventTitle.setFont(new Font(16));
+        while (eventTitle.getLayoutBounds().getWidth() > 250) {
+            eventTitle.setFont(Font.font(eventTitle.getFont().getSize() - 1));
         }
+        eventTitle.setWrapText(false);
+        eventTitle.setMinHeight(Region.USE_PREF_SIZE);
+        eventTitle.setMaxWidth(Double.MAX_VALUE);
+        eventTitle.setAlignment(Pos.TOP_LEFT);
+        
+        Label eventDate = new Label(event.getDateTime().format(formatter));
+        eventDate.setStyle("-fx-text-fill: #aee8f0; -fx-font-size: 16px;");
+        eventDate.setAlignment(Pos.BOTTOM_LEFT);
+
+        header.getChildren().addAll(eventTitle, eventDate);
+
+        // Content-Bereich der Karte mit Beschreibung und Event-Typ
+        VBox content = createVBox(10, Pos.TOP_LEFT);
+        content.setPadding(new Insets(0, 12, 0, 12));
+
+
+        String eventDescription;
+        if (event.getDescription() != null) {
+            eventDescription = event.getDescription().trim();
+        } else {
+            eventDescription = "";
+        }
+        
         Label eventDescriptionLabel = new Label(eventDescription);
         eventDescriptionLabel.setWrapText(true);
-        eventDescriptionLabel.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 12px;");
+        eventDescriptionLabel.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 14px;");
 
-        Label mapTypeLabel = new Label(event.getMapType().toString());
+        Label mapTypeLabel = new Label(event.getEventType().toString());
         mapTypeLabel.setStyle(
             "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +
@@ -232,8 +253,12 @@ public class MainMenuScreen extends BaseScreen {
             "-fx-background-radius: 4px;"
         );
 
-        card.getChildren().addAll(eventTitle, eventDescriptionLabel, spacer, eventDate, mapTypeLabel);
+        content.getChildren().addAll(eventDescriptionLabel, mapTypeLabel);
+        
+        // Fügt Header, Content und Spacer zur Karte hinzu
+        card.getChildren().addAll(header, content, spacer);
 
+        // Fügt Hover- und Klick-Effekte hinzu, um die Karte interaktiv zu machen
         card.setOnMouseEntered(e -> {
             if (app.getCurrentSelectedEvent() != event) {
                 card.setStyle(CARD_HOVER_STYLE);

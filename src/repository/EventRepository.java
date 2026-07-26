@@ -2,6 +2,7 @@ package repository;
 
 import domain.*;
 import domain.Event.MapType;
+import domain.Event.EventType;
 import domain.layout.HallLayoutFactory;
 
 import java.io.IOException;
@@ -84,7 +85,13 @@ public class EventRepository {
                     mapType = MapType.valueOf(columns[4].trim());
                 }
 
-                Event event = new Event(eventId, title, description, dateTime, basePrice, mapType);
+                EventType eventType;
+                if (columns.length >= 7) {
+                    eventType = EventType.valueOf(columns[6].trim());
+                } else {
+                    eventType = EventType.OTHER;
+                }
+                Event event = new Event(eventId, title, description, eventType, dateTime, basePrice, mapType);
                 HallLayoutFactory.applyLayoutForMapType(event);
                 this.events.add(event);
             }
@@ -99,7 +106,7 @@ public class EventRepository {
 
     private void saveAllToCsv() {
         List<String> eventLines = new ArrayList<>();
-        eventLines.add("event_id,title,description,date_time,base_price,map_type");
+        eventLines.add("event_id,title,description,event_type,date_time,base_price,map_type");
 
         List<Event> sortedEvents = new ArrayList<>(this.events);
         sortedEvents.sort(Comparator.comparing(Event::getId));
@@ -109,6 +116,7 @@ public class EventRepository {
                 event.getId() + "," +
                 escapeCsv(event.getTitle()) + "," +
                 escapeCsv(event.getDescription()) + "," +
+                event.getEventType().name() + "," +
                 event.getDateTime() + "," +
                 event.getBasePrice() + "," +
                 event.getMapType().name()
@@ -178,6 +186,7 @@ public class EventRepository {
                 event.getId(),
                 event.getTitle(),
                 event.getDescription(),
+                event.getEventType(),
                 event.getDateTime(),
                 event.getBasePrice(),
                 event.getMapType()

@@ -12,6 +12,10 @@ import domain.StandingSection;
 
 public final class HallLayoutFactory {
 
+    private static final int OUTER_BLOCK_ROWS = 10;
+    private static final int OUTER_BLOCK_SEATS_PER_ROW = 20;
+    private static final int INTERIOR_ROWS = (int) (OUTER_BLOCK_ROWS * 1.5);
+
     public enum InteriorMode {
         STANDING,
         SEATED,
@@ -52,7 +56,7 @@ public final class HallLayoutFactory {
                 event.addSection(new StandingSection("Innenraum", 1.0, 2000));
                 break;
             case SEATED:
-                event.addSection(new SeatedSection("Innenraum", 1.0, 15, 12));
+                event.addSection(new SeatedSection("Innenraum", 1.0, INTERIOR_ROWS, OUTER_BLOCK_SEATS_PER_ROW));
                 break;
             case EMPTY:
                 event.addSection(new EmptySection("Innenraum"));
@@ -63,12 +67,12 @@ public final class HallLayoutFactory {
         }
 
         // Feste Hallenstruktur: diese Blöcke sind für alle Events gleich.
-        event.addSection(new SeatedSection("Block 1", 1.2, 10, 20));
-        event.addSection(new SeatedSection("Block 2", 1.2, 10, 20));
-        event.addSection(new SeatedSection("Block 3", 1.2, 10, 20));
-        event.addSection(new SeatedSection("Block 4", 1.2, 10, 20));
-        event.addSection(new SeatedSection("Block 5", 1.0, 10, 20));
-        event.addSection(new SeatedSection("Block 6", 0.8, 10, 20));
+        event.addSection(new SeatedSection("Block 1", 1.2, OUTER_BLOCK_ROWS, OUTER_BLOCK_SEATS_PER_ROW));
+        event.addSection(new SeatedSection("Block 2", 1.2, OUTER_BLOCK_ROWS, OUTER_BLOCK_SEATS_PER_ROW));
+        event.addSection(new SeatedSection("Block 3", 1.2, OUTER_BLOCK_ROWS, OUTER_BLOCK_SEATS_PER_ROW));
+        event.addSection(new SeatedSection("Block 4", 1.2, OUTER_BLOCK_ROWS, OUTER_BLOCK_SEATS_PER_ROW));
+        event.addSection(new SeatedSection("Block 5", 1.0, OUTER_BLOCK_ROWS, OUTER_BLOCK_SEATS_PER_ROW));
+        event.addSection(new SeatedSection("Block 6", 0.8, OUTER_BLOCK_ROWS, OUTER_BLOCK_SEATS_PER_ROW));
         event.addSection(new SeatedSection("VIP", 2.5, 3, 15));
     }
 

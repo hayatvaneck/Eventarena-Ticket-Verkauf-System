@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import ui.App;
@@ -66,6 +67,13 @@ public class SeatSelectionScreen extends BaseScreen {
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartSeats());
 
+        ScrollPane seatGridScrollPane = createTransparentScrollPane(seatGrid);
+        seatGridScrollPane.setPannable(true);
+        seatGridScrollPane.setFitToHeight(false);
+        seatGridScrollPane.setFitToWidth(false);
+        seatGridScrollPane.setPrefViewportHeight(420);
+        seatGridScrollPane.setPrefViewportWidth(740);
+
         Label selectionStatusLabel = app.getSelectionStatusLabel();
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         selectionStatusLabel.setText("Kein Platz ausgewählt");
@@ -88,7 +96,7 @@ public class SeatSelectionScreen extends BaseScreen {
         backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(header, stageLabel, seatGrid, confirmButton, backButton, selectionStatusLabel);
+        root.getChildren().addAll(header, stageLabel, seatGridScrollPane, confirmButton, backButton, selectionStatusLabel);
         return createDefaultScene(root);
     }
 }

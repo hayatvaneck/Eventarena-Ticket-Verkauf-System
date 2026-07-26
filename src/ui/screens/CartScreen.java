@@ -43,6 +43,7 @@ public class CartScreen extends BaseScreen {
 
         List<ComboBox<String>> typeComboBoxes = new ArrayList<>();
         Event currentEvent = app.getCurrentSelectedEvent();
+        String eventName = currentEvent != null ? currentEvent.getTitle() : "Unbekanntes Event";
         double basePrice = currentEvent != null ? currentEvent.getBasePrice() : 0.0;
 
         List<Seat> cartSeats = app.getCartSeats();
@@ -60,9 +61,9 @@ public class CartScreen extends BaseScreen {
                 double sectionFactor = (seatSection != null) ? seatSection.getPriceFactor() : 1.0;
                 double singleTicketPrice = basePrice * sectionFactor;
 
-                HBox row = new HBox(15);
-                row.setAlignment(Pos.CENTER);
-                row.setPadding(new Insets(5, 10, 5, 10));
+                HBox row = new HBox(20);
+                row.setAlignment(Pos.CENTER_LEFT);
+                row.setPadding(new Insets(10, 14, 10, 14));
                 row.setStyle(
                     "-fx-background-color: white;" +
                     "-fx-border-color: #dcdde1;" +
@@ -72,23 +73,37 @@ public class CartScreen extends BaseScreen {
 
                 String seatLabelText;
                 if (seatSection instanceof StandingSection) {
-                    seatLabelText = "Innenraum (Stehplatz)";
+                    seatLabelText = "Stehplatz: " + seatSection.getName();
                 } else if (seat != null && seatSection != null) {
-                    seatLabelText = seatSection.getName() + ", Reihe " + seat.getRowNumber() + ", Platz " + seat.getSeatNumber();
+                    seatLabelText = "Sitzplatz: " + seatSection.getName() + ", Reihe " + seat.getRowNumber() + ", Platz " + seat.getSeatNumber();
                 } else {
                     seatLabelText = "Ticket " + (i + 1);
                 }
 
+                VBox ticketInfoBox = new VBox(4);
+                ticketInfoBox.setAlignment(Pos.CENTER_LEFT);
+
+                Label lblEvent = new Label("Event: " + eventName);
+                lblEvent.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
                 Label lblSeat = new Label(seatLabelText);
-                lblSeat.setStyle("-fx-pref-width: 180px; -fx-alignment: center-left;");
+                lblSeat.setStyle("-fx-text-fill: #34495e;");
+
+                ticketInfoBox.getChildren().addAll(lblEvent, lblSeat);
 
                 Label lblPrice = new Label(String.format("%.2f €", singleTicketPrice));
-                lblPrice.setStyle("-fx-pref-width: 80px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
+                lblPrice.setStyle("-fx-pref-width: 90px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
 
                 ComboBox<String> cbType = new ComboBox<>();
                 cbType.getItems().addAll("Standard", "Student", "Rentner", "Kind");
                 cbType.setValue("Standard");
                 cbType.setPrefWidth(110);
+
+                VBox discountBox = new VBox(3);
+                discountBox.setAlignment(Pos.CENTER_LEFT);
+                Label lblDiscount = new Label("Rabatt:");
+                lblDiscount.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 11px;");
+                discountBox.getChildren().addAll(lblDiscount, cbType);
 
                 cbType.setOnAction(e -> {
                     String selectedType = cbType.getValue();
@@ -102,16 +117,18 @@ public class CartScreen extends BaseScreen {
                     "-fx-background-color: #e74c3c;" +
                     "-fx-text-fill: white;" +
                     "-fx-font-weight: bold;" +
+                    "-fx-padding: 6px 10px;" +
                     "-fx-background-radius: 4px;" +
                     "-fx-cursor: hand"
                 );
+                btnDelete.setAlignment(Pos.CENTER_RIGHT);
 
                 btnDelete.setOnAction(e -> {
                     app.getCartSeats().remove(index);
                     app.navigateTo(ScreenManager.Screen.CART);
                 });
 
-                row.getChildren().addAll(lblSeat, lblPrice, cbType, btnDelete);
+                row.getChildren().addAll(ticketInfoBox, lblPrice, discountBox, btnDelete);
                 formContainer.getChildren().add(row);
                 typeComboBoxes.add(cbType);
             }

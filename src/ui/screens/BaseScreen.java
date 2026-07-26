@@ -28,12 +28,21 @@ public abstract class BaseScreen {
     protected static final String TITLE_STYLE = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: " + COLOR_TEXT + ";";
     protected static final String SUBTITLE_STYLE = "-fx-font-size: 14px; -fx-text-fill: #7f8c8d;";
 
-    protected static final String PRIMARY_BUTTON_STYLE =
+    protected static final String CONFIRM_BUTTON_STYLE =
         "-fx-background-color: #2c3e50;" +
         "-fx-text-fill: white;" +
+        "-fx-font-size: 14px;" +
         "-fx-font-weight: bold;" +
+        "-fx-padding: 10 20 10 20;" +
         "-fx-background-radius: 6px;" +
         "-fx-cursor: hand;";
+
+    protected static final String BACK_BUTTON_STYLE =
+        "-fx-background-color: #595c6e;" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 14px;" +
+        "-fx-padding: 10 20 10 20;" +
+        "-fx-background-radius: 6px;";
 
     protected static final String SECONDARY_BUTTON_STYLE =
         "-fx-background-color: #7f8c8d;" +
@@ -82,9 +91,9 @@ public abstract class BaseScreen {
         return label;
     }
 
-    protected Button createPrimaryButton(String text) {
+    protected Button createConfirmButton(String text) {
         Button button = new Button(text);
-        button.setStyle(PRIMARY_BUTTON_STYLE);
+        button.setStyle(CONFIRM_BUTTON_STYLE);
         return button;
     }
 
@@ -101,8 +110,8 @@ public abstract class BaseScreen {
     }
 
     protected Button createBackButton(String text) {
-        Button button = createSecondaryButton(text);
-        button.setStyle(SECONDARY_BUTTON_STYLE + "-fx-cursor: hand;");
+        Button button = createConfirmButton(text);
+        button.setStyle(BACK_BUTTON_STYLE + "-fx-cursor: hand;");
         return button;
     }
 
