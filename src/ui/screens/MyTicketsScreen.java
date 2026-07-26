@@ -162,7 +162,7 @@ public class MyTicketsScreen extends BaseScreen {
 
         btnCancel.setOnAction(e -> cancelTicket(ticket, eventTitle, loggedInUser));
 
-        Button btnOpenEvent = createPrimaryButton("Event öffnen");
+        Button btnOpenEvent = createConfirmButton("Event öffnen");
         btnOpenEvent.setStyle(
             "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +

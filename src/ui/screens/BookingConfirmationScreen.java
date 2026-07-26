@@ -72,7 +72,7 @@ public class BookingConfirmationScreen extends BaseScreen {
 
         HBox actionButtons = createHBox(10, Pos.CENTER);
 
-        Button openReceiptButton = createPrimaryButton("Quittung öffnen");
+        Button openReceiptButton = createConfirmButton("Quittung öffnen");
         openReceiptButton.setOnAction(e -> app.openLastReceiptWindow());
 
         actionButtons.getChildren().add(openReceiptButton);
@@ -132,7 +132,7 @@ public class BookingConfirmationScreen extends BaseScreen {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button openTicketButton = createPrimaryButton("Ticket öffnen");
+        Button openTicketButton = createConfirmButton("Ticket öffnen");
         openTicketButton.setOnAction(e -> app.openTicketWindow(ticket));
 
         card.getChildren().addAll(details, spacer, openTicketButton);
