@@ -4,9 +4,9 @@ public class Customer {
     private final long id;
     private final String firstName;
     private final String lastName;
-    private final String customerType;
+    private final CustomerType customerType;
 
-    public Customer(long id, String firstName, String lastName, String customerType) {
+    public Customer(long id, String firstName, String lastName, CustomerType customerType) {
         if (id <= 0) {
             throw new IllegalArgumentException("ID muss größer als 0 sein.");
         }
@@ -16,14 +16,11 @@ public class Customer {
         if (lastName == null || lastName.trim().isEmpty()) {
             throw new IllegalArgumentException("Nachname darf nicht leer sein.");
         }
-        if (customerType == null) {
-            throw new IllegalArgumentException("CustomerType darf nicht null sein.");
-        }
 
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.customerType = (customerType != null) ? customerType : "Standard";
+        this.customerType = (customerType != null) ? customerType : CustomerType.STANDARD;
     }
 
     public long getId() {
@@ -38,7 +35,7 @@ public class Customer {
         return lastName;
     }
 
-    public String getCustomerType() {
+    public CustomerType getCustomerType() {
         return customerType;
     }
 
