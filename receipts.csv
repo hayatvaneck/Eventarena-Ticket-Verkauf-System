@@ -1,0 +1,6 @@
+receiptId;userEmail;customerName;createdAt;totalAmount;ticketIds
+R-1001;test@test.de;test test;2026-07-26T10:13:27.703281600;96.0;T-1004|T-1005
+R-1002;test@test.de;test test;2026-07-26T10:16:54.499516300;160.0;T-1006|T-1007
+R-1003;test@test.de;test test;2026-07-26T10:21:24.095089800;144.0;T-1008|T-1009
+R-1004;test@test.de;test test;2026-07-26T10:22:13.699234200;144.0;T-1010|T-1011
+R-1005;test@test.de;test test;2026-07-26T11:54:47.242615900;86.4;T-1012|T-1013
