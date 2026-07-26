@@ -81,15 +81,13 @@ public class MainMenuScreen extends BaseScreen {
         Label title = createTitle("ARENA TICKETSYSTEM");
         Label subtitle = createSubtitle("Wählen Sie ein Event aus:");
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-
         FlowPane cardContainer = new FlowPane();
         cardContainer.setHgap(20);
         cardContainer.setVgap(20);
         cardContainer.setPadding(new Insets(10));
         cardContainer.setAlignment(Pos.CENTER);
+
+        ScrollPane scrollPane = createTransparentScrollPane(cardContainer);
 
         DateTimeFormatter germanDateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
         List<Event> events = eventRepo.getAllEvents();

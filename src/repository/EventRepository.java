@@ -3,7 +3,6 @@ package repository;
 import domain.*;
 import domain.Event.MapType;
 import domain.layout.HallLayoutFactory;
-import domain.layout.HallLayoutFactory.InteriorMode;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Die Klasse EventRepository lädt, speichert und verwaltet alle verfügbaren Events inklusive Innenraum-Modus.
+ * Die Klasse EventRepository lädt, speichert und verwaltet alle verfügbaren Events inklusive Layout-Definition.
 
  */
 
@@ -39,12 +38,8 @@ public class EventRepository {
 
     private void loadEventsFromCsvOrSeed() {
         this.events.clear();
-
-        if (loadFromCsv()) {
-            return;
-        }
-
-        seedMockData();
+        // Demo-Daten sind die einzige Quelle beim Start: CSV wird damit synchronisiert.
+        EventDemoData.seedInto(this.events);
         saveAllToCsv();
     }
 
@@ -77,26 +72,20 @@ public class EventRepository {
                 LocalDateTime dateTime;
                 double basePrice;
                 MapType mapType;
-                InteriorMode interiorMode;
-
-                if (columns.length >= 7) {
+                if (columns.length >= 6) {
                     description = columns[2].trim();
                     dateTime = LocalDateTime.parse(columns[3].trim());
                     basePrice = Double.parseDouble(columns[4].trim());
                     mapType = MapType.valueOf(columns[5].trim());
-                    interiorMode = parseInteriorMode(columns[6]);
                 } else {
                     description = "";
                     dateTime = LocalDateTime.parse(columns[2].trim());
                     basePrice = Double.parseDouble(columns[3].trim());
                     mapType = MapType.valueOf(columns[4].trim());
-                    interiorMode = columns.length >= 6
-                        ? parseInteriorMode(columns[5])
-                        : inferInteriorModeFromMapType(mapType);
                 }
 
                 Event event = new Event(eventId, title, description, dateTime, basePrice, mapType);
-                HallLayoutFactory.applyStandardLayout(event, interiorMode);
+                HallLayoutFactory.applyLayoutForMapType(event);
                 this.events.add(event);
             }
 
@@ -110,21 +99,19 @@ public class EventRepository {
 
     private void saveAllToCsv() {
         List<String> eventLines = new ArrayList<>();
-        eventLines.add("event_id,title,description,date_time,base_price,map_type,interior_mode");
+        eventLines.add("event_id,title,description,date_time,base_price,map_type");
 
         List<Event> sortedEvents = new ArrayList<>(this.events);
         sortedEvents.sort(Comparator.comparing(Event::getId));
 
         for (Event event : sortedEvents) {
-            InteriorMode interiorMode = HallLayoutFactory.inferInteriorMode(event);
             eventLines.add(
                 event.getId() + "," +
                 escapeCsv(event.getTitle()) + "," +
                 escapeCsv(event.getDescription()) + "," +
                 event.getDateTime() + "," +
                 event.getBasePrice() + "," +
-                event.getMapType().name() + "," +
-                interiorMode.name()
+                event.getMapType().name()
             );
         }
 
@@ -156,8 +143,8 @@ public class EventRepository {
                 current.append(c);
             }
         }
-        result.add(current.toString());
 
+        result.add(current.toString());
         return result.toArray(new String[0]);
     }
 
@@ -169,85 +156,24 @@ public class EventRepository {
         return "\"" + escaped + "\"";
     }
 
-    private InteriorMode parseInteriorMode(String value) {
-        try {
-            if (value == null || value.trim().isEmpty()) {
-                return InteriorMode.STANDING;
-            }
-            return InteriorMode.valueOf(value.trim().toUpperCase());
-        } catch (Exception ex) {
-            return InteriorMode.STANDING;
-        }
-    }
-
-    private InteriorMode inferInteriorModeFromMapType(MapType mapType) {
-        if (mapType == MapType.ARENA) {
-            return InteriorMode.EMPTY;
-        }
-        if (mapType == MapType.STAGE_SEATED) {
-            return InteriorMode.SEATED;
-        }
-        return InteriorMode.STANDING;
-    }
-
-    // Erstellen der Events und die zugehÃ¶rigen Sections
-    private void seedMockData() {
-        Event concert = new Event(
-            1L,
-            "Don Toliver Octane Tour Leg 2",
-            "Hip-Hop-Liveshow mit Stehplatz-Innenraum und energiegeladener Konzertatmosphäre.",
-            LocalDateTime.of(2026, 11, 2, 19, 0),
-            100.0,
-            MapType.STAGE_STANDING
-        );
-        HallLayoutFactory.applyStandardLayout(concert, InteriorMode.STANDING);
-        events.add(concert);
-    
-        Event gala = new Event(
-            2L,
-            "Klassik Gala",
-            "Festlicher Konzertabend mit klassischem Programm im bestuhlten Innenraum.",
-            LocalDateTime.of(2026, 12, 15, 20, 0),
-            150.0,
-            MapType.STAGE_SEATED
-        );
-        HallLayoutFactory.applyStandardLayout(gala, InteriorMode.SEATED);
-        events.add(gala);
-
-        Event sport = new Event(
-            3L,
-            "Alba Berlin vs. FC Bayern MÃ¼nchen",
-            "Topspiel der Basketball-Bundesliga mit freier Sicht auf das Spielfeld.",
-            LocalDateTime.of(2026, 8, 11, 18, 0),
-            80.0,
-            MapType.ARENA
-        );
-        HallLayoutFactory.applyStandardLayout(sport, InteriorMode.EMPTY);
-        events.add(sport);
-    }
-
     // Liste aller geladenen Events
     public List<Event> getAllEvents() {
         return new ArrayList<>(this.events);
     }
-    
+
     // Event nach ID suchen
     public Event findById(Long id) {
-        for(Event event : events) {
-            if(event.getId().equals(id)) {
+        for (Event event : events) {
+            if (event.getId().equals(id)) {
                 return event;
             }
         }
         return null;
     }
 
-    // Event wÃ¤hrend der Laufzeit hinzufÃ¼gen
+    // Event waehrend der Laufzeit hinzufuegen
     public void save(Event event) {
-        if(event != null) {
-            InteriorMode interiorMode = event.getSections() == null || event.getSections().isEmpty()
-                ? inferInteriorModeFromMapType(event.getMapType())
-                : HallLayoutFactory.inferInteriorMode(event);
-
+        if (event != null) {
             Event normalizedEvent = new Event(
                 event.getId(),
                 event.getTitle(),
@@ -256,7 +182,7 @@ public class EventRepository {
                 event.getBasePrice(),
                 event.getMapType()
             );
-            HallLayoutFactory.applyStandardLayout(normalizedEvent, interiorMode);
+            HallLayoutFactory.applyLayoutForMapType(normalizedEvent);
 
             this.events.add(normalizedEvent);
             saveAllToCsv();
@@ -272,8 +198,10 @@ public class EventRepository {
         }
         return maxId + 1;
     }
-    
 }
+
+
+
 
 
 

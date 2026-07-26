@@ -61,8 +61,7 @@ public class LoginScreen extends BaseScreen {
         Label registerLink = new Label("Noch kein Konto? Hier registrieren");
         registerLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
 
-        Button btnBackToMain = new Button("Zurück zum Hauptmenü");
-        btnBackToMain.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand;");
+        Button btnBackToMain = createBackButton("Zurück zum Hauptmenü");
         btnBackToMain.setPrefWidth(150);
 
         loginBtn.setOnAction(e -> {

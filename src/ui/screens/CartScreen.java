@@ -49,8 +49,7 @@ public class CartScreen extends BaseScreen {
         Section selectedSection = app.getCurrentSelectedSection();
 
         if (cartSeats == null || cartSeats.isEmpty()) {
-            Label emptyLabel = new Label("Ihr Warenkorb ist derzeit leer.");
-            emptyLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px;");
+            Label emptyLabel = createMutedInfoLabel("Ihr Warenkorb ist derzeit leer.");
             formContainer.getChildren().add(emptyLabel);
         } else {
             for (int i = 0; i < cartSeats.size(); i++) {
@@ -118,9 +117,7 @@ public class CartScreen extends BaseScreen {
             }
         }
 
-        ScrollPane scrollPane = new ScrollPane(formContainer);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: #f5f5f7;");
+        ScrollPane scrollPane = createTransparentScrollPane(formContainer);
         scrollPane.setPrefHeight(300);
 
         VBox buttonBox = new VBox(10);

@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -97,6 +98,25 @@ public abstract class BaseScreen {
         Button button = new Button(text);
         button.setStyle(DANGER_BUTTON_STYLE);
         return button;
+    }
+
+    protected Button createBackButton(String text) {
+        Button button = createSecondaryButton(text);
+        button.setStyle(SECONDARY_BUTTON_STYLE + "-fx-cursor: hand;");
+        return button;
+    }
+
+    protected Label createMutedInfoLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px;");
+        return label;
+    }
+
+    protected ScrollPane createTransparentScrollPane(Parent content) {
+        ScrollPane scrollPane = new ScrollPane(content);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+        return scrollPane;
     }
 
     protected Region createHorizontalSpacer() {

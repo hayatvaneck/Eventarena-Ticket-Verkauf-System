@@ -2,6 +2,7 @@
 
 import domain.EmptySection;
 import domain.Event;
+import domain.Event.MapType;
 import domain.SeatedSection;
 import domain.StandingSection;
 
@@ -18,6 +19,23 @@ public final class HallLayoutFactory {
     }
 
     private HallLayoutFactory() {
+    }
+
+    public static void applyLayoutForMapType(Event event) {
+        if (event == null) {
+            return;
+        }
+
+        applyLayoutForMapType(event, event.getMapType());
+    }
+
+    public static void applyLayoutForMapType(Event event, MapType mapType) {
+        if (event == null) {
+            return;
+        }
+
+        InteriorMode interiorMode = inferInteriorModeFromMapType(mapType);
+        applyStandardLayout(event, interiorMode);
     }
 
     public static void applyStandardLayout(Event event, InteriorMode interiorMode) {
@@ -52,6 +70,22 @@ public final class HallLayoutFactory {
         event.addSection(new SeatedSection("Block 5", 1.0, 10, 20));
         event.addSection(new SeatedSection("Block 6", 0.8, 10, 20));
         event.addSection(new SeatedSection("VIP", 2.5, 3, 15));
+    }
+
+    private static InteriorMode inferInteriorModeFromMapType(MapType mapType) {
+        if (mapType == null) {
+            return InteriorMode.STANDING;
+        }
+
+        switch (mapType) {
+            case ARENA:
+                return InteriorMode.EMPTY;
+            case STAGE_SEATED:
+                return InteriorMode.SEATED;
+            case STAGE_STANDING:
+            default:
+                return InteriorMode.STANDING;
+        }
     }
 
     public static InteriorMode inferInteriorMode(Event event) {

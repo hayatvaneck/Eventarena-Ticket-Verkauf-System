@@ -48,19 +48,16 @@ public class MyTicketsScreen extends BaseScreen {
 
         Label title = createTitle("MEINE TICKETS");
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-
         VBox ticketContainer = createVBox(15, Pos.TOP_CENTER);
         ticketContainer.setPadding(new Insets(10));
+
+        ScrollPane scrollPane = createTransparentScrollPane(ticketContainer);
 
         User loggedInUser = app.getLoggedInUser();
         List<Ticket> myTickets = loggedInUser != null ? loggedInUser.getPurchasedTickets() : null;
 
         if (myTickets == null || myTickets.isEmpty()) {
-            Label noTicketsLabel = new Label("Sie haben bisher noch keine Tickets gebucht.");
-            noTicketsLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px;");
+            Label noTicketsLabel = createMutedInfoLabel("Sie haben bisher noch keine Tickets gebucht.");
             ticketContainer.getChildren().add(noTicketsLabel);
         } else {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
@@ -76,8 +73,7 @@ public class MyTicketsScreen extends BaseScreen {
         Button receiptsButton = createSecondaryButton("Quittungen anzeigen");
         receiptsButton.setOnAction(e -> app.openReceiptHistoryWindow());
 
-        Button backButton = createPrimaryButton("Zurück zum Hauptmenü");
-        backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px; -fx-cursor: Hand;");
+        Button backButton = createBackButton("Zurück zum Hauptmenü");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
         HBox actionButtons = createHBox(10, Pos.CENTER);

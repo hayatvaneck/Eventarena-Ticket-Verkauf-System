@@ -59,8 +59,7 @@ public class BookingConfirmationScreen extends BaseScreen {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
         if (bookedTickets.isEmpty()) {
-            Label noTicketLabel = new Label("Keine Tickets zur aktuellen Buchung gefunden.");
-            noTicketLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;");
+            Label noTicketLabel = createMutedInfoLabel("Keine Tickets zur aktuellen Buchung gefunden.");
             ticketList.getChildren().add(noTicketLabel);
         } else {
             for (Ticket ticket : bookedTickets) {
@@ -68,9 +67,7 @@ public class BookingConfirmationScreen extends BaseScreen {
             }
         }
 
-        ScrollPane detailsScroll = new ScrollPane(ticketList);
-        detailsScroll.setFitToWidth(true);
-        detailsScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        ScrollPane detailsScroll = createTransparentScrollPane(ticketList);
         detailsScroll.setPrefHeight(240);
 
         HBox actionButtons = createHBox(10, Pos.CENTER);

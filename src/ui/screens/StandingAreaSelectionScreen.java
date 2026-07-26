@@ -55,8 +55,7 @@ public class StandingAreaSelectionScreen extends BaseScreen {
             app.navigateTo(ScreenManager.Screen.CART);
         });
 
-        Button backButton = new Button("Zurück zum Saalplan");
-        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
+        Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
         root.getChildren().addAll(header, infoLabel, ticketSpinner, confirmButton, backButton);
