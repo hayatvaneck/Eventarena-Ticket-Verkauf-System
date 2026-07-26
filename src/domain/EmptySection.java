@@ -2,7 +2,7 @@ package domain;
 import exceptions.SeatAlreadyBookedException;
 
 /**
- * Die Klasse EmptySection repraesentiert einen nicht buchbaren Innenraum wie Buehne oder Spielflaeche.
+ * Die Klasse EmptySection repräsentiert einen nicht buchbaren Innenraum wie Bühne oder Spielfläche.
 
  */
 
@@ -13,20 +13,20 @@ public class EmptySection extends Section {
 
     @Override
     public boolean bookNextAvailableTicket() throws SeatAlreadyBookedException {
-        System.out.println("[INFO] Dieser Bereich ist fÃ¼r das Event " + getName() + " nicht verfÃ¼gbar.");
-        return false; // Keine Buchungen mÃ¶glich
+        System.out.println("[INFO] Dieser Bereich ist für das Event " + getName() + " nicht verfügbar.");
+        return false; // Keine Buchungen möglich
     }
 
     @Override
     public int getAvailableSeats() {
-        return 0; // Keine verfÃ¼gbaren PlÃ¤tze
+        return 0; // Keine verfügbaren Plätze
     }
 
     @Override
     public void printLayout() {
         System.out.println("\nBereich: " + getName());
-        System.out.println("Typ: GESPERRT | SPIELFLÃ„CHE | BÃœHNE");
-        System.out.println("Status: FÃ¼r Zuschauer nicht verfÃ¼gbar.\n");
+        System.out.println("Typ: GESPERRT | SPIELFLÄCHE | BÜHNE");
+        System.out.println("Status: Für Zuschauer nicht verfügbar.\n");
     }
 }
 

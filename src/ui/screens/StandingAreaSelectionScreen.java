@@ -13,7 +13,7 @@ import ui.App;
 import ui.ScreenManager;
 
 /**
- * Die Klasse StandingAreaSelectionScreen erfasst die Anzahl von Stehplatz-Tickets fuer den Warenkorb.
+ * Die Klasse StandingAreaSelectionScreen erfasst die Anzahl von Stehplatz-Tickets für den Warenkorb.
 
  */
 
@@ -35,14 +35,14 @@ public class StandingAreaSelectionScreen extends BaseScreen {
         Label header = new Label("Stehplatz-Auswahl: " + selectedSection.getName());
         header.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        Label infoLabel = new Label("Bitte waehlen Sie die Anzahl der gewuenschten Stehplatz-Tickets aus.");
+        Label infoLabel = new Label("Bitte wählen Sie die Anzahl der gewünschten Stehplatz-Tickets aus.");
         infoLabel.setStyle("-fx-font-size: 14px;");
 
         Spinner<Integer> ticketSpinner = new Spinner<>(1, 10, 1);
         ticketSpinner.setStyle("-fx-font-size: 16px;");
         ticketSpinner.setPrefWidth(100);
 
-        Button confirmButton = new Button("Auswahl bestaetigen");
+        Button confirmButton = new Button("Auswahl bestätigen");
         confirmButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
         confirmButton.setPrefWidth(200);
         confirmButton.setOnAction(e -> {
@@ -55,7 +55,7 @@ public class StandingAreaSelectionScreen extends BaseScreen {
             app.navigateTo(ScreenManager.Screen.CART);
         });
 
-        Button backButton = new Button("Zurueck zum Saalplan");
+        Button backButton = new Button("Zurück zum Saalplan");
         backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 

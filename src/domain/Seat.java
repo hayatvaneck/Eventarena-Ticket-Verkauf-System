@@ -2,7 +2,7 @@ package domain;
 import exceptions.SeatAlreadyBookedException;
 
 /**
- * Die Klasse Seat repraesentiert einen einzelnen Sitzplatz mit Position, Bereich und Buchungsstatus.
+ * Die Klasse Seat repräsentiert einen einzelnen Sitzplatz mit Position, Bereich und Buchungsstatus.
 
  */
 

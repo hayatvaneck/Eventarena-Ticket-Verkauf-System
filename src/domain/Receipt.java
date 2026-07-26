@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Die Klasse Receipt repraesentiert eine Buchungsquittung mit Betrag, Zeitstempel und Ticketreferenzen.
+ * Die Klasse Receipt repräsentiert eine Buchungsquittung mit Betrag, Zeitstempel und Ticketreferenzen.
 
  */
 

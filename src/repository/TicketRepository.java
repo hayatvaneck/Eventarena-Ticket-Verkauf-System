@@ -117,7 +117,7 @@ public class TicketRepository {
 
                 Event event = eventRepo.findById(eventId);
                 if (event == null) {
-                    System.err.println("Event mit ID " + eventId + " fÃ¼r Ticket " + ticketId + "existiert nicht mehr. Ticket Ã¼bersprungen.");
+                    System.err.println("Event mit ID " + eventId + " für Ticket " + ticketId + " existiert nicht mehr. Ticket übersprungen.");
                     continue;
                 }
 
@@ -127,7 +127,7 @@ public class TicketRepository {
                 }
                 
                 if (section == null) {
-                    System.err.println("Bereich " + sectionName + " fÃ¼r Ticket " + ticketId + " existiert nicht mehr. Ticket Ã¼bersprungen.");
+                    System.err.println("Bereich " + sectionName + " für Ticket " + ticketId + " existiert nicht mehr. Ticket übersprungen.");
                     continue;
                 }
 

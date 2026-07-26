@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Die Klasse User repraesentiert ein Benutzerkonto mit Login-Daten und gekauften Tickets.
+ * Die Klasse User repräsentiert ein Benutzerkonto mit Login-Daten und gekauften Tickets.
 
  */
 
@@ -12,7 +12,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private String password; // hier nicht verschlÃ¼sselt
+    private String password; // hier nicht verschlüsselt
     private List<Ticket> purchasedTickets = new ArrayList<>(); // Liste der gekauften Tickets
 
     public User (String firstName, String lastName, String email, String password) {

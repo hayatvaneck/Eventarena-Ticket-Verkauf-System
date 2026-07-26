@@ -3,7 +3,7 @@ package domain;
 import exceptions.SeatAlreadyBookedException;
 
 /**
- * Die abstrakte Klasse Section definiert die gemeinsame Basis fuer alle buchbaren und nicht buchbaren Bereiche.
+ * Die abstrakte Klasse Section definiert die gemeinsame Basis für alle buchbaren und nicht buchbaren Bereiche.
 
  */
 

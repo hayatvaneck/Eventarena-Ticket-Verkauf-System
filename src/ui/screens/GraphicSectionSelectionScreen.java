@@ -1,6 +1,6 @@
 package ui.screens;
 
-import domain.Event.EventType;
+import domain.Event.MapType;
 import domain.Section;
 import domain.StandingSection;
 import javafx.geometry.Insets;
@@ -10,22 +10,28 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import ui.App;
 import ui.ScreenManager;
 
 /**
- * Die Klasse GraphicSectionSelectionScreen zeigt den grafischen Saalplan und ermoeglicht die Bereichsauswahl.
+ * Die Klasse GraphicSectionSelectionScreen zeigt den grafischen Saalplan und ermöglicht die Bereichsauswahl.
 
  */
 
 public class GraphicSectionSelectionScreen extends BaseScreen {
+
+    private static final String ROOT_STYLE = "-fx-background-color: #f5f5f7;";
+    private static final String CARD_STYLE = "-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-border-color: #cbd5e1; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 8, 0, 0, 2);";
+    private static final String SIMPLE_CARD_STYLE = "-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-border-color: #cbd5e1; -fx-border-radius: 16;";
+    private static final String BLOCK_BUTTON_STYLE = "-fx-background-color: %s; -fx-border-color: %s; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 4, 0, 0, 1);";
 
     private final App app;
 
@@ -37,193 +43,338 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
     public Scene buildScene() {
         if (app.getCurrentSelectedEvent() == null) {
             VBox emptyRoot = createRoot(10, new Insets(20), Pos.CENTER);
-            emptyRoot.getChildren().add(new Label("Kein Event ausgewaehlt."));
+            emptyRoot.getChildren().add(new Label("Kein Event ausgewählt."));
             return createDefaultScene(emptyRoot);
         }
 
         VBox root = createRoot(15, new Insets(20), Pos.CENTER);
-        root.setStyle("-fx-background-color: #ebe4e4;");
+        root.setStyle(ROOT_STYLE);
 
-        Label title = new Label("Blockauswahl fuer: " + app.getCurrentSelectedEvent().getTitle());
+        Label title = new Label("Blockauswahl für: " + app.getCurrentSelectedEvent().getTitle());
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;");
 
         StackPane mapContainer;
-        if (app.getCurrentSelectedEvent().getEventType() == EventType.BASKETBALL) {
-            mapContainer = createBasketballLayout();
-        } else if (app.getCurrentSelectedEvent().getEventType() == EventType.CONCERT) {
-            mapContainer = createConcertLayout();
+        if (app.getCurrentSelectedEvent().getMapType() == MapType.ARENA) {
+            mapContainer = createArenaLayout();
+        } else if (app.getCurrentSelectedEvent().getMapType() == MapType.STAGE_STANDING) {
+            mapContainer = createStageStandingLayout();
+        } else if (app.getCurrentSelectedEvent().getMapType() == MapType.STAGE_SEATED) {
+            mapContainer = createStageSeatedLayout();
         } else {
-            mapContainer = createGalaLayout();
+            mapContainer = null;
         }
 
         if (mapContainer == null) {
             mapContainer = new StackPane(new Label("Fehler: Saalplan-Layout ist null!"));
-            mapContainer.setStyle("-fx-background-color: #ffcccc; -fx-border-color: red;");
+            mapContainer.setStyle("-fx-background-color: #7f8c8d; -fx-border-color: red;");
             mapContainer.setPrefSize(600, 400);
         }
 
-        Button backButton = new Button("Zurueck zu den Events");
-        backButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
+        Button backButton = new Button("Zurück zu den Events");
+        backButton.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
         root.getChildren().addAll(title, mapContainer, backButton);
         return createDefaultScene(root);
     }
 
-    private StackPane createConcertLayout() {
+    private StackPane createStageStandingLayout() {
         StackPane mapContainer = new StackPane();
-        Pane clickLayer = new Pane();
-        mapContainer.setStyle("-fx-border-color: rgba(0,0,0,0.1);");
+         VBox mapWrapper = new VBox(20);
+        mapWrapper.setAlignment(Pos.CENTER);
+        mapWrapper.setPadding(new Insets(24));
+        mapWrapper.setStyle(CARD_STYLE);
 
-        ImageView imageView = new ImageView();
-        try {
-            Image arenaMapImage = new Image(getClass().getResourceAsStream("/ui/resources/images/saalplan_stehplaetze_innenraum.png"));
-            imageView.setImage(arenaMapImage);
-            imageView.setFitWidth(600);
-            imageView.setPreserveRatio(true);
-            mapContainer.getChildren().add(imageView);
-        } catch (Exception e) {
-            mapContainer.setStyle("-fx-background-color: #cccccc; -fx-border-color: red");
-            mapContainer.setPrefSize(600, 450);
-        }
+        // GRID OF SECTIONS
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setAlignment(Pos.CENTER);
 
-        Polygon block1 = new Polygon(new double[]{373.6, 124.0, 373.6, 68.0, 583.2, 68.0, 583.2, 160.0, 423.2, 160.0, 422.4, 124.0});
-        setupStandardBlock(block1, "Block 1");
+        // TOP ROW: Block 2 & Block 1
+        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
+        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
 
-        Polygon block2 = new Polygon(new double[]{158.4, 160.0, 320.0, 160.0, 320.0, 125.0, 368.8, 125.0, 368.8, 68.0, 158.4, 68.0});
-        setupStandardBlock(block2, "Block 2");
+        // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
+        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180+20);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180+20);
+        Button standingBtn = createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8", "INNENRAUM (Stehplätze)", 442, 180);
 
-        Polygon block3 = new Polygon(new double[]{155.2, 354.4, 368.8, 354.4, 369.6, 447.2, 156.0, 447.2});
-        setupStandardBlock(block3, "Block 3");
+        // BÜHNE Block
+        StackPane stageBox = new StackPane();
+        Rectangle stageRect = new Rectangle(90, 180, Color.web("#0f172a"));
+        stageRect.setArcWidth(14);
+        stageRect.setArcHeight(14);
+        stageRect.setStroke(Color.web("#334155"));
+        stageRect.setStrokeWidth(2);
 
-        Polygon block4 = new Polygon(new double[]{372.8, 354.4, 583.2, 354.4, 583.2, 447.2, 372.8, 447.2});
-        setupStandardBlock(block4, "Block 4");
+        Label stageLabel = new Label("B Ü H N E");
+        stageLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        stageLabel.setTextFill(Color.WHITE);
+        stageLabel.setRotate(-90);
+        stageBox.getChildren().addAll(stageRect, stageLabel);
 
-        Polygon block6 = new Polygon(new double[]{97.6, 176.0, 166.4, 176.8, 165.6, 336.0, 97.6, 336.0});
-        setupStandardBlock(block6, "Block 6");
+        // BOTTOM ROW: Block 3 & Block 4
+        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
+        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215, 85+10);
 
-        Polygon vipBlock = new Polygon(new double[]{319.2, 160.0, 319.2, 124.0, 421.6, 124.0, 423.2, 160.0});
-        setupStandardBlock(vipBlock, "VIP");
+        // GRID ASSEMBLY
+        grid.add(block2Btn, 2, 0);
+        grid.add(block1Btn, 3, 0);
 
-        Polygon standingArea = new Polygon(new double[]{185.6, 176.8, 548.8, 176.8, 548.8, 336.0, 185.6, 336.0});
-        standingArea.setStyle("-fx-cursor: hand;");
-        standingArea.setFill(Color.web("#2c3e50", 0.15));
-        standingArea.setStroke(Color.web("#2c3e50", 0.4));
-        standingArea.setStrokeWidth(1);
+        grid.add(block6Btn, 0, 1);
+        grid.add(vipBtn, 1, 1);
+        grid.add(standingBtn, 2, 1, 2, 1); // Spans cols 2 & 3
+        grid.add(stageBox, 4, 1);
 
-        Section standingSection = app.findSectionByName("Innenraum");
-        if (standingSection != null && app.getCurrentSelectedEvent() != null) {
-            double calculatedPrice = app.getCurrentSelectedEvent().getBasePrice() * standingSection.getPriceFactor();
-            Tooltip standingTooltip = new Tooltip(String.format("Innenraum (Stehplatz)\n-----------------------\nTicketpreis: %.2f â‚¬", calculatedPrice));
-            standingTooltip.setStyle(
-                "-fx-font-size: 12px;" +
-                "-fx-background-color: #2c3e50;" +
-                "-fx-text-fill: white;" +
-                "-fx-padding: 8px;" +
-                "-fx-background-radius: 4px;"
-            );
-            standingTooltip.setShowDelay(javafx.util.Duration.millis(100));
-            Tooltip.install(standingArea, standingTooltip);
-        }
+        grid.add(block3Btn, 2, 2);
+        grid.add(block4Btn, 3, 2);
 
-        standingArea.setOnMouseEntered(e -> standingArea.setFill(Color.web("#2c3e50", 0.5)));
-        standingArea.setOnMouseExited(e -> standingArea.setFill(Color.web("#2c3e50", 0.15)));
-        standingArea.setOnMouseClicked(e -> {
-            app.setCurrentSelectedSection(app.findSectionByName("Innenraum"));
-            if (app.getCurrentSelectedSection() instanceof StandingSection) {
+        // Legend
+        HBox legend = new HBox(28);
+        legend.setAlignment(Pos.CENTER);
+        legend.setPadding(new Insets(10, 0, 0, 0));
+        legend.getChildren().addAll(
+            createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
+            createLegendItem("VIP Balkon", "#fde047", "#d97706"),
+            createLegendItem("Innenraum (Stehplätze)", "#e0e7ff", "#2563eb"),
+            createLegendItem("Bühne", "#0f172a", "#334155")
+        );
+
+        mapWrapper.getChildren().addAll(grid, legend);
+        mapContainer.getChildren().add(mapWrapper);
+        return mapContainer;
+    }
+
+    private Button createBlockButton(String name, String bgHex, String borderHex, String textHex, String subtitle, double width, double height) {
+        Button btn = new Button();
+        btn.setPrefSize(width, height);
+
+        String sectionLookupName = name.contains("Innenraum") ? "Innenraum" : name;
+        Section sec = app.findSectionByName(sectionLookupName);
+        double priceFactor = sec != null ? sec.getPriceFactor() : 1.0;
+        double calcPrice = app.getCurrentSelectedEvent().getBasePrice() * priceFactor;
+
+        VBox content = new VBox(3);
+        content.setAlignment(Pos.CENTER);
+
+        Label nameLbl = new Label(name.toUpperCase());
+        nameLbl.setFont(Font.font("System", FontWeight.BOLD, 14));
+        nameLbl.setTextFill(Color.web(textHex));
+
+        Label subLbl = new Label(subtitle);
+        subLbl.setFont(Font.font("System", 11));
+        subLbl.setTextFill(Color.web(textHex));
+
+        Label priceLbl = new Label(String.format("%.2f €", calcPrice));
+        priceLbl.setFont(Font.font("System", FontWeight.BOLD, 13));
+        priceLbl.setTextFill(Color.web(borderHex));
+
+        content.getChildren().addAll(nameLbl, subLbl, priceLbl);
+        btn.setGraphic(content);
+
+        btn.setStyle(String.format(BLOCK_BUTTON_STYLE, bgHex, borderHex));
+
+        btn.setOnAction(e -> {
+            if (sec == null) {
+                app.showAlert(Alert.AlertType.WARNING, "Fehler", "Der Bereich '" + name + "' konnte im Event nicht gefunden werden.");
+                return;
+            }
+
+            app.setCurrentSelectedSection(sec);
+            if (sec instanceof StandingSection) {
                 app.navigateTo(ScreenManager.Screen.STANDING_AREA_SELECTION);
             } else {
-                app.showAlert(Alert.AlertType.WARNING, "Fehler", "Der Stehplatzbereich konnte nicht geladen werden.");
-            }
-        });
-
-        clickLayer.getChildren().addAll(block1, block2, block3, block4, block6, vipBlock, standingArea);
-        mapContainer.getChildren().addAll(clickLayer);
-        return mapContainer;
-    }
-
-    private StackPane createBasketballLayout() {
-        StackPane mapContainer = new StackPane();
-        Pane clickLayer = new Pane();
-        mapContainer.setStyle("-fx-border-color: rgba(0,0,0,0.1);");
-
-        Image arenaMapImage = new Image(getClass().getResourceAsStream("/ui/resources/images/saalplan_basketball.png"));
-        ImageView imageView = new ImageView(arenaMapImage);
-        imageView.setFitWidth(600);
-        imageView.setPreserveRatio(true);
-
-        Polygon block2 = new Polygon(new double[]{191.0, 96.0, 369.0, 96.0, 369.0, 137.0, 318.0, 138.0, 318.0, 174.0, 191.0, 174.0});
-        setupStandardBlock(block2, "Block 2");
-
-        Polygon vipBlock = new Polygon(new double[]{318.4, 175.2, 318.4, 139.0, 422.4, 139.0, 422.4, 175.2});
-        setupStandardBlock(vipBlock, "VIP");
-
-        Polygon block1 = new Polygon(new double[]{372.0, 96.0, 551.0, 96.0, 551.0, 174.0, 422.0, 174.0, 422.0, 138.0, 372.0, 138.0});
-        setupStandardBlock(block1, "Block 1");
-
-        Polygon block6 = new Polygon(new double[]{140.8, 190.4, 198.4, 190.4, 198.4, 324.8, 140.8, 324.8});
-        setupStandardBlock(block6, "Block 6");
-
-        Polygon block5 = new Polygon(new double[]{541.6, 190.4, 600.8, 190.4, 600.8, 324.8, 541.6, 324.8});
-        setupStandardBlock(block5, "Block 5");
-
-        Polygon block3 = new Polygon(new double[]{190.4, 340.0, 370.4, 340.0, 370.4, 419.2, 190.4, 419.2});
-        setupStandardBlock(block3, "Block 3");
-
-        Polygon block4 = new Polygon(new double[]{372.8, 340.0, 552.8, 340.0, 552.8, 419.2, 372.8, 419.2});
-        setupStandardBlock(block4, "Block 4");
-
-        clickLayer.getChildren().addAll(block1, block2, vipBlock, block3, block4, block5, block6);
-        mapContainer.getChildren().addAll(imageView, clickLayer);
-        return mapContainer;
-    }
-
-    private StackPane createGalaLayout() {
-        StackPane mapContainer = new StackPane();
-        mapContainer.setStyle("-fx-background-color: #34495e; -fx-border-color: gold;");
-        mapContainer.setPrefSize(600, 400);
-
-        Label placeholder = new Label("Gala-Saalplan (Noch in Entwicklung)");
-        placeholder.setStyle("-fx-text-fill: white; -fx-font-size: 16px");
-
-        mapContainer.getChildren().add(placeholder);
-        return mapContainer;
-    }
-
-    private void setupStandardBlock(Polygon block, String sectionName) {
-        block.setStyle("-fx-cursor: hand;");
-        block.setFill(Color.web("#2c3e50", 0.15));
-        block.setStroke(Color.web("#2c3e50", 0.4));
-        block.setStrokeWidth(1);
-
-        block.setOnMouseEntered(e -> block.setFill(Color.web("#2c3e50", 0.5)));
-        block.setOnMouseExited(e -> block.setFill(Color.web("#2c3e50", 0.15)));
-
-        block.setOnMouseClicked(e -> {
-            app.setCurrentSelectedSection(app.findSectionByName(sectionName));
-            if (app.getCurrentSelectedSection() != null) {
                 app.navigateTo(ScreenManager.Screen.SEAT_SELECTION);
             }
         });
 
-        Section section = app.findSectionByName(sectionName);
-        if (section != null && app.getCurrentSelectedEvent() != null) {
-            double calculatedPrice = app.getCurrentSelectedEvent().getBasePrice() * section.getPriceFactor();
-            String tooltipText = String.format("%s\n-----------------------\nTicketpreis: %.2f â‚¬", sectionName, calculatedPrice);
+        btn.setOnMouseEntered(e -> btn.setStyle(btn.getStyle().replace(bgHex, "#ffffff")));
+        btn.setOnMouseExited(e -> btn.setStyle(btn.getStyle().replace("#ffffff", bgHex)));
 
-            Tooltip tooltip = new Tooltip(tooltipText);
-            tooltip.setStyle(
-                "-fx-font-size: 12px;" +
-                "-fx-background-color: #2c3e50;" +
-                "-fx-text-fill: white;" +
-                "-fx-padding: 8px;" +
-                "-fx-background-radius: 4px"
-            );
-            tooltip.setShowDelay(javafx.util.Duration.millis(100));
-            Tooltip.install(block, tooltip);
+        if (sec != null) {
+            Tooltip tooltip = new Tooltip(String.format("%s\nTicketpreis: %.2f €", sec.getName(), calcPrice));
+            Tooltip.install(btn, tooltip);
         }
+
+        return btn;
     }
-}
+
+    private HBox createLegendItem(String labelText, String bgHex, String borderHex) {
+        HBox box = new HBox(8);
+        box.setAlignment(Pos.CENTER);
+
+        Rectangle r = new Rectangle(14, 14, Color.web(bgHex));
+        r.setArcWidth(4);
+        r.setArcHeight(4);
+        r.setStroke(Color.web(borderHex));
+        r.setStrokeWidth(1.5);
+
+        Label lbl = new Label(labelText);
+        lbl.setFont(Font.font("System", FontWeight.BOLD, 12));
+        lbl.setTextFill(Color.web("#475569"));
+
+        box.getChildren().addAll(r, lbl);
+        return box;
+    }
+
+    private StackPane createArenaLayout() {
+        StackPane mapContainer = new StackPane();
+        
+        VBox mapWrapper = new VBox(20);
+        mapWrapper.setAlignment(Pos.CENTER);
+        mapWrapper.setPadding(new Insets(24));
+        mapWrapper.setStyle(CARD_STYLE);
+
+        // GRID OF SECTIONS
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setAlignment(Pos.CENTER);
+
+        // Wir berechnen die Breite des Spielfelds passend zu Block 1 & 2 (235 + 235 + 12 Lücke = 482)
+        double blockWidth = 235;
+        double blockHeight = 95;
+        double centerHeight = 200;
+
+        // TOP ROW: Block 2 & Block 1
+        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
+        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
+
+        // MIDDLE ROW: Block 6, VIP Balkon, SPIELFELD, Block 5
+        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, centerHeight);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, centerHeight);
+        
+        // SPIELFELD (Visuelles Element, nicht klickbar)
+        StackPane courtBox = new StackPane();
+        Rectangle courtRect = new Rectangle(482, centerHeight, Color.web("#fef3c7")); // Helle Holz-Farbe (Parkett)
+        courtRect.setArcWidth(14);
+        courtRect.setArcHeight(14);
+        courtRect.setStroke(Color.web("#d97706")); // Dunkelorange Begrenzungslinie
+        courtRect.setStrokeWidth(3);
+
+        // Arena-Flair: Mittellinie und Mittelkreis
+        Rectangle centerLine = new Rectangle(3, centerHeight, Color.web("#d97706"));
+        javafx.scene.shape.Circle centerCircle = new javafx.scene.shape.Circle(25, Color.TRANSPARENT);
+        centerCircle.setStroke(Color.web("#d97706"));
+        centerCircle.setStrokeWidth(3);
+
+        Label courtLabel = new Label("VERANSTAlTUNGSFLÄCHE");
+        courtLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
+        courtLabel.setTextFill(Color.web("#b45309")); // Dunkelbraun/Orange für Text
+        courtLabel.setTranslateY(-centerHeight / 2 + 60); // Positioniert den Text oben im Spielfeld
+        courtLabel.setTranslateX(-4); // Positioniert den Text leicht links
+
+        // Alles übereinanderlegen
+        courtBox.getChildren().addAll(courtRect, centerLine, centerCircle, courtLabel);
+
+        // RECHTE SEITE: Block 5 (statt der Bühne)
+        Button block5Btn = createBlockButton("Block 5", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, centerHeight);
+
+        // BOTTOM ROW: Block 3 & Block 4
+        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
+        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
+
+        // GRID ASSEMBLY
+        // Reihe 0: Block 2 und 1
+        grid.add(block2Btn, 2, 0);
+        grid.add(block1Btn, 3, 0);
+
+        // Reihe 1: Block 6, VIP, Spielfeld (nimmt 2 Spalten ein), Block 5
+        grid.add(block6Btn, 0, 1);
+        grid.add(vipBtn, 1, 1);
+        grid.add(courtBox, 2, 1, 2, 1); // Spans cols 2 & 3
+        grid.add(block5Btn, 4, 1);
+
+        // Reihe 2: Block 3 und 4
+        grid.add(block3Btn, 2, 2);
+        grid.add(block4Btn, 3, 2);
+
+        // Legende (Angepasst für Arena)
+        HBox legend = new HBox(28);
+        legend.setAlignment(Pos.CENTER);
+        legend.setPadding(new Insets(10, 0, 0, 0));
+        legend.getChildren().addAll(
+            createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
+            createLegendItem("VIP Balkon", "#fde047", "#d97706"),
+            createLegendItem("Veranstaltungsfläche", "#fef3c7", "#d97706")
+        );
+
+        mapWrapper.getChildren().addAll(grid, legend);
+        mapContainer.getChildren().add(mapWrapper);
+        
+        return mapContainer;
+    }
+
+    private StackPane createStageSeatedLayout() {
+        StackPane mapContainer = new StackPane();
+
+        VBox mapWrapper = new VBox(20);
+        mapWrapper.setAlignment(Pos.CENTER);
+        mapWrapper.setPadding(new Insets(24));
+        mapWrapper.setStyle(CARD_STYLE);
+// GRID OF SECTIONS
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setAlignment(Pos.CENTER);
+
+        // TOP ROW: Block 2 & Block 1
+        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
+        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
+
+        // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
+        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180+20);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180+20);
+        Button blockInnerBtn = createBlockButton("Innenraum (Sitzplatz)", "#e0e7ff", "#2563eb", "#1d4ed8", "INNENRAUM (Sitzplätze)", 442, 180);
+        //Button text= createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8", "INNENRAUM (Sitzplätze)", 442, 180);
+
+        // BÜHNE Block
+        StackPane stageBox = new StackPane();
+        Rectangle stageRect = new Rectangle(90, 180, Color.web("#0f172a"));
+        stageRect.setArcWidth(14);
+        stageRect.setArcHeight(14);
+        stageRect.setStroke(Color.web("#334155"));
+        stageRect.setStrokeWidth(2);
+
+        Label stageLabel = new Label("B Ü H N E");
+        stageLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        stageLabel.setTextFill(Color.WHITE);
+        stageLabel.setRotate(-90);
+        stageBox.getChildren().addAll(stageRect, stageLabel);
+
+        // BOTTOM ROW: Block 3 & Block 4
+        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
+        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215, 85+10);
+
+        // GRID ASSEMBLY
+        grid.add(block2Btn, 2, 0);
+        grid.add(block1Btn, 3, 0);
+
+        grid.add(block6Btn, 0, 1);
+        grid.add(vipBtn, 1, 1);
+        grid.add(blockInnerBtn, 2, 1, 2, 1); // Spans cols 2 & 3
+        grid.add(stageBox, 4, 1);
+
+        grid.add(block3Btn, 2, 2);
+        grid.add(block4Btn, 3, 2);
+
+        // Legend
+        HBox legend = new HBox(28);
+        legend.setAlignment(Pos.CENTER);
+        legend.setPadding(new Insets(10, 0, 0, 0));
+        legend.getChildren().addAll(
+            createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
+            createLegendItem("VIP Balkon", "#fde047", "#d97706"),
+            createLegendItem("Innenraum (Sitzplätze)", "#e0e7ff", "#2563eb"),
+            createLegendItem("Bühne", "#0f172a", "#334155")
+        );
+        mapWrapper.getChildren().addAll(grid, legend);
+        mapContainer.getChildren().add(mapWrapper);
+
+        return mapContainer;
+    }
+} 
 
 
 

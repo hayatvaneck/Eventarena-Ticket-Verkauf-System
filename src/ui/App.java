@@ -26,7 +26,7 @@ import ui.screens.SeatSelectionScreen;
 import ui.screens.StandingAreaSelectionScreen;
 
 /**
- * Die Klasse App startet die JavaFX-Anwendung, verwaltet die Navigation und haelt den globalen Buchungszustand.
+ * Die Klasse App startet die JavaFX-Anwendung, verwaltet die Navigation und hält den globalen Buchungszustand.
  */
 
 public class App extends Application {

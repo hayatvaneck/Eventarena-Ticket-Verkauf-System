@@ -6,7 +6,7 @@ import domain.SeatedSection;
 import domain.StandingSection;
 
 /**
- * Die Klasse HallLayoutFactory erstellt das feste Hallenlayout und waehlt die Innenraum-Nutzung je Event.
+ * Die Klasse HallLayoutFactory erstellt das feste Hallenlayout und wählt die Innenraum-Nutzung je Event.
  */
 
 public final class HallLayoutFactory {
@@ -44,7 +44,7 @@ public final class HallLayoutFactory {
                 break;
         }
 
-        // Feste Hallenstruktur: diese Bloecke sind fuer alle Events gleich.
+        // Feste Hallenstruktur: diese Blöcke sind für alle Events gleich.
         event.addSection(new SeatedSection("Block 1", 1.2, 10, 20));
         event.addSection(new SeatedSection("Block 2", 1.2, 10, 20));
         event.addSection(new SeatedSection("Block 3", 1.2, 10, 20));

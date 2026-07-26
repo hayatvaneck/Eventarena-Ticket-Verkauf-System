@@ -1,7 +1,7 @@
 package domain;
 
 /**
- * Die Klasse Ticket repraesentiert ein gebuchtes Ticket mit Event-, Platz- und Preisinformationen.
+ * Die Klasse Ticket repräsentiert ein gebuchtes Ticket mit Event-, Platz- und Preisinformationen.
 
  */
 
@@ -63,7 +63,7 @@ public class Ticket {
     // Anzeige des Tickets in der Konsole
     public void printTicketDetails() {
         System.out.println("\n=======================================================");
-        System.out.println("                    TICKET BESTÃ„TIGUNG                   ");
+        System.out.println("                    TICKET BESTÄTIGUNG                   ");
         System.out.println("=======================================================");
         System.out.printf(" Ticket-ID:     %s%n", ticketId);
         System.out.printf(" Event:         %s%n", event.getTitle());

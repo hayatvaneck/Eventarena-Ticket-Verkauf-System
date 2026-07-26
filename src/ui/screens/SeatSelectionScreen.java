@@ -18,7 +18,7 @@ import ui.ScreenManager;
 import java.util.List;
 
 /**
- * Die Klasse SeatSelectionScreen zeigt den Sitzplan eines Blocks und uebernimmt ausgewaehlte Sitze in den Warenkorb.
+ * Die Klasse SeatSelectionScreen zeigt den Sitzplan eines Blocks und übernimmt ausgewählte Sitze in den Warenkorb.
 
  */
 
@@ -35,7 +35,7 @@ public class SeatSelectionScreen extends BaseScreen {
         Section selectedSection = app.getCurrentSelectedSection();
 
         if (!(selectedSection instanceof SeatedSection)) {
-            app.showAlert(Alert.AlertType.ERROR, "Fehler", "Dieser Block besitzt keine Sitzplaetze!");
+            app.showAlert(Alert.AlertType.ERROR, "Fehler", "Dieser Block besitzt keine Sitzplätze!");
             app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION);
             return createDefaultScene(createRoot(10, new Insets(20), Pos.CENTER));
         }
@@ -44,11 +44,11 @@ public class SeatSelectionScreen extends BaseScreen {
 
         VBox root = createRoot(15, new Insets(20), Pos.CENTER);
 
-        Label header = new Label("Saalplan fuer: " + seatedSection.getName());
+        Label header = new Label("Saalplan für: " + seatedSection.getName());
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Label stageLabel = new Label("--- BUEHNE / SPIELFELD ---");
-        stageLabel.setStyle("-fx-background-color: #cc0c0c77; -fx-padding: 5 50 5 50; -fx-text-fill: white;");
+        Label stageLabel = new Label("--- BÜHNE / SPIELFELD ---");
+        stageLabel.setStyle("-fx-background-color: #7f8c8d; -fx-padding: 5 50 5 50; -fx-text-fill: white;");
 
         GridPane seatGrid = new GridPane();
         seatGrid.setHgap(6);
@@ -68,9 +68,9 @@ public class SeatSelectionScreen extends BaseScreen {
 
         Label selectionStatusLabel = app.getSelectionStatusLabel();
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-        selectionStatusLabel.setText("Kein Platz ausgewaehlt");
+        selectionStatusLabel.setText("Kein Platz ausgewählt");
 
-        Button confirmButton = new Button("Sitzplatz bestaetigen");
+        Button confirmButton = new Button("Sitzplatz bestätigen");
         confirmButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: #2c3e50;");
         confirmButton.setOnAction(e -> {
             List<Seat> newSeats = controller.getSelectedSeats();
@@ -80,11 +80,11 @@ public class SeatSelectionScreen extends BaseScreen {
             } else if (!app.getCartSeats().isEmpty()) {
                 app.navigateTo(ScreenManager.Screen.CART);
             } else {
-                app.showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz", "Bitte waehlen Sie einen freien Sitzplatz aus!");
+                app.showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz", "Bitte wählen Sie einen freien Sitzplatz aus!");
             }
         });
 
-        Button backButton = new Button("Zurueck zum Saalplan");
+        Button backButton = new Button("Zurück zum Saalplan");
         backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 

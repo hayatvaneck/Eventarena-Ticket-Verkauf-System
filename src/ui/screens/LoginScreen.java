@@ -15,7 +15,7 @@ import ui.App;
 import ui.ScreenManager;
 
 /**
- * Die Klasse LoginScreen stellt die Benutzeranmeldung inklusive Ruecksprung in den Buchungsfluss bereit.
+ * Die Klasse LoginScreen stellt die Benutzeranmeldung inklusive Rücksprung in den Buchungsfluss bereit.
 
  */
 
@@ -61,7 +61,7 @@ public class LoginScreen extends BaseScreen {
         Label registerLink = new Label("Noch kein Konto? Hier registrieren");
         registerLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
 
-        Button btnBackToMain = new Button("Zurueck zum Hauptmenue");
+        Button btnBackToMain = new Button("Zurück zum Hauptmenü");
         btnBackToMain.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand;");
         btnBackToMain.setPrefWidth(150);
 

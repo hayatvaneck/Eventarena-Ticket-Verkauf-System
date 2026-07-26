@@ -13,6 +13,7 @@
             "name": "Launch Arena App",
             "request": "launch",
             "mainClass": "ui.App",
+            "cwd": "${workspaceFolder}",
             "vmArgs": "--module-path \"${workspaceFolder}\\lib\\javafx-sdk\\lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]

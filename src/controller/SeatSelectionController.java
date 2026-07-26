@@ -125,9 +125,9 @@ public class SeatSelectionController {
 
     private void updateStatusLabel() {
         if (selectedSeats.isEmpty()) {
-            statusUpdater.accept("Keine PlÃ¤tze ausgewÃ¤hlt");
+            statusUpdater.accept("Keine Plätze ausgewählt");
         } else {
-            StringBuilder sb = new StringBuilder("AusgewÃ¤hlt: ");
+            StringBuilder sb = new StringBuilder("Ausgewählt: ");
             for (Seat s : selectedSeats) {
                 sb.append(String.format("| Reihe: %d, Platz: %d ", s.getRowNumber(), s.getSeatNumber()));
             }

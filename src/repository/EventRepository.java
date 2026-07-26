@@ -1,7 +1,7 @@
 package repository;
 
 import domain.*;
-import domain.Event.EventType;
+import domain.Event.MapType;
 import domain.layout.HallLayoutFactory;
 import domain.layout.HallLayoutFactory.InteriorMode;
 
@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Die Klasse EventRepository laedt, speichert und verwaltet alle verfuegbaren Events inklusive Innenraum-Modus.
+ * Die Klasse EventRepository lädt, speichert und verwaltet alle verfügbaren Events inklusive Innenraum-Modus.
 
  */
 
@@ -76,26 +76,26 @@ public class EventRepository {
                 String description;
                 LocalDateTime dateTime;
                 double basePrice;
-                EventType eventType;
+                MapType mapType;
                 InteriorMode interiorMode;
 
                 if (columns.length >= 7) {
                     description = columns[2].trim();
                     dateTime = LocalDateTime.parse(columns[3].trim());
                     basePrice = Double.parseDouble(columns[4].trim());
-                    eventType = EventType.valueOf(columns[5].trim());
+                    mapType = MapType.valueOf(columns[5].trim());
                     interiorMode = parseInteriorMode(columns[6]);
                 } else {
                     description = "";
                     dateTime = LocalDateTime.parse(columns[2].trim());
                     basePrice = Double.parseDouble(columns[3].trim());
-                    eventType = EventType.valueOf(columns[4].trim());
+                    mapType = MapType.valueOf(columns[4].trim());
                     interiorMode = columns.length >= 6
                         ? parseInteriorMode(columns[5])
-                        : inferInteriorModeFromEventType(eventType);
+                        : inferInteriorModeFromMapType(mapType);
                 }
 
-                Event event = new Event(eventId, title, description, dateTime, basePrice, eventType);
+                Event event = new Event(eventId, title, description, dateTime, basePrice, mapType);
                 HallLayoutFactory.applyStandardLayout(event, interiorMode);
                 this.events.add(event);
             }
@@ -110,7 +110,7 @@ public class EventRepository {
 
     private void saveAllToCsv() {
         List<String> eventLines = new ArrayList<>();
-        eventLines.add("event_id,title,description,date_time,base_price,event_type,interior_mode");
+        eventLines.add("event_id,title,description,date_time,base_price,map_type,interior_mode");
 
         List<Event> sortedEvents = new ArrayList<>(this.events);
         sortedEvents.sort(Comparator.comparing(Event::getId));
@@ -123,7 +123,7 @@ public class EventRepository {
                 escapeCsv(event.getDescription()) + "," +
                 event.getDateTime() + "," +
                 event.getBasePrice() + "," +
-                event.getEventType().name() + "," +
+                event.getMapType().name() + "," +
                 interiorMode.name()
             );
         }
@@ -180,11 +180,11 @@ public class EventRepository {
         }
     }
 
-    private InteriorMode inferInteriorModeFromEventType(EventType eventType) {
-        if (eventType == EventType.BASKETBALL) {
+    private InteriorMode inferInteriorModeFromMapType(MapType mapType) {
+        if (mapType == MapType.ARENA) {
             return InteriorMode.EMPTY;
         }
-        if (eventType == EventType.GALA) {
+        if (mapType == MapType.STAGE_SEATED) {
             return InteriorMode.SEATED;
         }
         return InteriorMode.STANDING;
@@ -195,10 +195,10 @@ public class EventRepository {
         Event concert = new Event(
             1L,
             "Don Toliver Octane Tour Leg 2",
-            "Hip-Hop-Liveshow mit Stehplatz-Innenraum und energiegeladener Konzertatmosphaere.",
+            "Hip-Hop-Liveshow mit Stehplatz-Innenraum und energiegeladener Konzertatmosphäre.",
             LocalDateTime.of(2026, 11, 2, 19, 0),
             100.0,
-            EventType.CONCERT
+            MapType.STAGE_STANDING
         );
         HallLayoutFactory.applyStandardLayout(concert, InteriorMode.STANDING);
         events.add(concert);
@@ -209,7 +209,7 @@ public class EventRepository {
             "Festlicher Konzertabend mit klassischem Programm im bestuhlten Innenraum.",
             LocalDateTime.of(2026, 12, 15, 20, 0),
             150.0,
-            EventType.GALA
+            MapType.STAGE_SEATED
         );
         HallLayoutFactory.applyStandardLayout(gala, InteriorMode.SEATED);
         events.add(gala);
@@ -220,7 +220,7 @@ public class EventRepository {
             "Topspiel der Basketball-Bundesliga mit freier Sicht auf das Spielfeld.",
             LocalDateTime.of(2026, 8, 11, 18, 0),
             80.0,
-            EventType.BASKETBALL
+            MapType.ARENA
         );
         HallLayoutFactory.applyStandardLayout(sport, InteriorMode.EMPTY);
         events.add(sport);
@@ -245,7 +245,7 @@ public class EventRepository {
     public void save(Event event) {
         if(event != null) {
             InteriorMode interiorMode = event.getSections() == null || event.getSections().isEmpty()
-                ? inferInteriorModeFromEventType(event.getEventType())
+                ? inferInteriorModeFromMapType(event.getMapType())
                 : HallLayoutFactory.inferInteriorMode(event);
 
             Event normalizedEvent = new Event(
@@ -254,7 +254,7 @@ public class EventRepository {
                 event.getDescription(),
                 event.getDateTime(),
                 event.getBasePrice(),
-                event.getEventType()
+                event.getMapType()
             );
             HallLayoutFactory.applyStandardLayout(normalizedEvent, interiorMode);
 

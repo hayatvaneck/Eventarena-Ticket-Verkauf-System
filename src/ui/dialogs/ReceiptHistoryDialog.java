@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Die Klasse ReceiptHistoryDialog zeigt die gespeicherten Quittungen eines Benutzers und oeffnet ausgewaehlte Eintraege.
+ * Die Klasse ReceiptHistoryDialog zeigt die gespeicherten Quittungen eines Benutzers und öffnet ausgewählte Einträge.
 
  */
 
@@ -51,7 +51,7 @@ public final class ReceiptHistoryDialog {
             }
         }
 
-        Button openButton = new Button("Quittung oeffnen");
+        Button openButton = new Button("Quittung öffnen");
         openButton.setDisable(receipts == null || receipts.isEmpty());
         openButton.setOnAction(e -> {
             int selectedIndex = receiptList.getSelectionModel().getSelectedIndex();

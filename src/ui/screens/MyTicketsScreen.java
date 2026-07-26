@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Die Klasse MyTicketsScreen zeigt gebuchte Tickets, ermoeglicht Oeffnen und Stornieren sowie Quittungszugriff.
+ * Die Klasse MyTicketsScreen zeigt gebuchte Tickets, ermöglicht Öffnen und Stornieren sowie Quittungszugriff.
 
  */
 
@@ -76,7 +76,7 @@ public class MyTicketsScreen extends BaseScreen {
         Button receiptsButton = createSecondaryButton("Quittungen anzeigen");
         receiptsButton.setOnAction(e -> app.openReceiptHistoryWindow());
 
-        Button backButton = createPrimaryButton("Zurueck zum Hauptmenue");
+        Button backButton = createPrimaryButton("Zurück zum Hauptmenü");
         backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px; -fx-cursor: Hand;");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
@@ -150,7 +150,7 @@ public class MyTicketsScreen extends BaseScreen {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label lblPrice = new Label(String.format("%.2f â‚¬", ticket.getFinalPrice()));
+        Label lblPrice = new Label(String.format("%.2f €", ticket.getFinalPrice()));
         lblPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
         Button btnCancel = createDangerButton("Stornieren");
@@ -166,7 +166,7 @@ public class MyTicketsScreen extends BaseScreen {
 
         btnCancel.setOnAction(e -> cancelTicket(ticket, eventTitle, loggedInUser));
 
-        Button btnOpenEvent = createPrimaryButton("Event oeffnen");
+        Button btnOpenEvent = createPrimaryButton("Event öffnen");
         btnOpenEvent.setStyle(
             "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +
@@ -189,7 +189,7 @@ public class MyTicketsScreen extends BaseScreen {
     private void cancelTicket(Ticket ticket, String eventTitle, User loggedInUser) {
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Ticket stornieren");
-        confirmAlert.setHeaderText("Moechten Sie dieses Ticket wirklich stornieren?");
+        confirmAlert.setHeaderText("Möchten Sie dieses Ticket wirklich stornieren?");
 
         String placeText = (ticket.getSection() instanceof StandingSection)
             ? "Bereich: " + ticket.getSection().getName()
@@ -198,7 +198,7 @@ public class MyTicketsScreen extends BaseScreen {
         confirmAlert.setContentText(
             "Event: " + eventTitle + "\n" +
             placeText + "\n" +
-            "Preis: " + String.format("%.2f â‚¬", ticket.getFinalPrice())
+            "Preis: " + String.format("%.2f €", ticket.getFinalPrice())
         );
 
         Optional<ButtonType> result = confirmAlert.showAndWait();

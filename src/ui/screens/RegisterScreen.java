@@ -14,7 +14,7 @@ import ui.App;
 import ui.ScreenManager;
 
 /**
- * Die Klasse RegisterScreen erfasst neue Benutzerkonten und fuehrt zur Anmeldung zurueck.
+ * Die Klasse RegisterScreen erfasst neue Benutzerkonten und führt zur Anmeldung zurück.
 
  */
 
@@ -56,7 +56,7 @@ public class RegisterScreen extends BaseScreen {
         passwordField.setMaxWidth(250);
 
         PasswordField confirmPasswordField = new PasswordField();
-        confirmPasswordField.setPromptText("Passwort bestaetigen");
+        confirmPasswordField.setPromptText("Passwort bestätigen");
         confirmPasswordField.setPrefWidth(250);
         confirmPasswordField.setMaxWidth(250);
 
@@ -76,17 +76,17 @@ public class RegisterScreen extends BaseScreen {
             String confirmPassword = confirmPasswordField.getText().trim();
 
             if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                app.showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte fuellen Sie alle Felder aus.");
+                app.showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte füllen Sie alle Felder aus.");
                 return;
             }
 
             if (!email.contains("@") || !email.contains(".")) {
-                app.showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte geben Sie eine gueltige E-Mail-Adresse ein.");
+                app.showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte geben Sie eine gültige E-Mail-Adresse ein.");
                 return;
             }
 
             if (!password.equals(confirmPassword)) {
-                app.showAlert(Alert.AlertType.ERROR, "Fehler", "Die eingegebenen Passwoerter stimmen nicht ueberein!");
+                app.showAlert(Alert.AlertType.ERROR, "Fehler", "Die eingegebenen Passwörter stimmen nicht überein!");
                 passwordField.clear();
                 confirmPasswordField.clear();
                 return;

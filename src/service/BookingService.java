@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Die Klasse BookingService kapselt die zentrale Buchungslogik fuer Tickets, Preise und Stornierungen.
+ * Die Klasse BookingService kapselt die zentrale Buchungslogik für Tickets, Preise und Stornierungen.
 
  */
 

@@ -79,7 +79,7 @@ public class MainMenuScreen extends BaseScreen {
         HBox headerBar = createHeaderBar();
 
         Label title = createTitle("ARENA TICKETSYSTEM");
-        Label subtitle = createSubtitle("Waehlen Sie ein Event aus:");
+        Label subtitle = createSubtitle("Wählen Sie ein Event aus:");
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
@@ -107,13 +107,13 @@ public class MainMenuScreen extends BaseScreen {
 
         scrollPane.setContent(cardContainer);
 
-        Button nextButton = createPrimaryButton("Bloecke anzeigen");
+        Button nextButton = createPrimaryButton("Blöcke anzeigen");
         nextButton.setPrefWidth(200);
         nextButton.setOnAction(e -> {
             if (app.getCurrentSelectedEvent() != null) {
                 app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION);
             } else {
-                app.showAlert(Alert.AlertType.WARNING, "Auswahl fehlt", "Bitte waehlen Sie zuerst ein Event aus!");
+                app.showAlert(Alert.AlertType.WARNING, "Auswahl fehlt", "Bitte wählen Sie zuerst ein Event aus!");
             }
         });
 
@@ -224,8 +224,8 @@ public class MainMenuScreen extends BaseScreen {
         eventDescriptionLabel.setWrapText(true);
         eventDescriptionLabel.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 12px;");
 
-        Label eventTypeLabel = new Label(event.getEventType().toString());
-        eventTypeLabel.setStyle(
+        Label mapTypeLabel = new Label(event.getMapType().toString());
+        mapTypeLabel.setStyle(
             "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +
             "-fx-padding: 3px 8px;" +
@@ -234,7 +234,7 @@ public class MainMenuScreen extends BaseScreen {
             "-fx-background-radius: 4px;"
         );
 
-        card.getChildren().addAll(eventTitle, eventDescriptionLabel, spacer, eventDate, eventTypeLabel);
+        card.getChildren().addAll(eventTitle, eventDescriptionLabel, spacer, eventDate, mapTypeLabel);
 
         card.setOnMouseEntered(e -> {
             if (app.getCurrentSelectedEvent() != event) {

@@ -21,10 +21,10 @@ public class ScreenManager {
         CART
     }
 
-    //Map-Array, das jeden Screen mit einer zugehÃ¶rigen Aktion verknÃ¼pft.
+    //Map-Array, das jeden Screen mit einer zugehörigen Aktion verknüpft.
     private final Map<Screen, Runnable> routes = new EnumMap<>(Screen.class);
 
-    //Methode zum mappen. Jeder Screen erhÃ¤lt eine zugehÃ¶rige Aktion, die ausgefÃ¼hrt wird, wenn zu diesem Screen navigiert wird.
+    //Methode zum mappen. Jeder Screen erhält eine zugehörige Aktion, die ausgeführt wird, wenn zu diesem Screen navigiert wird.
     public ScreenManager register(Screen screen, Runnable action) {
         if (screen == null) {
             throw new IllegalArgumentException("Screeneingabe fehlt");
@@ -37,11 +37,11 @@ public class ScreenManager {
         return this;
     }
 
-    //Navigiert zu einem registrierten Screen und fÃ¼hrt die zugehÃ¶rige Aktion aus.
+    //Navigiert zu einem registrierten Screen und führt die zugehörige Aktion aus.
     public void navigateTo(Screen screen) {
         Runnable action = routes.get(screen);
         if (action == null) {
-            throw new IllegalStateException("Kein Screen registriert fÃ¼r: " + screen);
+            throw new IllegalStateException("Kein Screen registriert für: " + screen);
         }
 
         action.run();

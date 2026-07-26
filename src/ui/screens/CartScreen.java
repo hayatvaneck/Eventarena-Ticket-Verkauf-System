@@ -83,7 +83,7 @@ public class CartScreen extends BaseScreen {
                 Label lblSeat = new Label(seatLabelText);
                 lblSeat.setStyle("-fx-pref-width: 180px; -fx-alignment: center-left;");
 
-                Label lblPrice = new Label(String.format("%.2f â‚¬", singleTicketPrice));
+                Label lblPrice = new Label(String.format("%.2f €", singleTicketPrice));
                 lblPrice.setStyle("-fx-pref-width: 80px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
 
                 ComboBox<String> cbType = new ComboBox<>();
@@ -95,7 +95,7 @@ public class CartScreen extends BaseScreen {
                     String selectedType = cbType.getValue();
                     double discount = getDiscountFactor(selectedType);
                     double finalPrice = singleTicketPrice * discount;
-                    lblPrice.setText(String.format("%.2f â‚¬", finalPrice));
+                    lblPrice.setText(String.format("%.2f €", finalPrice));
                 });
 
                 javafx.scene.control.Button btnDelete = new javafx.scene.control.Button("X");
@@ -126,7 +126,7 @@ public class CartScreen extends BaseScreen {
         VBox buttonBox = new VBox(10);
         buttonBox.setAlignment(Pos.CENTER);
 
-        javafx.scene.control.Button btnAddMore = new javafx.scene.control.Button("Weitere Tickets hinzufuegen");
+        javafx.scene.control.Button btnAddMore = new javafx.scene.control.Button("Weitere Tickets hinzufügen");
         btnAddMore.setStyle(
             "-fx-background-color: #413f3ff7;" +
             "-fx-text-fill: white;" +

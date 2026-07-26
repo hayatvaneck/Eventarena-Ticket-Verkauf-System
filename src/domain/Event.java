@@ -3,7 +3,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 /**
- * Die Klasse Event repraesentiert eine Veranstaltung mit Basispreis, Termin und Bereichen.
+ * Die Klasse Event repräsentiert eine Veranstaltung mit Basispreis, Termin und Bereichen.
  */
 public class Event {
     private Long id;
@@ -12,20 +12,20 @@ public class Event {
     private LocalDateTime dateTime;
     private double basePrice;
     private List<Section> sections;
-    private EventType eventType;
+    private MapType mapType;
 
-    public Event(Long id, String title, String description, LocalDateTime dateTime, double basePrice, EventType eventType) {
+    public Event(Long id, String title, String description, LocalDateTime dateTime, double basePrice, MapType mapType) {
         this.id = id;
         this.title = title;
         this.description = description != null ? description : "";
         this.dateTime = dateTime;
         this.basePrice = basePrice;
         this.sections = new ArrayList<>();
-        this.eventType = eventType;
+        this.mapType = mapType;
     }
 
-    public Event(Long id, String title, LocalDateTime dateTime, double basePrice, EventType eventType) {
-        this(id, title, "", dateTime, basePrice, eventType);
+    public Event(Long id, String title, LocalDateTime dateTime, double basePrice, MapType mapType) {
+        this(id, title, "", dateTime, basePrice, mapType);
     }
 
     public void addSection(Section section) {
@@ -51,9 +51,10 @@ public class Event {
         return totalSeats;
     }
 
-    public enum EventType {
-        CONCERT, BASKETBALL, GALA
+    public enum MapType {
+        STAGE_SEATED, ARENA, STAGE_STANDING
     }
+
 
     public boolean isSoldOut() {
         return getTotalAvailableSeats() == 0;
@@ -77,8 +78,8 @@ public class Event {
     public List<Section> getSections() {
         return sections;
     }
-    public EventType getEventType() {
-        return eventType;
+    public MapType getMapType() {
+        return mapType;
     }
 }
 
