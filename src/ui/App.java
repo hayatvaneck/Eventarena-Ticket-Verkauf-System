@@ -1028,30 +1028,13 @@ public class App extends Application {
             successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n", firstName, lastName, totalExtendedPrice));
 
             for (Ticket t : generatedTickets) {
-                successMessage.append(String.format("- %s | (%s) - %.2f EUR\n",
+                successMessage.append(String.format("- %s %s | (%s) - %.2f EUR\n",
                     t.getSection() != null ? t.getSection().getName() : "Bereich",
-                    //t.getSeatInfo(),
+                    t.getSeatInfo(),
                     t.getCustomer().getCustomerType(),
                     t.getFinalPrice()
                 ));
             }
-                
-                /* 
-                if (currentSelectedSection instanceof StandingSection) {
-                    successMessage.append(String.format("- Stehplatz %s (%s) - %.2f EUR\n", 
-                    t.getTicketId(), 
-                    t.getCustomer().getCustomerType(), 
-                    t.getFinalPrice()
-                ));
-            } else {
-                successMessage.append(String.format("- Sitzplatz %s (%s) - %.2f EUR\n",
-            t.getTicketId(),
-            t.getCustomer().getCustomerType(),
-            t.getFinalPrice()
-        ));
-    }
-}
-*/
 
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
             successAlert.setTitle("Buchung erfolgreich!");

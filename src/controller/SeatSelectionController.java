@@ -39,13 +39,14 @@ public class SeatSelectionController {
             for (int r = 0; r < totalRows; r++) {
                 for (int s = 0; s < seatsPerRow; s++) {
 
-                    int rowNum = r ;
-                    int seatNum = s;
+                    Seat seat = seatedSection.getSeat(r + 1, s + 1);
 
-                    Seat seat = seatedSection.getSeat(r, s);
                     if (seat == null) {
-                        seat = new Seat (rowNum, seatNum);
+                        continue;
                     }
+
+                    int rowNum = seat.getRowNumber() ;
+                    int seatNum = seat.getSeatNumber();
 
                     boolean isBookedInRepo = seat.isBooked();
 
@@ -81,7 +82,7 @@ public class SeatSelectionController {
                     } else {
                         seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
 
-                        Tooltip tooltip = new Tooltip("Reihe " + (rowNum + 1) + ", Platz " + (seatNum + 1));
+                        Tooltip tooltip = new Tooltip("Reihe " + rowNum + ", Platz " + seatNum);
                         tooltip.setShowDelay(Duration.millis(100));
                         Tooltip.install(seatButton, tooltip);
                         
@@ -93,7 +94,7 @@ public class SeatSelectionController {
                             if (existingSeat != null) {
                                 seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
                                 selectedSeats.remove(existingSeat);
-                                selectedButtons.remove(existingSeat);
+                                selectedButtons.remove(seatButton);
                             } else {
                                 seatButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: black;");
                                 selectedSeats.add(finalSeat);
@@ -125,7 +126,7 @@ public class SeatSelectionController {
         } else {
             StringBuilder sb = new StringBuilder("Ausgewählt: ");
             for (Seat s : selectedSeats) {
-                sb.append(String.format("| Reihe: %d, Platz: %d ", (s.getRowNumber() + 1), (s.getSeatNumber() + 1)));
+                sb.append(String.format("| Reihe: %d, Platz: %d ", s.getRowNumber(), s.getSeatNumber()));
             }
             mainApp.updateSelectionLabel(sb.toString());
         }

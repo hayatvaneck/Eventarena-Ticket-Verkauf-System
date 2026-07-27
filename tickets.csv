@@ -2,3 +2,10 @@ ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;custo
 T-1014;1;Block 2;2;test;test;Student;96.0;Reihe 2, Platz 7;test@test.de
 T-1010;1;Block 2;1;Gian-Luca;Levels;Standard;120.0;Reihe 3, Platz 8;gian-luca.levels@bsr.de
 T-1011;1;Block 2;2;Gian-Luca;Levels;Student;96.0;Reihe 3, Platz 9;gian-luca.levels@bsr.de
+T-1004;1;Block 2;1;test;test;Standard;120.0;Reihe 1, Platz 8;test@test.de
+T-1005;1;Block 2;2;test;test;Standard;120.0;Reihe 1, Platz 9;test@test.de
+T-1006;1;Innenraum (Stehplatz);1;test;test;Standard;100.0;Freie Platzwahl (Stehplatz);test@test.de
+T-1007;1;Block 2;2;test;test;Standard;120.0;Reihe 1, Platz 3;test@test.de
+T-1008;1;Block 2;1;test;test;Standard;120.0;Reihe 1, Platz 4;test@test.de
+T-1009;1;Block 2;2;test;test;Standard;120.0;Reihe 1, Platz 5;test@test.de
+T-1010;1;Innenraum (Stehplatz);3;test;test;Standard;100.0;Freie Platzwahl (Stehplatz);test@test.de
