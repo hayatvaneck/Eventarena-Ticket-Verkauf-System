@@ -293,7 +293,7 @@ public class App extends Application {
         VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
 
         root.getChildren().addAll(headerBar, title, subtitle, scrollPane, nextButton, bottomSpacer, footerBar);
-        Scene scene = new Scene(root, 800, 700);
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -538,10 +538,14 @@ public class App extends Application {
             Button backButton = new Button("Zurück zum Hauptmenü");
             backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px; -fx-padding: 8px 15px; -fx-cursor: Hand;");
             backButton.setOnAction(e -> showMainMenu());
-
+           
+            //Hover / doesn't work
+            //backButton.setOnMouseEntered(e -> btn.setStyle(btn.getStyle().replace(bgHex, "#ffffff")));
+            //backButton.setOnMouseExited(e -> btn.setStyle(btn.getStyle().replace("#ffffff", bgHex)));
+            
             root.getChildren().addAll(title, scrollPane, backButton);
 
-            Scene scene = new Scene(root, 800, 700);
+            Scene scene = new Scene(root, 900, 700);
             primaryStage.setScene(scene);
             primaryStage.show();
         });
@@ -621,7 +625,7 @@ public class App extends Application {
 
         registerLink.setOnMouseClicked(e -> showRegisterView());
 
-        primaryStage.setScene(new Scene(mainRoot, 800, 700));
+        primaryStage.setScene(new Scene(mainRoot, 900, 700));
     }
 
     // REGISTRIERUNGS SCREEN
@@ -719,7 +723,7 @@ public class App extends Application {
             backToLoginLink
         );
 
-        primaryStage.setScene(new Scene(registerRoot, 800, 700));
+        primaryStage.setScene(new Scene(registerRoot, 900, 700));
     }
 
     // --- SCREEN 2: SITZAUSWAHL ---
@@ -782,7 +786,7 @@ public class App extends Application {
         backButton.setOnAction(e -> showGraphicSectionSelection());
 
         root.getChildren().addAll(header, stageLabel, seatGrid, confirmButton, backButton, selectionStatusLabel);
-        Scene scene = new Scene(root, 800, 700);
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
     }
 
@@ -822,7 +826,7 @@ public class App extends Application {
         backButton.setOnAction(e -> showGraphicSectionSelection());
 
         root.getChildren().addAll(header, infoLabel, ticketSpinner, confirmButton, backButton);
-        Scene scene = new Scene(root, 800, 700);
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
     }
 
@@ -970,7 +974,7 @@ public class App extends Application {
         buttonBox.getChildren().addAll(btnFinalBook, btnAddMore);
 
         root.getChildren().addAll(title, scrollPane, buttonBox);
-        primaryStage.setScene(new Scene(root, 800, 700));
+        primaryStage.setScene(new Scene(root, 900, 700));
     }
 
     private double getDiscountFactor(String customerType) {
@@ -1087,11 +1091,36 @@ public class App extends Application {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #f5f5f7;");
+        root.setStyle("-fx-background-color: #ffffff;");
+
+        javafx.scene.layout.FlowPane labelContainer = new javafx.scene.layout.FlowPane();
+        labelContainer.setHgap(5);
+        labelContainer.setVgap(5);
+        labelContainer.setPadding(new Insets(5));
+        labelContainer.setAlignment(Pos.CENTER);
 
         Label title = new Label("Blockauswahl für: " + currentSelectedEvent.getTitle());
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
 
+        VBox titleBox = new VBox(10);
+            titleBox.setPadding(new Insets(5));
+            //titleBox.setMinWidth(220);
+            //titleBox.setPrefWidth(220);
+            //titleBox.setMaxWidth(220);
+            //titleBox.setMinHeight(160);
+            titleBox.setAlignment(Pos.CENTER);
+            titleBox.setStyle(
+                "-fx-background-color: #2c3e50;" +
+                "-fx-border-color: #bdc3c7;" + 
+                "-fx-border-width: 1px;" +
+                "-fx-border-radius: 8px;" +
+                "-fx-background-radius: 8px;" +
+                //"-fx-cursor: Hand;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);"
+            );
+
+        titleBox.getChildren().add(title);
+        labelContainer.getChildren().add(titleBox);
         // Auswahl des Saalplans
         StackPane mapContainer = null;
 
@@ -1115,21 +1144,21 @@ public class App extends Application {
         backButton.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
         backButton.setOnAction(e -> showMainMenu());
  
-        root.getChildren().add(title);
+        root.getChildren().add(labelContainer);
         root.getChildren().add(mapContainer);
         root.getChildren().add(backButton);
 
-        Scene scene = new Scene(root, 800, 800);
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
    private StackPane createConcertLayout() {
         StackPane mapContainer = new StackPane();
-        
-        VBox arenaWrapper = new VBox(20);
+
+        VBox arenaWrapper = new VBox(10);
         arenaWrapper.setAlignment(Pos.CENTER);
-        arenaWrapper.setPadding(new Insets(24));
+        arenaWrapper.setPadding(new Insets(10));
         arenaWrapper.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-border-color: #cbd5e1; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 8, 0, 0, 2);");
 
         // GRID OF SECTIONS
@@ -1144,7 +1173,7 @@ public class App extends Application {
 
         // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
         Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180+20);
-        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180+20);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "BALKON", 70, 180+20);
         Button standingBtn = createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8", "INNENRAUM (Stehplätze)", 442, 180);
 
         // BÜHNE Block
@@ -1183,7 +1212,7 @@ public class App extends Application {
         legend.setPadding(new Insets(10, 0, 0, 0));
         legend.getChildren().addAll(
             createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
-            createLegendItem("VIP Balkon", "#fde047", "#d97706"),
+            createLegendItem("Balkon", "#fde047", "#d97706"),
             createLegendItem("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb"),
             createLegendItem("Bühne", "#0f172a", "#334155")
         );
