@@ -1,22 +1,34 @@
 package domain;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Die Klasse Event repräsentiert eine Veranstaltung mit Basispreis, Termin und Bereichen.
+ */
 public class Event {
     private Long id;
     private String title;
+    private String description;
+    private EventType eventType;
     private LocalDateTime dateTime;
     private double basePrice;
     private List<Section> sections;
-    private EventType eventType;
+    private MapType mapType;
 
-    public Event(Long id, String title, LocalDateTime dateTime, double basePrice, EventType eventType) {
+    public Event(Long id, String title, String description, EventType eventType, LocalDateTime dateTime, double basePrice, MapType mapType) {
         this.id = id;
         this.title = title;
+        this.description = description != null ? description : "";
+        this.eventType = eventType;
         this.dateTime = dateTime;
         this.basePrice = basePrice;
         this.sections = new ArrayList<>();
-        this.eventType = eventType;
+        this.mapType = mapType;
+    }
+
+    public Event(Long id, String title, EventType eventType, LocalDateTime dateTime, double basePrice, MapType mapType) {
+        this(id, title, "", eventType, dateTime, basePrice, mapType);
     }
 
     public void addSection(Section section) {
@@ -37,14 +49,19 @@ public class Event {
         for (Section section : sections) {
             totalSeats += section.getAvailableSeats();
             // Jede section muss eine Methode getAvailableSeats() haben, 
-            // die die Anzahl der verfügbaren Plätze in dieser Section zurückgibt.
+            // die die Anzahl der verfÃ¼gbaren PlÃ¤tze in dieser Section zurÃ¼ckgibt.
         }
         return totalSeats;
     }
 
-    public enum EventType {
-        CONCERT, BASKETBALL, GALA
+    public enum MapType {
+        STAGE_SEATED, ARENA, STAGE_STANDING
     }
+
+    public enum EventType {
+        KONZERT, THEATER, SPORTS, COMEDY, GALA, TANZ, FIRMENEVENT, MUSICAL, OTHER
+    }
+
 
     public boolean isSoldOut() {
         return getTotalAvailableSeats() == 0;
@@ -56,6 +73,9 @@ public class Event {
     public String getTitle() {
         return title;
     }
+    public String getDescription() {
+        return description;
+    }
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -65,7 +85,14 @@ public class Event {
     public List<Section> getSections() {
         return sections;
     }
+    public MapType getMapType() {
+        return mapType;
+    }
+
     public EventType getEventType() {
         return eventType;
     }
 }
+
+
+

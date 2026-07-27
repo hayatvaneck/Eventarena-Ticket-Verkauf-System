@@ -1,4 +1,0 @@
-ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice,seatInfo;userEmail
-T-1014;1;Block 2;2;test;test;Student;96.0;Reihe 2, Platz 7;test@test.de
-T-1010;1;Block 2;1;Gian-Luca;Levels;Standard;120.0;Reihe 3, Platz 8;gian-luca.levels@bsr.de
-T-1011;1;Block 2;2;Gian-Luca;Levels;Student;96.0;Reihe 3, Platz 9;gian-luca.levels@bsr.de

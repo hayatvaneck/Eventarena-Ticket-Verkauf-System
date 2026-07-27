@@ -1,5 +1,10 @@
 package domain;
 
+/**
+ * Die Klasse Ticket repräsentiert ein gebuchtes Ticket mit Event-, Platz- und Preisinformationen.
+
+ */
+
 public class Ticket {
     private final String ticketId;
     private final Event event;
@@ -32,7 +37,7 @@ public class Ticket {
             finalPrice,
             seatInfo, 
             userEmail,
-            (customer != null ? customer.getCustomerType() : "Standard"),
+            (customer != null && customer.getCustomerType() != null ? customer.getCustomerType().name() : "STANDARD"),
             (event != null && section != null ? event. getBasePrice() * section.getPriceFactor() : finalPrice)
         );
     }
@@ -108,3 +113,6 @@ public class Ticket {
 
 
 }
+
+
+

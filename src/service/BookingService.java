@@ -6,6 +6,11 @@ import repository.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse BookingService kapselt die zentrale Buchungslogik für Tickets, Preise und Stornierungen.
+
+ */
+
 public class BookingService {
     
     private final EventRepository eventRepo;
@@ -32,7 +37,7 @@ public class BookingService {
         // 2. Sections im Event suchen
         Section section = event.findSectionByName(sectionName);
         if(section == null) {
-            throw new IllegalArgumentException("Der Block '" + sectionName + "' existiert für dieses Event nicht.");
+            throw new IllegalArgumentException("Der Block '" + sectionName + "' existiert fÃ¼r dieses Event nicht.");
         }
 
         // 3. Platz reservieren
@@ -46,7 +51,9 @@ public class BookingService {
         ticketIdCounter++;
         String generatedTicektId = "T-" + ticketIdCounter;
         double basePrice = event.getBasePrice() * section.getPriceFactor();
-        String customerType = (customer != null) ? customer.getCustomerType() : "Standard";
+        CustomerType customerType = (customer != null && customer.getCustomerType() != null)
+            ? customer.getCustomerType()
+            : CustomerType.STANDARD;
         double discountFactor = calculateDiscountFactor(customerType);
         double finalPrice = basePrice * discountFactor;
         String seatInfo = "Freie Platzwahl (Stehplatz)";
@@ -60,7 +67,7 @@ public class BookingService {
             finalPrice, 
             seatInfo, 
             userEmail,
-            customerType,
+            customerType.name(),
             basePrice
         );
         activeTickets.add(newTicket);
@@ -101,7 +108,9 @@ public class BookingService {
         ticketIdCounter++;
         String generatedTicketId = "T-" + ticketIdCounter;
         double basePrice = event.getBasePrice() * section.getPriceFactor();
-        String customerType = (customer != null) ? customer.getCustomerType() : "Standard";
+        CustomerType customerType = (customer != null && customer.getCustomerType() != null)
+            ? customer.getCustomerType()
+            : CustomerType.STANDARD;
         double discountFactor = calculateDiscountFactor(customerType);
         double finalPrice = basePrice * discountFactor;
         String seatInfo = "Reihe " + row + ", Platz " + seatNumber;
@@ -114,7 +123,7 @@ public class BookingService {
             finalPrice, 
             seatInfo, 
             userEmail,
-            customerType,
+            customerType.name(),
             basePrice
         );
         activeTickets.add(newTicket);
@@ -123,16 +132,16 @@ public class BookingService {
         return newTicket;
     }
 
-    private double calculateDiscountFactor(String customerType) {
+    private double calculateDiscountFactor(CustomerType customerType) {
         if (customerType == null) {
             return 1.0;
         }
         switch (customerType) {
-            case "Student":
+            case STUDENT:
                 return 0.80;
-            case "Rentner":
+            case SENIOR:
                 return 0.7;
-            case "Kind":
+            case KIND:
                 return 0.5;
             default:
                 return 1.0;
@@ -225,8 +234,11 @@ public class BookingService {
                     section.bookNextAvailableTicket();
                 }
             } catch (SeatAlreadyBookedException e) {
-                System.err.println("Warnung beim Wiederherstellen der Plätze: " + e.getMessage());
+                System.err.println("Warnung beim Wiederherstellen der PlÃ¤tze: " + e.getMessage());
             }
         }
     }
 }
+
+
+

@@ -1,0 +1,29 @@
+ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice,seatInfo;userEmail
+T-1014;1;Block 2;2;test;test;Student;96.0;Reihe 2, Platz 7;test@test.de
+T-1010;1;Block 2;1;Gian-Luca;Levels;Standard;120.0;Reihe 3, Platz 8;gian-luca.levels@bsr.de
+T-1011;1;Block 2;2;Gian-Luca;Levels;Student;96.0;Reihe 3, Platz 9;gian-luca.levels@bsr.de
+T-1004;3;Block 5;1;test;test;Rentner;56.0;Reihe 3, Platz 8;test@test.de
+T-1005;3;Block 5;2;test;test;Kind;40.0;Reihe 3, Platz 7;test@test.de
+T-1006;3;Block 4;1;test;test;Standard;80.0;Reihe 5, Platz 7;test@test.de
+T-1007;3;Block 4;2;test;test;Standard;80.0;Reihe 5, Platz 8;test@test.de
+T-1008;3;Block 2;1;test;test;Standard;72.0;Reihe 2, Platz 4;test@test.de
+T-1009;3;Block 2;2;test;test;Standard;72.0;Reihe 2, Platz 5;test@test.de
+T-1010;3;Block 2;3;test;test;Standard;72.0;Reihe 2, Platz 9;test@test.de
+T-1011;3;Block 2;4;test;test;Standard;72.0;Reihe 2, Platz 10;test@test.de
+T-1012;3;Block 2;1;test;test;Rentner;50.4;Reihe 3, Platz 6;test@test.de
+T-1013;3;Block 2;2;test;test;Kind;36.0;Reihe 3, Platz 7;test@test.de
+T-1014;3;Block 2;1;test;test;STANDARD;96.0;Reihe 5, Platz 3;test@test.de
+T-1015;3;Block 2;2;test;test;STANDARD;96.0;Reihe 5, Platz 4;test@test.de
+T-1016;3;Block 2;1;test;test;STUDENT;76.80000000000001;Reihe 5, Platz 11;test@test.de
+T-1017;3;Block 2;2;test;test;STANDARD;96.0;Reihe 5, Platz 12;test@test.de
+T-1018;1;Block 2;1;test;test;STANDARD;120.0;Reihe 1, Platz 8;test@test.de
+T-1019;1;Block 2;2;test;test;STANDARD;120.0;Reihe 1, Platz 9;test@test.de
+T-1020;1;Block 4;3;test;test;STANDARD;120.0;Reihe 6, Platz 11;test@test.de
+T-1021;1;Innenraum;1;test;test;STANDARD;100.0;Freie Platzwahl (Stehplatz);test@test.de
+T-1022;1;Innenraum;2;test;test;STANDARD;100.0;Freie Platzwahl (Stehplatz);test@test.de
+T-1023;1;Innenraum;3;test;test;STANDARD;100.0;Freie Platzwahl (Stehplatz);test@test.de
+T-1024;1;Innenraum;4;test;test;STANDARD;100.0;Freie Platzwahl (Stehplatz);test@test.de
+T-1025;2;Innenraum;1;test;test;STANDARD;150.0;Reihe 12, Platz 5;test@test.de
+T-1026;2;Innenraum;2;test;test;STANDARD;150.0;Reihe 12, Platz 6;test@test.de
+T-1027;2;Block 2;3;test;test;STANDARD;180.0;Reihe 7, Platz 9;test@test.de
+T-1028;2;Block 2;4;test;test;STANDARD;180.0;Reihe 7, Platz 10;test@test.de

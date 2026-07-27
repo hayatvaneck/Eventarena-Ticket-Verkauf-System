@@ -6,9 +6,14 @@ import java.util.List;
 
 import java.io.*;
 
+/**
+ * Die Klasse UserRepository verwaltet Benutzerdaten, Registrierung und Validierung von Logins.
+
+ */
+
 public class UserRepository {
     private final List<User> users;
-    private static final String FILE_PATH = "users.csv";
+    private static final String FILE_PATH = "data/users.csv";
 
     public UserRepository() {
         this.users = new ArrayList<>();
@@ -63,7 +68,7 @@ public class UserRepository {
         return null;
     }
 
-    // Gibt eine Kopie der aktuellen Benutzerliste zurück
+    // Gibt eine Kopie der aktuellen Benutzerliste zurÃ¼ck
     public List<User> getAllUsers() {
         return new ArrayList<>(users);
     }
@@ -114,3 +119,6 @@ public class UserRepository {
         }
     }
 }
+
+
+

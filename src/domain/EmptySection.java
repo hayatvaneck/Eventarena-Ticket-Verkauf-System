@@ -1,6 +1,11 @@
 package domain;
 import exceptions.SeatAlreadyBookedException;
 
+/**
+ * Die Klasse EmptySection repräsentiert einen nicht buchbaren Innenraum wie Bühne oder Spielfläche.
+
+ */
+
 public class EmptySection extends Section {
     public EmptySection(String name) {
         super(name, 0.0);
@@ -24,3 +29,6 @@ public class EmptySection extends Section {
         System.out.println("Status: Für Zuschauer nicht verfügbar.\n");
     }
 }
+
+
+

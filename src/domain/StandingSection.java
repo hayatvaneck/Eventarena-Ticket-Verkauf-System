@@ -1,6 +1,11 @@
 package domain;
 import exceptions.SeatAlreadyBookedException;
 
+/**
+ * Die Klasse StandingSection verwaltet einen Stehplatzbereich mit Kapazität und Verkaufsstand.
+
+ */
+
 public class StandingSection extends Section {
     private final int capacity;
     private int soldTickets;
@@ -31,7 +36,7 @@ public class StandingSection extends Section {
         System.out.printf("Typ: STEHPLÄTZE | Verkauft: %d/%d | Verfügbar: %d%n",
                 this.soldTickets, this.capacity, this.getAvailableSeats());
 
-        // Visueller Balken für die Konsole
+        // Visueller Balken fÃ¼r die Konsole
         int barLength = 10;
         int percentageFilled = (int) (((double) this.soldTickets / this.capacity) * barLength);
 
@@ -64,3 +69,6 @@ public class StandingSection extends Section {
         return capacity;
     }
 }
+
+
+

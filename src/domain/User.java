@@ -3,6 +3,11 @@ package domain;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse User repräsentiert ein Benutzerkonto mit Login-Daten und gekauften Tickets.
+
+ */
+
 public class User {
     private String firstName;
     private String lastName;
@@ -52,3 +57,6 @@ public class User {
     
     
 }
+
+
+
