@@ -2,6 +2,7 @@ package ui.screens;
 
 import domain.Seat;
 import domain.Section;
+import domain.CartItem;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -50,7 +51,7 @@ public class StandingAreaSelectionScreen extends BaseScreen {
             for (int i = 1; i <= count; i++) {
                 Seat seat = new Seat(0, i);
                 seat.setSection(selectedSection);
-                app.getCartSeats().add(seat);
+                app.getCartItems().add(new CartItem(app.getCurrentSelectedEvent(), selectedSection, seat));
             }
             app.navigateTo(ScreenManager.Screen.CART);
         });

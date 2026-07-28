@@ -40,7 +40,7 @@ public class App extends Application {
     private final ReceiptRepository receiptRepo = ReceiptRepository.getInstance();
     private User loggedInUser = null;
     private Runnable postLoginAction = null; // Merkt sich was nach dem Login passieren soll
-    private List<Seat> cartSeats = new ArrayList<>();
+    private List<CartItem> cartItems = new ArrayList<>();
     private Receipt lastReceipt = null;
     private List<Ticket> lastBookedTickets = new ArrayList<>();
     private String lastBookingInfoMessage = null;
@@ -107,8 +107,8 @@ public class App extends Application {
         this.currentSelectedSection = selectedSection;
     }
 
-    public List<Seat> getCartSeats() {
-        return cartSeats;
+    public List<CartItem> getCartItems() {
+        return cartItems;
     }
 
     public Label getSelectionStatusLabel() {
@@ -158,13 +158,13 @@ public class App extends Application {
 
     public void bookCurrentCart(List<String> chosenTypes) {
         ensureLoggedIn(() -> {
-            if (chosenTypes.size() != cartSeats.size()) {
+            if (chosenTypes.size() != cartItems.size()) {
                 showAlert(Alert.AlertType.ERROR, "Fehler", "Fehler bei der Zuordnung der Ticket-Typen.");
                 return;
             }
 
-            executeBooking(new ArrayList<>(cartSeats), chosenTypes);
-            cartSeats.clear();
+            executeBooking(new ArrayList<>(cartItems), chosenTypes);
+            cartItems.clear();
         });
     }
 
@@ -266,84 +266,76 @@ public class App extends Application {
         primaryStage.show();
     }
 
-    private void executeBooking(List<Seat> chosenSeats, List<String> chosenTypes) {
-        String firstName = loggedInUser.getFirstName();
-        String lastName = loggedInUser.getLastName();
-        String userEmail = loggedInUser.getEmail();
+    private void executeBooking(List<CartItem> chosenItems, List<String> chosenTypes) {
+    String firstName = loggedInUser.getFirstName();
+    String lastName = loggedInUser.getLastName();
+    String userEmail = loggedInUser.getEmail();
 
-        List<Ticket> generatedTickets = new ArrayList<>();
-        double totalExtendedPrice = 0.0;
+    List<Ticket> generatedTickets = new ArrayList<>();
+    double totalExtendedPrice = 0.0;
 
-        try {
-            for (int i = 0; i < chosenSeats.size(); i++) {
-                Seat seat = chosenSeats.get(i);
-                String currentType = chosenTypes.get(i);
-                CustomerType customerType = mapCustomerType(currentType);
+    try {
+        for (int i = 0; i < chosenItems.size(); i++) {
+            CartItem item = chosenItems.get(i);
+            Seat seat = item.getSeat();
+            Event event = item.getEvent();
+            Section seatSection = item.getSection();
 
-                Section seatSection = (seat != null && seat.getSection() != null)
-                        ? seat.getSection()
-                        : currentSelectedSection;
+            String currentType = chosenTypes.get(i);
+            CustomerType customerType = mapCustomerType(currentType);
 
-                Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
+            Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
 
-                Ticket ticket;
-                if (seatSection instanceof SeatedSection) {
-                    ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), seatSection.getName(),
-                            seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
-                } else {
-                    ticket = bookingService.bookTicket(currentSelectedEvent.getId(), seatSection.getName(), customer,
-                            userEmail);
-                }
-
-                generatedTickets.add(ticket);
-                totalExtendedPrice += ticket.getFinalPrice();
+            Ticket ticket;
+            if (seatSection instanceof SeatedSection) {
+                ticket = bookingService.bookSpecificTicket(
+                        event.getId(),
+                        seatSection.getName(),
+                        seat.getRowNumber(),
+                        seat.getSeatNumber(),
+                        customer,
+                        userEmail
+                );
+            } else {
+                ticket = bookingService.bookTicket(
+                        event.getId(),
+                        seatSection.getName(),
+                        customer,
+                        userEmail
+                );
             }
 
-            for (Ticket ticket : generatedTickets) {
-                loggedInUser.addTicket(ticket);
-            }
-            userRepo.saveUsersToFile();
-
-            lastBookedTickets = new ArrayList<>(generatedTickets);
-            lastReceipt = createAndSaveReceipt(firstName, lastName, userEmail, totalExtendedPrice, generatedTickets);
-
-            StringBuilder successMessage = new StringBuilder();
-            successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n",
-                    firstName, lastName, totalExtendedPrice));
-
-            for (Ticket t : generatedTickets) {
-                successMessage.append(String.format("- %s | (%s) - %.2f EUR\n",
-                        t.getSection() != null ? t.getSection().getName() : "Bereich",
-                        // t.getSeatInfo(),
-                        t.getCustomer().getCustomerType(),
-                        t.getFinalPrice()));
-            }
-
-            /*
-             * if (currentSelectedSection instanceof StandingSection) {
-             * successMessage.append(String.format("- Stehplatz %s (%s) - %.2f EUR\n",
-             * t.getTicketId(),
-             * t.getCustomer().getCustomerType(),
-             * t.getFinalPrice()
-             * ));
-             * } else {
-             * successMessage.append(String.format("- Sitzplatz %s (%s) - %.2f EUR\n",
-             * t.getTicketId(),
-             * t.getCustomer().getCustomerType(),
-             * t.getFinalPrice()
-             * ));
-             * }
-             * }
-             */
-
-            lastBookingInfoMessage = successMessage.toString();
-
-            cartSeats.clear();
-            screenManager.navigateTo(ScreenManager.Screen.BOOKING_CONFIRMATION);
-        } catch (Exception ex) {
-            showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
+            generatedTickets.add(ticket);
+            totalExtendedPrice += ticket.getFinalPrice();
         }
+
+        for (Ticket ticket : generatedTickets) {
+            loggedInUser.addTicket(ticket);
+        }
+        userRepo.saveUsersToFile();
+
+        lastBookedTickets = new ArrayList<>(generatedTickets);
+        lastReceipt = createAndSaveReceipt(firstName, lastName, userEmail, totalExtendedPrice, generatedTickets);
+
+        StringBuilder successMessage = new StringBuilder();
+        successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n",
+                firstName, lastName, totalExtendedPrice));
+
+        for (Ticket t : generatedTickets) {
+            successMessage.append(String.format("- %s | (%s) - %.2f EUR\n",
+                    t.getSection() != null ? t.getSection().getName() : "Bereich",
+                    t.getCustomer().getCustomerType(),
+                    t.getFinalPrice()));
+        }
+
+        lastBookingInfoMessage = successMessage.toString();
+
+        cartItems.clear();
+        screenManager.navigateTo(ScreenManager.Screen.BOOKING_CONFIRMATION);
+    } catch (Exception ex) {
+        showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
     }
+}
 
     private Receipt createAndSaveReceipt(String firstName, String lastName, String userEmail, double totalAmount,
             List<Ticket> generatedTickets) {

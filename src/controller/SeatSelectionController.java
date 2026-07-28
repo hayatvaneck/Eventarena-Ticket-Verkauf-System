@@ -3,6 +3,7 @@
 import domain.Seat;
 import domain.SeatedSection;
 import domain.Section;
+import domain.CartItem;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -30,7 +31,7 @@ public class SeatSelectionController {
         this.statusUpdater = statusUpdater;
     }
 
-    public void populateSeatPlan(Section section, List<Seat> cartSeats) {
+    public void populateSeatPlan(Section section, List<CartItem> cartSeats) {
         seatGrid.getChildren().clear();
         selectedSeats.clear();
         selectedButtons.clear();
@@ -72,8 +73,8 @@ public class SeatSelectionController {
 
                     boolean isInCart = false;
                     if (cartSeats != null) {
-                        for (Seat cartSeat : cartSeats) {
-                            if (cartSeat.getRowNumber() == rowNum && cartSeat.getSeatNumber() == seatNum) {
+                        for (CartItem cartItem : cartSeats) {
+                            if (cartItem.getSeat().getRowNumber() == rowNum && cartItem.getSeat().getSeatNumber() == seatNum) {
                                 isInCart = true;
                                 break;
                             }

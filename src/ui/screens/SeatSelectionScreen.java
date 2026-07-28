@@ -15,14 +15,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
+import domain.CartItem; // Falls CartItem woanders liegt, diesen Import anpassen
 
 import java.util.List;
 
 /**
- * Die Klasse SeatSelectionScreen zeigt den Sitzplan eines Blocks und übernimmt ausgewählte Sitze in den Warenkorb.
-
+ * Die Klasse SeatSelectionScreen zeigt den Sitzplan eines Blocks
+ * und übernimmt ausgewählte Sitze in den Warenkorb.
  */
-
 public class SeatSelectionScreen extends BaseScreen {
 
     private final App app;
@@ -65,7 +65,7 @@ public class SeatSelectionScreen extends BaseScreen {
         );
 
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
-        controller.populateSeatPlan(selectedSection, app.getCartSeats());
+        controller.populateSeatPlan(selectedSection, app.getCartItems());
 
         ScrollPane seatGridScrollPane = createTransparentScrollPane(seatGrid);
         seatGridScrollPane.setPannable(true);
@@ -82,10 +82,15 @@ public class SeatSelectionScreen extends BaseScreen {
         confirmButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: #2c3e50;");
         confirmButton.setOnAction(e -> {
             List<Seat> newSeats = controller.getSelectedSeats();
+
             if (!newSeats.isEmpty()) {
-                app.getCartSeats().addAll(newSeats);
+                for (Seat seat : newSeats) {
+                    app.getCartItems().add(
+                        new CartItem(app.getCurrentSelectedEvent(), selectedSection, seat)
+                    );
+                }
                 app.navigateTo(ScreenManager.Screen.CART);
-            } else if (!app.getCartSeats().isEmpty()) {
+            } else if (!app.getCartItems().isEmpty()) {
                 app.navigateTo(ScreenManager.Screen.CART);
             } else {
                 app.showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz", "Bitte wählen Sie einen freien Sitzplatz aus!");
@@ -96,10 +101,15 @@ public class SeatSelectionScreen extends BaseScreen {
         backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(header, stageLabel, seatGridScrollPane, confirmButton, backButton, selectionStatusLabel);
+        root.getChildren().addAll(
+            header,
+            stageLabel,
+            seatGridScrollPane,
+            confirmButton,
+            backButton,
+            selectionStatusLabel
+        );
+
         return createDefaultScene(root);
     }
 }
-
-
-
