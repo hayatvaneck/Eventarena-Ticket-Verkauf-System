@@ -25,10 +25,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Die Klasse MyTicketsScreen zeigt gebuchte Tickets, ermöglicht Öffnen und Stornieren sowie Quittungszugriff.
+import javafx.scene.image.WritableImage;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.stage.FileChooser;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.paint.Color;
 
- */
 
 public class MyTicketsScreen extends BaseScreen {
 
@@ -70,16 +76,23 @@ public class MyTicketsScreen extends BaseScreen {
 
         scrollPane.setContent(ticketContainer);
 
-        Button receiptsButton = createSecondaryButton("Quittungen anzeigen");
-        receiptsButton.setOnAction(e -> app.openReceiptHistoryWindow());
+        // --- NEUER BUTTON ---
+        Button downloadAllButton = createConfirmButton("Alle Tickets als PNG speichern");
+        downloadAllButton.setDisable(myTickets == null || myTickets.isEmpty());
+        downloadAllButton.setStyle(
+                "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 6px; -fx-cursor: hand;");
+
+        downloadAllButton.setOnAction(e -> saveAllTicketsAsImage(myTickets));
 
         Button backButton = createBackButton("Zurück zum Hauptmenü");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
         HBox actionButtons = createHBox(10, Pos.CENTER);
-        actionButtons.getChildren().addAll(receiptsButton, backButton);
+        // downloadAllButton statt receiptsButton hinzufügen
+        actionButtons.getChildren().addAll(downloadAllButton, backButton);
 
         root.getChildren().addAll(title, scrollPane, actionButtons);
+
         return createDefaultScene(root);
     }
 
@@ -87,13 +100,12 @@ public class MyTicketsScreen extends BaseScreen {
         HBox ticketCard = createHBox(20, Pos.CENTER_LEFT);
         ticketCard.setPadding(new Insets(15));
         ticketCard.setStyle(
-            "-fx-background-color: white; " +
-            "-fx-border-color: #2ecc71; " +
-            "-fx-border-width: 1px 1px 1px 5px; " +
-            "-fx-border-radius: 4px; " +
-            "-fx-background-radius: 4px; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);"
-        );
+                "-fx-background-color: white; " +
+                        "-fx-border-color: #2ecc71; " +
+                        "-fx-border-width: 1px 1px 1px 5px; " +
+                        "-fx-border-radius: 4px; " +
+                        "-fx-background-radius: 4px; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);");
 
         VBox details = new VBox(5);
 
@@ -107,8 +119,8 @@ public class MyTicketsScreen extends BaseScreen {
         lblDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
 
         String eventDescription = (ticket.getEvent() != null && ticket.getEvent().getDescription() != null)
-            ? ticket.getEvent().getDescription().trim()
-            : "";
+                ? ticket.getEvent().getDescription().trim()
+                : "";
         if (eventDescription.isEmpty()) {
             eventDescription = "Keine Eventbeschreibung vorhanden.";
         }
@@ -123,7 +135,8 @@ public class MyTicketsScreen extends BaseScreen {
         } else if (ticket.getSection() instanceof SeatedSection) {
             int[] rowAndSeat = parseRowAndSeat(ticket.getSeatInfo());
             if (rowAndSeat[0] > 0 && rowAndSeat[1] > 0) {
-                seatInfo = String.format("%s | Reihe %d | Sitz %d", ticket.getSection().getName(), rowAndSeat[0], rowAndSeat[1]);
+                seatInfo = String.format("%s | Reihe %d | Sitz %d", ticket.getSection().getName(), rowAndSeat[0],
+                        rowAndSeat[1]);
             } else {
                 seatInfo = "Bereich: " + ticket.getSection().getName() + " | " + ticket.getSeatInfo();
             }
@@ -135,8 +148,8 @@ public class MyTicketsScreen extends BaseScreen {
         lblSeat.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px;");
 
         String customerType = (ticket.getCustomer() != null && ticket.getCustomerType() != null)
-            ? ticket.getCustomerType()
-            : (ticket.getCustomerType() != null ? ticket.getCustomerType() : "Standard");
+                ? ticket.getCustomerType()
+                : (ticket.getCustomerType() != null ? ticket.getCustomerType() : "Standard");
 
         Label lblType = new Label("Typ: " + customerType);
         lblType.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 12px;");
@@ -151,32 +164,42 @@ public class MyTicketsScreen extends BaseScreen {
 
         Button btnCancel = createDangerButton("Stornieren");
         btnCancel.setStyle(
-            "-fx-background-color: #e74c3c;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 12px;" +
-            "-fx-background-radius: 4px;" +
-            "-fx-padding: 6px 12px;" +
-            "-fx-cursor: Hand;"
-        );
+                "-fx-background-color: #e74c3c;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-background-radius: 4px;" +
+                        "-fx-padding: 6px 12px;" +
+                        "-fx-cursor: Hand;");
 
         btnCancel.setOnAction(e -> cancelTicket(ticket, eventTitle, loggedInUser));
 
+        Button btnDownload = createConfirmButton("Ticket speichern");
+        btnDownload.setStyle(
+                "-fx-background-color: #2ecc71;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-background-radius: 4px;" +
+                        "-fx-padding: 6px 12px;" +
+                        "-fx-cursor: Hand;");
+
+        btnDownload.setOnAction(e -> saveTicketAsImage(ticket));
+
         Button btnOpenEvent = createConfirmButton("Event öffnen");
         btnOpenEvent.setStyle(
-            "-fx-background-color: #2c3e50;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 12px;" +
-            "-fx-background-radius: 4px;" +
-            "-fx-padding: 6px 12px;" +
-            "-fx-cursor: Hand;"
-        );
+                "-fx-background-color: #2c3e50;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-background-radius: 4px;" +
+                        "-fx-padding: 6px 12px;" +
+                        "-fx-cursor: Hand;");
         btnOpenEvent.setOnAction(e -> app.openTicketWindow(ticket));
 
         VBox actionBox = new VBox(8);
         actionBox.setAlignment(Pos.CENTER_RIGHT);
-        actionBox.getChildren().addAll(btnOpenEvent, btnCancel);
+        actionBox.getChildren().addAll(btnOpenEvent, btnDownload, btnCancel);
 
         ticketCard.getChildren().addAll(details, spacer, lblPrice, actionBox);
         return ticketCard;
@@ -188,14 +211,13 @@ public class MyTicketsScreen extends BaseScreen {
         confirmAlert.setHeaderText("Möchten Sie dieses Ticket wirklich stornieren?");
 
         String placeText = (ticket.getSection() instanceof StandingSection)
-            ? "Bereich: " + ticket.getSection().getName()
-            : "Platz: " + ticket.getSeatInfo();
+                ? "Bereich: " + ticket.getSection().getName()
+                : "Platz: " + ticket.getSeatInfo();
 
         confirmAlert.setContentText(
-            "Event: " + eventTitle + "\n" +
-            placeText + "\n" +
-            "Preis: " + String.format("%.2f €", ticket.getFinalPrice())
-        );
+                "Event: " + eventTitle + "\n" +
+                        placeText + "\n" +
+                        "Preis: " + String.format("%.2f €", ticket.getFinalPrice()));
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -211,7 +233,7 @@ public class MyTicketsScreen extends BaseScreen {
     }
 
     private int[] parseRowAndSeat(String seatInfoStr) {
-        int[] result = new int[]{0, 0};
+        int[] result = new int[] { 0, 0 };
         if (seatInfoStr == null) {
             return result;
         }
@@ -226,7 +248,153 @@ public class MyTicketsScreen extends BaseScreen {
         }
         return result;
     }
+
+    private void saveTicketAsImage(Ticket ticket) {
+        // 1. Ein sauberes Layout nur für den Export erstellen (ohne Buttons)
+        VBox exportLayout = new VBox(10);
+        exportLayout.setPadding(new Insets(20));
+        exportLayout.setStyle(
+                "-fx-background-color: white; -fx-border-color: #2c3e50; -fx-border-width: 3px; -fx-border-radius: 8px; -fx-background-radius: 8px;");
+        exportLayout.setAlignment(Pos.CENTER_LEFT);
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
+        String eventTitle = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "Event";
+        String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(dtf) : "";
+
+        Label headerLbl = new Label("E-TICKET");
+        headerLbl.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label eventLbl = new Label(eventTitle);
+        eventLbl.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
+
+        Label dateLbl = new Label("Datum: " + eventDate);
+        dateLbl.setStyle("-fx-font-size: 16px; -fx-text-fill: #34495e;");
+
+        String seatInfo = ticket.getSeatInfo() != null ? ticket.getSeatInfo() : "Keine Platzinfo";
+        Label seatLbl = new Label("Bereich: " + ticket.getSection().getName() + " | " + seatInfo);
+        seatLbl.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
+
+        String customerName = ticket.getCustomer() != null ? ticket.getCustomer().getFullName() : "Unbekannt";
+        Label customerLbl = new Label("Käufer: " + customerName + " (" + ticket.getCustomerType() + ")");
+        customerLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #7f8c8d;");
+
+        Label idLbl = new Label("Ticket-ID: " + ticket.getTicketId());
+        idLbl.setStyle("-fx-font-size: 12px; -fx-text-fill: #bdc3c7;");
+
+        exportLayout.getChildren().addAll(headerLbl, eventLbl, dateLbl, seatLbl, customerLbl, idLbl);
+
+        // Szene kurz generieren, damit JavaFX das CSS und Layout für den Screenshot
+        // berechnet
+        new Scene(exportLayout);
+
+        // 2. Screenshot (Snapshot) von diesem Layout machen
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        WritableImage image = exportLayout.snapshot(params, null);
+
+        // 3. FileChooser öffnen, damit der Benutzer den Speicherort wählen kann
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Ticket speichern unter...");
+        fileChooser.setInitialFileName(ticket.getTicketId() + ".png"); // Bsp: T-1001.png
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Bild", "*.png"));
+
+        File file = fileChooser.showSaveDialog(null);
+
+        if (file != null) {
+            try {
+                // Bild auf die Festplatte schreiben
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Das Ticket wurde erfolgreich gespeichert!");
+            } catch (IOException ex) {
+                app.showAlert(Alert.AlertType.ERROR, "Fehler",
+                        "Das Ticket konnte nicht gespeichert werden: " + ex.getMessage());
+            }
+        }
+    }
+
+    private void saveAllTicketsAsImage(List<Ticket> tickets) {
+        if (tickets == null || tickets.isEmpty()) {
+            app.showAlert(Alert.AlertType.WARNING, "Keine Tickets", "Es gibt keine Tickets zum Speichern.");
+            return;
+        }
+
+        // 1. Ein Layout erstellen, das alle Tickets aufnimmt
+        VBox exportLayout = new VBox(20); // Abstand zwischen den Tickets
+        exportLayout.setPadding(new Insets(30));
+        exportLayout.setStyle("-fx-background-color: white;");
+        exportLayout.setAlignment(Pos.TOP_CENTER);
+
+        // Eine Überschrift für das Dokument
+        Label mainHeader = new Label("MEINE TICKETS");
+        mainHeader
+                .setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 20 0;");
+        exportLayout.getChildren().add(mainHeader);
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
+
+        // 2. Für jedes Ticket einen visuell abgetrennten Bereich erstellen
+        for (Ticket ticket : tickets) {
+            VBox ticketBox = new VBox(10);
+            ticketBox.setPadding(new Insets(20));
+            ticketBox.setStyle(
+                    "-fx-border-color: #3498db; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-background-color: #f8f9fa; -fx-background-radius: 8px; -fx-pref-width: 600px;");
+            ticketBox.setAlignment(Pos.CENTER_LEFT);
+
+            String eventTitle = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "Event";
+            String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(dtf) : "";
+
+            Label eventLbl = new Label(eventTitle);
+            eventLbl.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
+
+            Label dateLbl = new Label("Datum: " + eventDate);
+            dateLbl.setStyle("-fx-font-size: 16px; -fx-text-fill: #34495e;");
+
+            String seatInfo = ticket.getSeatInfo() != null ? ticket.getSeatInfo() : "Keine Platzinfo";
+            Label seatLbl = new Label("Bereich: " + ticket.getSection().getName() + " | " + seatInfo);
+            seatLbl.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
+
+            String customerName = ticket.getCustomer() != null ? ticket.getCustomer().getFullName() : "Unbekannt";
+            Label customerLbl = new Label("Käufer: " + customerName + " (" + ticket.getCustomerType() + ")");
+            customerLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #7f8c8d;");
+
+            Label idLbl = new Label("Ticket-ID: " + ticket.getTicketId() + "  |  Preis: "
+                    + String.format("%.2f EUR", ticket.getFinalPrice()));
+            idLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
+
+            ticketBox.getChildren().addAll(eventLbl, dateLbl, seatLbl, customerLbl, idLbl);
+            exportLayout.getChildren().add(ticketBox);
+        }
+
+        // Szene kurz generieren, damit JavaFX das CSS und Layout für den Screenshot
+        // berechnet
+        new Scene(exportLayout);
+
+        // 3. Screenshot (Snapshot) von diesem Gesamtlayout machen
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.WHITE); // Weißer Hintergrund, falls das Bild Ränder hat
+        WritableImage image = exportLayout.snapshot(params, null);
+
+        // 4. FileChooser öffnen
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Alle Tickets speichern unter...");
+
+        // Einen sinnvollen Standardnamen vorschlagen
+        String userName = app.getLoggedInUser() != null ? app.getLoggedInUser().getLastName() : "Kunde";
+        fileChooser.setInitialFileName("Tickets_" + userName + ".png");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Bild", "*.png"));
+
+        File file = fileChooser.showSaveDialog(null);
+
+        if (file != null) {
+            try {
+                // Bild auf die Festplatte schreiben
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                app.showAlert(Alert.AlertType.INFORMATION, "Erfolg",
+                        "Alle Tickets wurden erfolgreich in einer Datei gespeichert!");
+            } catch (IOException ex) {
+                app.showAlert(Alert.AlertType.ERROR, "Fehler",
+                        "Die Tickets konnten nicht gespeichert werden: " + ex.getMessage());
+            }
+        }
+    }
 }
-
-
-
