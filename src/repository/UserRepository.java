@@ -1,16 +1,16 @@
 package repository;
 
-import domain.*;
+import domain.Ticket;
+import domain.User;
+import domain.PasswordService;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.io.*;
-
 /**
  * Die Klasse UserRepository verwaltet Benutzerdaten, Registrierung und Validierung von Logins.
-
  */
-
 public class UserRepository {
     private final List<User> users;
     private static final String FILE_PATH = "data/users.csv";
@@ -18,12 +18,11 @@ public class UserRepository {
     public UserRepository() {
         this.users = new ArrayList<>();
 
-        // Bereits registrierte Nutzer laden
         loadUsersFromFile();
 
-        // Test-User anlegen
         if (findUserByEmail("max@mustermann.de") == null) {
-            User testUser = new User("Max", "Mustermann", "max@mustermann.de", "passwort");
+            String passwordHash = PasswordService.hashPassword("passwort");
+            User testUser = new User("Max", "Mustermann", "max@mustermann.de", passwordHash);
             users.add(testUser);
             saveUsersToFile();
         }
@@ -41,9 +40,10 @@ public class UserRepository {
     public User validateUser(String email, String password) {
         User user = findUserByEmail(email);
 
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || !PasswordService.verifyPassword(password, user.getPasswordHash())) {
             return null;
         }
+
         user.getPurchasedTickets().clear();
 
         List<Ticket> allTickets = TicketRepository.getInstance().findAll();
@@ -53,6 +53,7 @@ public class UserRepository {
                 user.addTicket(ticket);
             }
         }
+
         return user;
     }
 
@@ -60,6 +61,7 @@ public class UserRepository {
         if (email == null) {
             return null;
         }
+
         for (User user : users) {
             if (user.getEmail().equalsIgnoreCase(email.trim())) {
                 return user;
@@ -68,19 +70,17 @@ public class UserRepository {
         return null;
     }
 
-    // Gibt eine Kopie der aktuellen Benutzerliste zurÃ¼ck
     public List<User> getAllUsers() {
         return new ArrayList<>(users);
     }
 
-    // Persistenz Methoden
     public void saveUsersToFile() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
             for (User user : users) {
                 writer.println(user.getFirstName() + ";" +
                                user.getLastName() + ";" +
                                user.getEmail() + ";" +
-                               user.getPassword());
+                               user.getPasswordHash());
             }
         } catch (IOException e) {
             System.err.println("Fehler beim Speichern der Benutzerdaten: " + e.getMessage());
@@ -105,9 +105,9 @@ public class UserRepository {
                     String firstName = parts[0];
                     String lastName = parts[1];
                     String email = parts[2];
-                    String password = parts[3];
+                    String passwordHash = parts[3];
 
-                    User user = new User(firstName, lastName, email, password);
+                    User user = new User(firstName, lastName, email, passwordHash);
 
                     if (findUserByEmail(user.getEmail()) == null) {
                         users.add(user);

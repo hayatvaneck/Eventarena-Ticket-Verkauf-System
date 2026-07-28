@@ -4,7 +4,8 @@
     ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "lib/**/*.jar",
+        "c:\\Users\\lukas\\Documents\\jbcrypt-0.4.jar"
     ],
     "java.launch.config.vmArgs": "--module-path \"${workspaceFolder}/lib/javafx-sdk/lib\" --add-modules javafx.controls,javafx.fxml"
 }

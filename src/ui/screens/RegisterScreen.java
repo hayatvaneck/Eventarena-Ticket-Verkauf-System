@@ -1,5 +1,6 @@
 package ui.screens;
 
+import domain.PasswordService;
 import domain.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -141,7 +142,8 @@ public class RegisterScreen extends BaseScreen {
                 return;
             }
 
-            User newUser = new User(firstName, lastName, email, password);
+            String passwordHash = PasswordService.hashPassword(password);
+            User newUser = new User(firstName, lastName, email, passwordHash);
             boolean success = app.registerUser(newUser);
 
             if (success) {
