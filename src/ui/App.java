@@ -26,11 +26,12 @@ import ui.screens.SeatSelectionScreen;
 import ui.screens.StandingAreaSelectionScreen;
 
 /**
- * Die Klasse App startet die JavaFX-Anwendung, verwaltet die Navigation und hält den globalen Buchungszustand.
+ * Die Klasse App startet die JavaFX-Anwendung, verwaltet die Navigation und
+ * hält den globalen Buchungszustand.
  */
 
 public class App extends Application {
-    
+
     private Stage primaryStage;
     private ScreenManager screenManager;
     private final EventRepository eventRepo = EventRepository.getInstance();
@@ -61,15 +62,15 @@ public class App extends Application {
         this.primaryStage.setTitle("Arena Ticketsystem OOP");
 
         this.screenManager = new ScreenManager()
-            .register(ScreenManager.Screen.MAIN_MENU, this::showMainMenu)
-            .register(ScreenManager.Screen.BOOKING_CONFIRMATION, this::showBookingConfirmationView)
-            .register(ScreenManager.Screen.MY_TICKETS, this::showMyTicketsView)
-            .register(ScreenManager.Screen.LOGIN, this::showLoginView)
-            .register(ScreenManager.Screen.REGISTER, this::showRegisterView)
-            .register(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION, this::showGraphicSectionSelection)
-            .register(ScreenManager.Screen.SEAT_SELECTION, this::showSeatSelection)
-            .register(ScreenManager.Screen.STANDING_AREA_SELECTION, this::showStandingAreaSelection)
-            .register(ScreenManager.Screen.CART, this::showCartView);
+                .register(ScreenManager.Screen.MAIN_MENU, this::showMainMenu)
+                .register(ScreenManager.Screen.BOOKING_CONFIRMATION, this::showBookingConfirmationView)
+                .register(ScreenManager.Screen.MY_TICKETS, this::showMyTicketsView)
+                .register(ScreenManager.Screen.LOGIN, this::showLoginView)
+                .register(ScreenManager.Screen.REGISTER, this::showRegisterView)
+                .register(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION, this::showGraphicSectionSelection)
+                .register(ScreenManager.Screen.SEAT_SELECTION, this::showSeatSelection)
+                .register(ScreenManager.Screen.STANDING_AREA_SELECTION, this::showStandingAreaSelection)
+                .register(ScreenManager.Screen.CART, this::showCartView);
 
         screenManager.navigateTo(ScreenManager.Screen.MAIN_MENU);
     }
@@ -77,9 +78,8 @@ public class App extends Application {
     // --- SCREEN 1: HAUPTMENÜ ---
     private void showMainMenu() {
         MainMenuScreen mainMenuScreen = new MainMenuScreen(
-            this,
-            eventRepo
-        );
+                this,
+                eventRepo);
 
         primaryStage.setScene(mainMenuScreen.buildScene());
         primaryStage.show();
@@ -281,16 +281,18 @@ public class App extends Application {
                 CustomerType customerType = mapCustomerType(currentType);
 
                 Section seatSection = (seat != null && seat.getSection() != null)
-                                        ? seat.getSection()
-                                        : currentSelectedSection;
+                        ? seat.getSection()
+                        : currentSelectedSection;
 
                 Customer customer = new Customer(customerIdCounter++, firstName, lastName, customerType);
 
                 Ticket ticket;
                 if (seatSection instanceof SeatedSection) {
-                    ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), seatSection.getName(), seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
+                    ticket = bookingService.bookSpecificTicket(currentSelectedEvent.getId(), seatSection.getName(),
+                            seat.getRowNumber(), seat.getSeatNumber(), customer, userEmail);
                 } else {
-                    ticket = bookingService.bookTicket(currentSelectedEvent.getId(), seatSection.getName(), customer, userEmail);
+                    ticket = bookingService.bookTicket(currentSelectedEvent.getId(), seatSection.getName(), customer,
+                            userEmail);
                 }
 
                 generatedTickets.add(ticket);
@@ -306,44 +308,45 @@ public class App extends Application {
             lastReceipt = createAndSaveReceipt(firstName, lastName, userEmail, totalExtendedPrice, generatedTickets);
 
             StringBuilder successMessage = new StringBuilder();
-            successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n", firstName, lastName, totalExtendedPrice));
+            successMessage.append(String.format("Käufer: %s %s\nGesamtpreis: %.2f EUR\n\nGekaufte Tickets:\n",
+                    firstName, lastName, totalExtendedPrice));
 
             for (Ticket t : generatedTickets) {
                 successMessage.append(String.format("- %s | (%s) - %.2f EUR\n",
-                    t.getSection() != null ? t.getSection().getName() : "Bereich",
-                    //t.getSeatInfo(),
-                    t.getCustomer().getCustomerType(),
-                    t.getFinalPrice()
-                ));
+                        t.getSection() != null ? t.getSection().getName() : "Bereich",
+                        // t.getSeatInfo(),
+                        t.getCustomer().getCustomerType(),
+                        t.getFinalPrice()));
             }
-                
-                /* 
-                if (currentSelectedSection instanceof StandingSection) {
-                    successMessage.append(String.format("- Stehplatz %s (%s) - %.2f EUR\n", 
-                    t.getTicketId(), 
-                    t.getCustomer().getCustomerType(), 
-                    t.getFinalPrice()
-                ));
-            } else {
-                successMessage.append(String.format("- Sitzplatz %s (%s) - %.2f EUR\n",
-            t.getTicketId(),
-            t.getCustomer().getCustomerType(),
-            t.getFinalPrice()
-        ));
-    }
-}
-*/
+
+            /*
+             * if (currentSelectedSection instanceof StandingSection) {
+             * successMessage.append(String.format("- Stehplatz %s (%s) - %.2f EUR\n",
+             * t.getTicketId(),
+             * t.getCustomer().getCustomerType(),
+             * t.getFinalPrice()
+             * ));
+             * } else {
+             * successMessage.append(String.format("- Sitzplatz %s (%s) - %.2f EUR\n",
+             * t.getTicketId(),
+             * t.getCustomer().getCustomerType(),
+             * t.getFinalPrice()
+             * ));
+             * }
+             * }
+             */
 
             lastBookingInfoMessage = successMessage.toString();
 
             cartSeats.clear();
             screenManager.navigateTo(ScreenManager.Screen.BOOKING_CONFIRMATION);
-    } catch (Exception ex) {
-        showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
+        } catch (Exception ex) {
+            showAlert(Alert.AlertType.ERROR, "Fehler bei der Buchung", ex.getMessage());
+        }
     }
-}
 
-    private Receipt createAndSaveReceipt(String firstName, String lastName, String userEmail, double totalAmount, List<Ticket> generatedTickets) {
+    private Receipt createAndSaveReceipt(String firstName, String lastName, String userEmail, double totalAmount,
+            List<Ticket> generatedTickets) {
         String receiptId = receiptRepo.nextReceiptId();
         String customerName = firstName + " " + lastName;
 
@@ -353,13 +356,12 @@ public class App extends Application {
         }
 
         Receipt receipt = new Receipt(
-            receiptId,
-            userEmail,
-            customerName,
-            LocalDateTime.now(),
-            totalAmount,
-            ticketIds
-        );
+                receiptId,
+                userEmail,
+                customerName,
+                LocalDateTime.now(),
+                totalAmount,
+                ticketIds);
 
         receiptRepo.save(receipt);
         return receipt;
@@ -383,7 +385,6 @@ public class App extends Application {
         primaryStage.show();
     }
 
-
     public Section findSectionByName(String name) {
         if (currentSelectedEvent == null || currentSelectedEvent.getSections() == null) {
             return null;
@@ -402,8 +403,9 @@ public class App extends Application {
         } else {
             this.postLoginAction = onLoggedInAction;
 
-            showAlert(Alert.AlertType.INFORMATION, "Anmeldung erforderlich", "Bitte logge dich ein oder erstelle ein Konto, um die Buchung abzuschließen.");
-        
+            showAlert(Alert.AlertType.INFORMATION, "Anmeldung erforderlich",
+                    "Bitte logge dich ein oder erstelle ein Konto, um die Buchung abzuschließen.");
+
             screenManager.navigateTo(ScreenManager.Screen.LOGIN);
         }
     }
@@ -432,5 +434,3 @@ public class App extends Application {
         }
     }
 }
-
-

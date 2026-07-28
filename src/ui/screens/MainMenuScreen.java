@@ -30,45 +30,42 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Die Klasse MainMenuScreen zeigt die Eventauswahl und den Einstieg in den Buchungsprozess.
+ * Die Klasse MainMenuScreen zeigt die Eventauswahl und den Einstieg in den
+ * Buchungsprozess.
  */
 
 public class MainMenuScreen extends BaseScreen {
 
-    private static final String CARD_DEFAULT_STYLE =
-        "-fx-background-color: white;" +
-        "-fx-border-color: #bdc3c7;" +
-        "-fx-border-width: 1px;" +
-        "-fx-border-radius: 8px;" +
-        "-fx-background-radius: 8px;" +
-        "-fx-cursor: Hand;" +
-        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);";
+    private static final String CARD_DEFAULT_STYLE = "-fx-background-color: white;" +
+            "-fx-border-color: #bdc3c7;" +
+            "-fx-border-width: 2px;" +
+            "-fx-border-radius: 8px;" +
+            "-fx-background-radius: 8px;" +
+            "-fx-cursor: Hand;" +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);";
 
-    private static final String CARD_HOVER_STYLE =
-        "-fx-background-color: #fdfdfd;" +
-        "-fx-border-color: #2c3e50;" +
-        "-fx-border-width: 1px;" +
-        "-fx-border-radius: 8px;" +
-        "-fx-background-radius: 8px;" +
-        "-fx-cursor: hand;" +
-        "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.2), 8, 0, 0, 4);";
+    private static final String CARD_HOVER_STYLE = "-fx-background-color: #fdfdfd;" +
+            "-fx-border-color: #2c3e50;" +
+            "-fx-border-width: 2px;" +
+            "-fx-border-radius: 8px;" +
+            "-fx-background-radius: 8px;" +
+            "-fx-cursor: hand;" +
+            "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.2), 8, 0, 0, 4);";
 
-    private static final String CARD_SELECTED_STYLE =
-        "-fx-background-color: #ebf5fb;" +
-        "-fx-border-color: #2c3e50;" +
-        "-fx-border-width: 2px;" +
-        "-fx-border-radius: 8px;" +
-        "-fx-background-radius: 8px;" +
-        "-fx-cursor: Hand;" +
-        "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.3), 10, 0, 0, 5);";
+    private static final String CARD_SELECTED_STYLE = "-fx-background-color: #ebf5fb;" +
+            "-fx-border-color: #2c3e50;" +
+            "-fx-border-width: 2px;" +
+            "-fx-border-radius: 8px;" +
+            "-fx-background-radius: 8px;" +
+            "-fx-cursor: Hand;" +
+            "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.3), 10, 0, 0, 5);";
 
     private final App app;
     private final EventRepository eventRepo;
 
     public MainMenuScreen(
-        App app,
-        EventRepository eventRepo
-    ) {
+            App app,
+            EventRepository eventRepo) {
         this.app = app;
         this.eventRepo = eventRepo;
     }
@@ -123,7 +120,8 @@ public class MainMenuScreen extends BaseScreen {
         footerBar.getChildren().add(teamLabel);
         footerBar.setPadding(new Insets(10, 0, 0, 0));
 
-        root.getChildren().addAll(headerBar, title, subtitle, scrollPane, nextButton, createVerticalSpacer(), footerBar);
+        root.getChildren().addAll(headerBar, title, subtitle, scrollPane, nextButton, createVerticalSpacer(),
+                footerBar);
         return createDefaultScene(root);
     }
 
@@ -131,19 +129,17 @@ public class MainMenuScreen extends BaseScreen {
         HBox headerBar = createHBox(15, Pos.CENTER_RIGHT);
         headerBar.setPadding(new Insets(10, 15, 10, 15));
         headerBar.setStyle(
-            "-fx-background-color: white;" +
-            "-fx-background-radius: 8px;" +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);"
-        );
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 8px;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);");
 
         Label dateTimeLabel = new Label();
         dateTimeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-size: 13px;");
 
         DateTimeFormatter clockFormatter = DateTimeFormatter.ofPattern("EEEE, dd.MM.yyyy | HH:mm:ss", Locale.GERMAN);
         Timeline clockTimer = new Timeline(
-            new KeyFrame(Duration.ZERO, e -> dateTimeLabel.setText(LocalDateTime.now().format(clockFormatter))),
-            new KeyFrame(Duration.seconds(1))
-        );
+                new KeyFrame(Duration.ZERO, e -> dateTimeLabel.setText(LocalDateTime.now().format(clockFormatter))),
+                new KeyFrame(Duration.seconds(1)));
         clockTimer.setCycleCount(Animation.INDEFINITE);
         clockTimer.play();
 
@@ -160,14 +156,16 @@ public class MainMenuScreen extends BaseScreen {
             welcomeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
             Button myTicketsButton = new Button("Meine Tickets");
-            myTicketsButton.setStyle("-fx-background-color: #4b9c6de1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
+            myTicketsButton.setStyle(
+                    "-fx-background-color: #4b9c6de1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
             myTicketsButton.setOnAction(e -> {
                 clockTimer.stop();
                 app.navigateTo(ScreenManager.Screen.MY_TICKETS);
             });
 
             Button logoutButton = new Button("Abmelden");
-            logoutButton.setStyle("-fx-background-color: #af645bea; -fx-text-fill: white; -fx-background-radius: 4px; -fx-cursor: hand;");
+            logoutButton.setStyle(
+                    "-fx-background-color: #af645bea; -fx-text-fill: white; -fx-background-radius: 4px; -fx-cursor: hand;");
             logoutButton.setOnAction(e -> {
                 clockTimer.stop();
                 app.logoutUser();
@@ -180,7 +178,8 @@ public class MainMenuScreen extends BaseScreen {
             guestLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
 
             Button loginButton = new Button("Zum Login");
-            loginButton.setStyle("-fx-background-color: #aee8f0; -fx-text-fill: black; -fx-background-radius: 6px; -fx-cursor: hand; -fx-border-color: #2c3e50; -fx-border-width: 1px; -fx-border-radius: 6px;");
+            loginButton.setStyle(
+                    "-fx-background-color: #aee8f0; -fx-text-fill: black; -fx-background-radius: 6px; -fx-cursor: hand; -fx-border-color: #2c3e50; -fx-border-width: 1px; -fx-border-radius: 6px;");
             loginButton.setOnAction(e -> {
                 clockTimer.stop();
                 app.navigateTo(ScreenManager.Screen.LOGIN);
@@ -192,7 +191,9 @@ public class MainMenuScreen extends BaseScreen {
         return headerBar;
     }
 
-    //Erstellt die Event-Karten für die Eventauswahl. Jede Karte zeigt den Titel, das Datum und die Beschreibung des Events an. Außerdem wird der Typ des Events angezeigt.
+    // Erstellt die Event-Karten für die Eventauswahl. Jede Karte zeigt den Titel,
+    // das Datum und die Beschreibung des Events an. Außerdem wird der Typ des
+    // Events angezeigt.
     private VBox createEventCard(Event event, DateTimeFormatter formatter, List<VBox> eventCards) {
         VBox card = createVBox(8, Pos.TOP_LEFT);
         card.setPadding(new Insets(10));
@@ -207,20 +208,17 @@ public class MainMenuScreen extends BaseScreen {
 
         // Header-Bereich der Karte mit Titel und Datum
         VBox header = createVBox(2, Pos.TOP_LEFT);
-        header.setStyle("-fx-background-color: #2c3e50; -fx-background-radius: 10 10 0 0; -fx-padding: 15;");
-        header.setPadding(new Insets(10,5,10,5));
+        header.setStyle("-fx-background-color: #2c3e50; -fx-background-radius: 10 10 0 0;-fx-padding: 15;");
+        header.setPadding(new Insets(10, 5, 10, 5));
 
         Label eventTitle = new Label(event.getTitle().toUpperCase());
-        eventTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #f3f6f8;");
-        eventTitle.setFont(new Font(16));
-        while (eventTitle.getLayoutBounds().getWidth() > 250) {
-            eventTitle.setFont(Font.font(eventTitle.getFont().getSize() - 1));
-        }
+        // Die 16px sind jetzt fest im CSS verankert und zucken nicht mehr:
+        eventTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #f3f6f8; -fx-font-size: 16px;");
         eventTitle.setWrapText(false);
         eventTitle.setMinHeight(Region.USE_PREF_SIZE);
         eventTitle.setMaxWidth(Double.MAX_VALUE);
         eventTitle.setAlignment(Pos.TOP_LEFT);
-        
+
         Label eventDate = new Label(event.getDateTime().format(formatter));
         eventDate.setStyle("-fx-text-fill: #aee8f0; -fx-font-size: 16px;");
         eventDate.setAlignment(Pos.BOTTOM_LEFT);
@@ -231,32 +229,31 @@ public class MainMenuScreen extends BaseScreen {
         VBox content = createVBox(10, Pos.TOP_LEFT);
         content.setPadding(new Insets(0, 12, 0, 12));
 
-
         String eventDescription;
         if (event.getDescription() != null) {
             eventDescription = event.getDescription().trim();
         } else {
             eventDescription = "";
         }
-        
+
         Label eventDescriptionLabel = new Label(eventDescription);
         eventDescriptionLabel.setWrapText(true);
         eventDescriptionLabel.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 14px;");
 
         Label mapTypeLabel = new Label(event.getEventType().toString());
         mapTypeLabel.setStyle(
-            "-fx-background-color: #2c3e50;" +
-            "-fx-text-fill: white;" +
-            "-fx-padding: 3px 8px;" +
-            "-fx-font-size: 10px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-background-radius: 4px;"
-        );
+                "-fx-background-color: #2c3e50;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-padding: 3px 8px;" +
+                        "-fx-font-size: 10px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 4px;");
+        mapTypeLabel.setAlignment(Pos.BOTTOM_LEFT);
 
-        content.getChildren().addAll(eventDescriptionLabel, mapTypeLabel);
-        
+        content.getChildren().addAll(eventDescriptionLabel);
+
         // Fügt Header, Content und Spacer zur Karte hinzu
-        card.getChildren().addAll(header, content, spacer);
+        card.getChildren().addAll(header, content, spacer, mapTypeLabel);
 
         // Fügt Hover- und Klick-Effekte hinzu, um die Karte interaktiv zu machen
         card.setOnMouseEntered(e -> {
@@ -287,6 +284,3 @@ public class MainMenuScreen extends BaseScreen {
         return card;
     }
 }
-
-
-
