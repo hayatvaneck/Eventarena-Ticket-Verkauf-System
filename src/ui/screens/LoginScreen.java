@@ -1,6 +1,7 @@
 package ui.screens;
 
 import domain.User;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -90,7 +91,9 @@ public class LoginScreen extends BaseScreen {
         mainRoot.setCenter(loginRoot);
         mainRoot.setBottom(bottomBar);
 
-        return createDefaultScene(mainRoot);
+        Scene scene = createDefaultScene(mainRoot);
+        Platform.runLater(mainRoot::requestFocus);
+        return scene;
     }
 }
 

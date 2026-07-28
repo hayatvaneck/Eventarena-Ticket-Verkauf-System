@@ -2,6 +2,7 @@ package ui.screens;
 
 import domain.PasswordService;
 import domain.User;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -168,7 +169,12 @@ public class RegisterScreen extends BaseScreen {
                 registerBtn,
                 backToLoginLink);
 
-        return createDefaultScene(registerRoot);
+        Scene scene = createDefaultScene(registerRoot);
+
+        scene.setOnMouseClicked(e -> registerRoot.requestFocus());
+        Platform.runLater(registerRoot::requestFocus);
+
+return scene;
     }
 
     private String validatePassword(String password) {
