@@ -11,7 +11,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -212,12 +214,15 @@ public class MainMenuScreen extends BaseScreen {
         header.setPadding(new Insets(10, 5, 10, 5));
 
         Label eventTitle = new Label(event.getTitle().toUpperCase());
-        // Die 16px sind jetzt fest im CSS verankert und zucken nicht mehr:
         eventTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #f3f6f8; -fx-font-size: 16px;");
         eventTitle.setWrapText(false);
+        eventTitle.setTextOverrun(OverrunStyle.ELLIPSIS);
         eventTitle.setMinHeight(Region.USE_PREF_SIZE);
         eventTitle.setMaxWidth(Double.MAX_VALUE);
         eventTitle.setAlignment(Pos.TOP_LEFT);
+
+        Tooltip fullTitleTooltip = new Tooltip(event.getTitle());
+        eventTitle.setTooltip(fullTitleTooltip);
 
         Label eventDate = new Label(event.getDateTime().format(formatter));
         eventDate.setStyle("-fx-text-fill: #aee8f0; -fx-font-size: 16px;");
