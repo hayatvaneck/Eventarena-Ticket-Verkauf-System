@@ -38,8 +38,8 @@ public abstract class BaseScreen {
         "-fx-cursor: hand;";
 
     protected static final String BACK_BUTTON_STYLE =
-        "-fx-background-color: #595c6e;" +
-        "-fx-text-fill: white;" +
+        "-fx-background-color: #a6a6ac;" +
+        "-fx-text-fill: black;" +
         "-fx-font-size: 14px;" +
         "-fx-padding: 10 20 10 20;" +
         "-fx-background-radius: 6px;";

@@ -33,11 +33,9 @@ public class StandingAreaSelectionScreen extends BaseScreen {
         VBox root = createRoot(20, new Insets(30), Pos.CENTER);
         root.setStyle("-fx-background-color: #f5f6fa;");
 
-        Label header = new Label("Stehplatz-Auswahl: " + selectedSection.getName());
-        header.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
-        Label infoLabel = new Label("Bitte wählen Sie die Anzahl der gewünschten Stehplatz-Tickets aus.");
-        infoLabel.setStyle("-fx-font-size: 14px;");
+        Label title = createTitle("Stehplatz-Auswahl: " + selectedSection.getName());
+        Label instruction = createSubtitle("Bitte wählen Sie die Anzahl der gewünschten Stehplatz-Tickets aus.");
+        
 
         Spinner<Integer> ticketSpinner = new Spinner<>(1, 10, 1);
         ticketSpinner.setStyle("-fx-font-size: 16px;");
@@ -59,7 +57,7 @@ public class StandingAreaSelectionScreen extends BaseScreen {
         Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(header, infoLabel, ticketSpinner, confirmButton, backButton);
+        root.getChildren().addAll(title, instruction, ticketSpinner, confirmButton, backButton);
         return createDefaultScene(root);
     }
 }

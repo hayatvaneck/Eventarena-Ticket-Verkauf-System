@@ -207,6 +207,10 @@ public class MyTicketsScreen extends BaseScreen {
 
     private void cancelTicket(Ticket ticket, String eventTitle, User loggedInUser) {
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        if (app.getPrimaryStage() != null) {
+            confirmAlert.initOwner(app.getPrimaryStage());
+        }
+
         confirmAlert.setTitle("Ticket stornieren");
         confirmAlert.setHeaderText("Möchten Sie dieses Ticket wirklich stornieren?");
 
