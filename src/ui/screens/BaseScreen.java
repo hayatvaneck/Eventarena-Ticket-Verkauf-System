@@ -13,8 +13,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
- * Die abstrakte Klasse BaseScreen stellt gemeinsame UI-Helfer fuer alle JavaFX-Screens bereit.
-
+ * Die abstrakte Klasse BaseScreen stellt gemeinsame UI-Helfer fuer alle
+ * JavaFX-Screens bereit.
+ * 
  */
 
 public abstract class BaseScreen {
@@ -25,37 +26,36 @@ public abstract class BaseScreen {
     private static final String COLOR_BG = "#f5f5f7";
     private static final String COLOR_TEXT = "#2c3e50";
 
-    protected static final String TITLE_STYLE = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: " + COLOR_TEXT + ";";
+    protected static final String TITLE_STYLE = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: "
+            + COLOR_TEXT + ";";
     protected static final String SUBTITLE_STYLE = "-fx-font-size: 14px; -fx-text-fill: #7f8c8d;";
 
-    protected static final String CONFIRM_BUTTON_STYLE =
-        "-fx-background-color: #2c3e50;" +
-        "-fx-text-fill: white;" +
-        "-fx-font-size: 14px;" +
-        "-fx-font-weight: bold;" +
-        "-fx-padding: 10 20 10 20;" +
-        "-fx-background-radius: 6px;" +
-        "-fx-cursor: hand;";
+    protected static final String CONFIRM_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 14px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-padding: 10 20 10 20;" +
+            "-fx-background-radius: 6px;" +
+            "-fx-cursor: hand;";
 
-    protected static final String BACK_BUTTON_STYLE =
-        "-fx-background-color: #595c6e;" +
-        "-fx-text-fill: white;" +
-        "-fx-font-size: 14px;" +
-        "-fx-padding: 10 20 10 20;" +
-        "-fx-background-radius: 6px;";
+    protected static final String BACK_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 14px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-padding: 10 20 10 20;" +
+            "-fx-background-radius: 6px;";
 
-    protected static final String SECONDARY_BUTTON_STYLE =
-        "-fx-background-color: #7f8c8d;" +
-        "-fx-text-fill: white;" +
-        "-fx-background-radius: 6px;" +
-        "-fx-cursor: hand;";
+    protected static final String SECONDARY_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 6px;" +
+            "-fx-cursor: hand;";
 
-    protected static final String DANGER_BUTTON_STYLE =
-        "-fx-background-color: #e74c3c;" +
-        "-fx-text-fill: white;" +
-        "-fx-font-weight: bold;" +
-        "-fx-background-radius: 6px;" +
-        "-fx-cursor: hand;";
+    protected static final String DANGER_BUTTON_STYLE = "-fx-background-color: #e74c3c;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 6px;" +
+            "-fx-cursor: hand;";
 
     public abstract Scene buildScene();
 
@@ -124,7 +124,8 @@ public abstract class BaseScreen {
     protected ScrollPane createTransparentScrollPane(Parent content) {
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+        scrollPane.setStyle(
+                "-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
         return scrollPane;
     }
 
@@ -144,6 +145,3 @@ public abstract class BaseScreen {
         return new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 }
-
-
-

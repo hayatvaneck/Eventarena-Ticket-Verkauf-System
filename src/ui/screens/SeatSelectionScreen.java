@@ -56,13 +56,12 @@ public class SeatSelectionScreen extends BaseScreen {
         seatGrid.setVgap(6);
         seatGrid.setAlignment(Pos.CENTER);
         seatGrid.setStyle(
-            "-fx-border-color: #2c3e50; " +
-            "-fx-border-width: 3px; " +
-            "-fx-border-radius: 8px; " +
-            "-fx-background-color: #f8f9fa; " +
-            "-fx-padding: 25px; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);"
-        );
+                "-fx-border-color: #2c3e50; " +
+                        "-fx-border-width: 3px; " +
+                        "-fx-border-radius: 8px; " +
+                        "-fx-background-color: #f8f9fa; " +
+                        "-fx-padding: 25px; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
 
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartItems());
@@ -79,21 +78,21 @@ public class SeatSelectionScreen extends BaseScreen {
         selectionStatusLabel.setText("Kein Platz ausgewählt");
 
         Button confirmButton = new Button("Sitzplatz bestätigen");
-        confirmButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: #2c3e50;");
+        confirmButton.setStyle("-fx-background-color: #d4af37; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
         confirmButton.setOnAction(e -> {
             List<Seat> newSeats = controller.getSelectedSeats();
 
             if (!newSeats.isEmpty()) {
                 for (Seat seat : newSeats) {
                     app.getCartItems().add(
-                        new CartItem(app.getCurrentSelectedEvent(), selectedSection, seat)
-                    );
+                            new CartItem(app.getCurrentSelectedEvent(), selectedSection, seat));
                 }
                 app.navigateTo(ScreenManager.Screen.CART);
             } else if (!app.getCartItems().isEmpty()) {
                 app.navigateTo(ScreenManager.Screen.CART);
             } else {
-                app.showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz", "Bitte wählen Sie einen freien Sitzplatz aus!");
+                app.showAlert(Alert.AlertType.WARNING, "Kein Sitzplatz",
+                        "Bitte wählen Sie einen freien Sitzplatz aus!");
             }
         });
 
@@ -102,13 +101,12 @@ public class SeatSelectionScreen extends BaseScreen {
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
         root.getChildren().addAll(
-            header,
-            stageLabel,
-            seatGridScrollPane,
-            confirmButton,
-            backButton,
-            selectionStatusLabel
-        );
+                header,
+                stageLabel,
+                seatGridScrollPane,
+                confirmButton,
+                backButton,
+                selectionStatusLabel);
 
         return createDefaultScene(root);
     }
