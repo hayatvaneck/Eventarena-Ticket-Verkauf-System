@@ -1,4 +1,4 @@
 ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice;seatInfo;userEmail
-T-1026;2;Innenraum;2;test;test;STANDARD;150.0;Reihe 12, Platz 6;test@test.de
-T-1027;2;Block 2;3;test;test;STANDARD;180.0;Reihe 7, Platz 9;test@test.de
-T-1028;2;Block 2;4;test;test;STANDARD;180.0;Reihe 7, Platz 10;test@test.de
+
+T-1001;1;Block 2;1;test;test;STANDARD;120.0;Reihe 1, Platz 9;test@test.de
+T-1002;1;Block 2;2;test;test;STANDARD;120.0;Reihe 1, Platz 10;test@test.de
