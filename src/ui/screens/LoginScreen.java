@@ -62,6 +62,10 @@ public class LoginScreen extends BaseScreen {
         Label registerLink = new Label("Noch kein Konto? Hier registrieren");
         registerLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
 
+        Label employeeLink = new Label("Mitarbeiter? Hier Einloggen");
+        employeeLink.setStyle("-fx-text-fill: #e74c3c; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+        employeeLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.EMPLOYEE_LOGIN));
+
         Button btnBackToMain = createBackButton("Zurück zum Hauptmenü");
         btnBackToMain.setPrefWidth(150);
 
@@ -85,7 +89,7 @@ public class LoginScreen extends BaseScreen {
 
         registerLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.REGISTER));
 
-        loginRoot.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink);
+        loginRoot.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink, employeeLink);
         bottomBar.getChildren().add(btnBackToMain);
 
         mainRoot.setCenter(loginRoot);

@@ -207,6 +207,19 @@ public class EventRepository {
         }
         return maxId + 1;
     }
+   
+    public synchronized boolean deleteEvent(Long eventId) {
+        if (eventId == null) return false;
+        
+        // Entfernt das Event aus der Liste, wenn die ID übereinstimmt
+        boolean removed = this.events.removeIf(e -> e.getId().equals(eventId));
+        
+        // Wenn es erfolgreich entfernt wurde, überschreiben wir die CSV
+        if (removed) {
+            saveAllToCsv();
+        }
+        return removed;
+    }
 }
 
 

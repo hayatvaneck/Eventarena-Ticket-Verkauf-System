@@ -18,7 +18,9 @@ public class ScreenManager {
         GRAPHIC_SECTION_SELECTION,
         SEAT_SELECTION,
         STANDING_AREA_SELECTION,
-        CART
+        CART,
+        EMPLOYEE_EVENTS,
+        EMPLOYEE_LOGIN
     }
 
     //Map-Array, das jeden Screen mit einer zugehörigen Aktion verknüpft.
