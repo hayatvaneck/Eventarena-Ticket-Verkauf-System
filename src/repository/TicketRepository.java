@@ -122,9 +122,6 @@ public class TicketRepository {
                 }
 
                 Section section = event.findSectionByName(sectionName);
-                if (section instanceof StandingSection) {
-                    ((StandingSection) section).incrementSoldTickets();
-                }
                 
                 if (section == null) {
                     System.err.println("Bereich " + sectionName + " für Ticket " + ticketId + " existiert nicht mehr. Ticket übersprungen.");
