@@ -186,7 +186,7 @@ public class MyTicketsScreen extends BaseScreen {
 
         btnDownload.setOnAction(e -> saveTicketAsImage(ticket));
 
-        Button btnOpenEvent = createConfirmButton("Event öffnen");
+        Button btnOpenEvent = createConfirmButton("Ticket anzeigen");
         btnOpenEvent.setStyle(
                 "-fx-background-color: #2c3e50;" +
                         "-fx-text-fill: white;" +
