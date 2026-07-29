@@ -1,6 +1,5 @@
 package ui.screens;
 
-import domain.PasswordService;
 import domain.User;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -13,6 +12,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import service.PasswordService;
 import ui.App;
 import ui.ScreenManager;
 

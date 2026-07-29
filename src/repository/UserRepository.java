@@ -2,7 +2,7 @@ package repository;
 
 import domain.Ticket;
 import domain.User;
-import domain.PasswordService;
+import service.PasswordService;
 
 import java.io.*;
 import java.util.ArrayList;

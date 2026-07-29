@@ -1,7 +1,8 @@
 package repository;
 
 import domain.Employee;
-import domain.PasswordService;
+import service.PasswordService;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;

@@ -207,38 +207,53 @@ public class BookingService {
     }
 
     public void restoreBookedSeatsFromRepository() {
-        List<Ticket> savedTickets = ticketRepo.findAll();
+    List<Ticket> savedTickets = ticketRepo.findAll();
 
-        for (Ticket ticket : savedTickets) {
-            if (!activeTickets.contains(ticket)) {
-                activeTickets.add(ticket);
-            }
+    for (Ticket ticket : savedTickets) {
+        if (!activeTickets.contains(ticket)) {
+            activeTickets.add(ticket);
+        }
 
-            Section section = ticket.getSection();
-            if (section == null) {
-                continue;
-            }
+        // 1. Event über ID holen
+        Event event = eventRepo.findById(ticket.getEvent().getId());
+        if (event == null) {
+            continue;
+        }
 
-            try {
-                if (section instanceof SeatedSection) {
-                    SeatedSection seatedSection = (SeatedSection) section;
-                    int[] rowAndSeat = parseRowAndSeat(ticket.getSeatInfo());
+        // 2. Section über Namen innerhalb dieses Events holen
+        String sectionName = ticket.getSection() != null
+                ? ticket.getSection().getName()
+                : null;
 
-                    if (rowAndSeat[0] > 0 && rowAndSeat[1] > 0) {
-                        Seat seat = seatedSection.getSeat(rowAndSeat[0], rowAndSeat[1]);
-                        if (seat != null) {
-                            seat.book();
-                        }
+        if (sectionName == null) {
+            continue;
+        }
+
+        Section section = event.findSectionByName(sectionName);
+        if (section == null) {
+            continue;
+        }
+
+        try {
+            if (section instanceof SeatedSection) {
+                SeatedSection seatedSection = (SeatedSection) section;
+                int[] rowAndSeat = parseRowAndSeat(ticket.getSeatInfo());
+
+                int row = rowAndSeat[0];
+                int seatNumber = rowAndSeat[1];
+
+                if (row > 0 && seatNumber > 0) {
+                    Seat seat = seatedSection.getSeat(row, seatNumber);
+                    if (seat != null && !seat.isBooked()) {
+                        seat.book();
                     }
-                } else if (section instanceof StandingSection) {
-                    section.bookNextAvailableTicket();
                 }
-            } catch (SeatAlreadyBookedException e) {
-                System.err.println("Warnung beim Wiederherstellen der PlÃ¤tze: " + e.getMessage());
+            } else if (section instanceof StandingSection) {
+                // Stehplätze vorerst ignorieren, wir kümmern uns später darum
+                // section.bookNextAvailableTicket();
             }
+        } catch (SeatAlreadyBookedException e) {
+            System.err.println("Warnung beim Wiederherstellen der Plätze: " + e.getMessage());
         }
     }
-}
-
-
-
+}}
