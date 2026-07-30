@@ -80,7 +80,7 @@ public class SeatSelectionScreen extends BaseScreen {
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         selectionStatusLabel.setText("Kein Platz ausgewählt");
 
-        Button confirmButton = createConfirmButton("Sitzplatz bestätigen");
+        Button confirmButton = createSelectingButton("Sitzplatz bestätigen");
         confirmButton.setOnAction(e -> {
             List<Seat> newSeats = controller.getSelectedSeats();
 
@@ -101,7 +101,8 @@ public class SeatSelectionScreen extends BaseScreen {
         Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(title, instruction, stageLabel, seatGridScrollPane, selectionStatusLabel, confirmButton, backButton);
+        root.getChildren().addAll(title, instruction, stageLabel, seatGridScrollPane, selectionStatusLabel,
+                confirmButton, backButton);
 
         return createDefaultScene(root);
     }
