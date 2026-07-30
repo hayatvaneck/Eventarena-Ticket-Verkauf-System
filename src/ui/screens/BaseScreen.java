@@ -28,7 +28,7 @@ public abstract class BaseScreen {
 
     protected static final String TITLE_STYLE = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: "
             + COLOR_TEXT + ";";
-    protected static final String SUBTITLE_STYLE = "-fx-font-size: 14px; -fx-text-fill: #7f8c8d;";
+    protected static final String SUBTITLE_STYLE = "-fx-font-size: 14px; -fx-text-fill: #2c3e50;";
 
     protected static final String CONFIRM_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +
@@ -40,8 +40,15 @@ public abstract class BaseScreen {
 
     protected static final String BACK_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +
-            "-fx-font-size: 14px;" +
             "-fx-font-weight: bold;" +
+            "-fx-font-size: 14px;" +
+            "-fx-padding: 10 20 10 20;" +
+            "-fx-background-radius: 6px;";
+
+    protected static final String SELECTING_BUTTON_STYLE = "-fx-background-color: #d4af37;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-font-size: 14px;" +
             "-fx-padding: 10 20 10 20;" +
             "-fx-background-radius: 6px;";
 
@@ -97,6 +104,12 @@ public abstract class BaseScreen {
         return button;
     }
 
+    protected Button createSelectingButton(String text) {
+        Button button = new Button(text);
+        button.setStyle(SELECTING_BUTTON_STYLE);
+        return button;
+    }
+
     protected Button createSecondaryButton(String text) {
         Button button = new Button(text);
         button.setStyle(SECONDARY_BUTTON_STYLE);
@@ -112,12 +125,13 @@ public abstract class BaseScreen {
     protected Button createBackButton(String text) {
         Button button = createConfirmButton(text);
         button.setStyle(BACK_BUTTON_STYLE + "-fx-cursor: hand;");
+
         return button;
     }
 
     protected Label createMutedInfoLabel(String text) {
         Label label = new Label(text);
-        label.setStyle("-fx-font-style: italic; -fx-text-fill: #7f8c8d; -fx-font-size: 14px;");
+        label.setStyle("-fx-font-style: italic; -fx-text-fill: #2c3e50; -fx-font-size: 14px;");
         return label;
     }
 

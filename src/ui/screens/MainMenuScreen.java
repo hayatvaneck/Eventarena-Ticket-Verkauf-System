@@ -74,13 +74,17 @@ public class MainMenuScreen extends BaseScreen {
 
     @Override
     public Scene buildScene() {
-        VBox root = createRoot(20, new Insets(30), Pos.TOP_CENTER);
+        // Das Hauptlayout, das Mitte und Unten strikt voneinander trennt!
+        javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
+        root.setStyle("-fx-background-color: #f5f5f7;");
 
+        // --- 1. OBERE BOX (Mitte) ---
+        VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
+        
         HBox headerBar = createHeaderBar();
-
         Label title = createTitle("ARENA TICKETSYSTEM");
         Label subtitle = createSubtitle("Wählen Sie ein Event aus:");
-
+        
         FlowPane cardContainer = new FlowPane();
         cardContainer.setHgap(20);
         cardContainer.setVgap(20);
@@ -102,11 +106,19 @@ public class MainMenuScreen extends BaseScreen {
                 card.setStyle(CARD_SELECTED_STYLE);
             }
         }
-
         scrollPane.setContent(cardContainer);
+        
+        // Die obere Box ist fertig! (KEIN Spacer mehr nötig)
+        topBox.getChildren().addAll(headerBar, title, subtitle, scrollPane);
 
+
+        // --- 2. UNTERE BOX (Button + Footer) ---
+        VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
+        
         Button nextButton = createConfirmButton("Blöcke anzeigen");
         nextButton.setPrefWidth(300);
+        nextButton.setMinHeight(45);
+        nextButton.setMaxHeight(45);
         nextButton.setOnAction(e -> {
             if (app.getCurrentSelectedEvent() != null) {
                 app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION);
@@ -117,13 +129,17 @@ public class MainMenuScreen extends BaseScreen {
 
         Label teamLabel = new Label("Entwickelt von: Lukas Beck, Maren Bohlig, Gian-Luca Levels, Hayat van Eck");
         teamLabel.setStyle("-fx-text-fill: #2c3e50; -fx-font-style: italic;");
-
         HBox footerBar = createHBox(0, Pos.BOTTOM_RIGHT);
-        footerBar.getChildren().add(teamLabel);
         footerBar.setPadding(new Insets(10, 0, 0, 0));
+        footerBar.getChildren().add(teamLabel);
 
-        root.getChildren().addAll(headerBar, title, subtitle, scrollPane, nextButton, createVerticalSpacer(),
-                footerBar);
+        bottomBox.getChildren().addAll(nextButton, footerBar);
+
+
+        // --- 3. ZUSAMMENBAUEN ---
+        root.setCenter(topBox);
+        root.setBottom(bottomBox); // Nagelt die untere Box absolut fest an den Bildschirmrand!
+
         return createDefaultScene(root);
     }
 

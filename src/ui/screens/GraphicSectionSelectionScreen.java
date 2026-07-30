@@ -22,8 +22,9 @@ import ui.App;
 import ui.ScreenManager;
 
 /**
- * Die Klasse GraphicSectionSelectionScreen zeigt den grafischen Saalplan und ermöglicht die Bereichsauswahl.
-
+ * Die Klasse GraphicSectionSelectionScreen zeigt den grafischen Saalplan und
+ * ermöglicht die Bereichsauswahl.
+ * 
  */
 
 public class GraphicSectionSelectionScreen extends BaseScreen {
@@ -46,8 +47,11 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
             return createDefaultScene(emptyRoot);
         }
 
-        VBox root = createRoot(15, new Insets(20), Pos.CENTER);
+        javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle(ROOT_STYLE);
+
+        // --- 1. OBERE BOX (Mitte) ---
+        VBox topBox = createRoot(25, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
 
         Label title = createTitle("Blockauswahl für: " + app.getCurrentSelectedEvent().getTitle());
         Label instruction = createSubtitle("Wählen Sie einen Block aus:");
@@ -69,16 +73,38 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
             mapContainer.setPrefSize(600, 400);
         }
 
+        topBox.getChildren().addAll(title, instruction, mapContainer);
+
+        // --- 2. UNTERE BOX (Button + Dummy Footer) ---
+        VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
+
         Button backButton = createBackButton("Zurück zu den Events");
+        backButton.setPrefWidth(300);
+        backButton.setMinHeight(45);
+        backButton.setMaxHeight(45);
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
-        root.getChildren().addAll(title, instruction, mapContainer, backButton);
+        // Der unsichtbare Klon, der exakt denselben Platz einnimmt wie im Hauptmenü
+        Label dummyLabel = new Label("Entwickelt von: Lukas Beck, Maren Bohlig, Gian-Luca Levels, Hayat van Eck");
+        dummyLabel.setStyle("-fx-text-fill: #2c3e50; -fx-font-style: italic;");
+        dummyLabel.setVisible(false); // Versteckt den Text!
+
+        HBox dummyFooter = createHBox(0, Pos.BOTTOM_RIGHT);
+        dummyFooter.setPadding(new Insets(10, 0, 0, 0));
+        dummyFooter.getChildren().add(dummyLabel);
+
+        bottomBox.getChildren().addAll(backButton, dummyFooter);
+
+        // --- 3. ZUSAMMENBAUEN ---
+        root.setCenter(topBox);
+        root.setBottom(bottomBox);
+
         return createDefaultScene(root);
     }
 
     private StackPane createStageStandingLayout() {
         StackPane mapContainer = new StackPane();
-         VBox mapWrapper = new VBox(20);
+        VBox mapWrapper = new VBox(20);
         mapWrapper.setAlignment(Pos.CENTER);
         mapWrapper.setPadding(new Insets(24));
         mapWrapper.setStyle(CARD_STYLE);
@@ -90,13 +116,16 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         grid.setAlignment(Pos.CENTER);
 
         // TOP ROW: Block 2 & Block 1
-        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
-        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
+        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
+                85 + 10);
+        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
+                85 + 10);
 
         // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
-        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180+20);
-        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180+20);
-        Button standingBtn = createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8", "INNENRAUM (Stehplätze)", 442, 180);
+        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180 + 20);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180 + 20);
+        Button standingBtn = createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8",
+                "INNENRAUM (Stehplätze)", 482, 200);
 
         // BÜHNE Block
         StackPane stageBox = new StackPane();
@@ -113,8 +142,9 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         stageBox.getChildren().addAll(stageRect, stageLabel);
 
         // BOTTOM ROW: Block 3 & Block 4
-        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
-        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215, 85+10);
+        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
+                85 + 10);
+        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215, 85 + 10);
 
         // GRID ASSEMBLY
         grid.add(block2Btn, 2, 0);
@@ -133,18 +163,18 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         legend.setAlignment(Pos.CENTER);
         legend.setPadding(new Insets(10, 0, 0, 0));
         legend.getChildren().addAll(
-            createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
-            createLegendItem("VIP Balkon", "#fde047", "#d97706"),
-            createLegendItem("Innenraum (Stehplätze)", "#e0e7ff", "#2563eb"),
-            createLegendItem("Bühne", "#0f172a", "#334155")
-        );
+                createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
+                createLegendItem("VIP Balkon", "#fde047", "#d97706"),
+                createLegendItem("Innenraum (Stehplätze)", "#e0e7ff", "#2563eb"),
+                createLegendItem("Bühne", "#0f172a", "#334155"));
 
         mapWrapper.getChildren().addAll(grid, legend);
         mapContainer.getChildren().add(mapWrapper);
         return mapContainer;
     }
 
-    private Button createBlockButton(String name, String bgHex, String borderHex, String textHex, String subtitle, double width, double height) {
+    private Button createBlockButton(String name, String bgHex, String borderHex, String textHex, String subtitle,
+            double width, double height) {
         Button btn = new Button();
         btn.setPrefSize(width, height);
 
@@ -175,7 +205,8 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
         btn.setOnAction(e -> {
             if (sec == null) {
-                app.showAlert(Alert.AlertType.WARNING, "Fehler", "Der Bereich '" + name + "' konnte im Event nicht gefunden werden.");
+                app.showAlert(Alert.AlertType.WARNING, "Fehler",
+                        "Der Bereich '" + name + "' konnte im Event nicht gefunden werden.");
                 return;
             }
 
@@ -218,7 +249,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
     private StackPane createArenaLayout() {
         StackPane mapContainer = new StackPane();
-        
+
         VBox mapWrapper = new VBox(20);
         mapWrapper.setAlignment(Pos.CENTER);
         mapWrapper.setPadding(new Insets(24));
@@ -230,19 +261,23 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         grid.setVgap(12);
         grid.setAlignment(Pos.CENTER);
 
-        // Wir berechnen die Breite des Spielfelds passend zu Block 1 & 2 (235 + 235 + 12 Lücke = 482)
+        // Wir berechnen die Breite des Spielfelds passend zu Block 1 & 2 (235 + 235 +
+        // 12 Lücke = 482)
         double blockWidth = 235;
         double blockHeight = 95;
         double centerHeight = 200;
 
         // TOP ROW: Block 2 & Block 1
-        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
-        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
+        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
+                blockHeight);
+        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
+                blockHeight);
 
         // MIDDLE ROW: Block 6, VIP Balkon, SPIELFELD, Block 5
-        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, centerHeight);
+        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100,
+                centerHeight);
         Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, centerHeight);
-        
+
         // SPIELFELD (Visuelles Element, nicht klickbar)
         StackPane courtBox = new StackPane();
         Rectangle courtRect = new Rectangle(482, centerHeight, Color.web("#fef3c7")); // Helle Holz-Farbe (Parkett)
@@ -257,7 +292,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         centerCircle.setStroke(Color.web("#d97706"));
         centerCircle.setStrokeWidth(3);
 
-        Label courtLabel = new Label("VERANSTAlTUNGSFLÄCHE");
+        Label courtLabel = new Label("S P I E L F E L D");
         courtLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
         courtLabel.setTextFill(Color.web("#b45309")); // Dunkelbraun/Orange für Text
         courtLabel.setTranslateY(-centerHeight / 2 + 60); // Positioniert den Text oben im Spielfeld
@@ -267,11 +302,14 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         courtBox.getChildren().addAll(courtRect, centerLine, centerCircle, courtLabel);
 
         // RECHTE SEITE: Block 5 (statt der Bühne)
-        Button block5Btn = createBlockButton("Block 5", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, centerHeight);
+        Button block5Btn = createBlockButton("Block 5", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100,
+                centerHeight);
 
         // BOTTOM ROW: Block 3 & Block 4
-        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
-        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth, blockHeight);
+        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
+                blockHeight);
+        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
+                blockHeight);
 
         // GRID ASSEMBLY
         // Reihe 0: Block 2 und 1
@@ -293,14 +331,13 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         legend.setAlignment(Pos.CENTER);
         legend.setPadding(new Insets(10, 0, 0, 0));
         legend.getChildren().addAll(
-            createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
-            createLegendItem("VIP Balkon", "#fde047", "#d97706"),
-            createLegendItem("Veranstaltungsfläche", "#fef3c7", "#d97706")
-        );
+                createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
+                createLegendItem("VIP Balkon", "#fde047", "#d97706"),
+                createLegendItem("Veranstaltungsfläche", "#fef3c7", "#d97706"));
 
         mapWrapper.getChildren().addAll(grid, legend);
         mapContainer.getChildren().add(mapWrapper);
-        
+
         return mapContainer;
     }
 
@@ -311,21 +348,25 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         mapWrapper.setAlignment(Pos.CENTER);
         mapWrapper.setPadding(new Insets(24));
         mapWrapper.setStyle(CARD_STYLE);
-// GRID OF SECTIONS
+        // GRID OF SECTIONS
         GridPane grid = new GridPane();
         grid.setHgap(12);
         grid.setVgap(12);
         grid.setAlignment(Pos.CENTER);
 
         // TOP ROW: Block 2 & Block 1
-        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
-        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
+        Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
+                85 + 10);
+        Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
+                85 + 10);
 
         // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
-        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180+20);
-        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180+20);
-        Button blockInnerBtn = createBlockButton("Innenraum (Sitzplatz)", "#e0e7ff", "#2563eb", "#1d4ed8", "INNENRAUM (Sitzplätze)", 442, 180);
-        //Button text= createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8", "INNENRAUM (Sitzplätze)", 442, 180);
+        Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180 + 20);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180 + 20);
+        Button blockInnerBtn = createBlockButton("Innenraum (Sitzplatz)", "#e0e7ff", "#2563eb", "#1d4ed8",
+                "INNENRAUM (Sitzplätze)", 482, 200);
+        // Button text= createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb",
+        // "#1d4ed8", "INNENRAUM (Sitzplätze)", 442, 180);
 
         // BÜHNE Block
         StackPane stageBox = new StackPane();
@@ -342,10 +383,10 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         stageBox.getChildren().addAll(stageRect, stageLabel);
 
         // BOTTOM ROW: Block 3 & Block 4
-        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215+20, 85+10);
-        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215, 85+10);
+        Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 235, 85 + 10);
+        Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 235, 85 + 10);
 
-        // GRID ASSEMBLY
+        // GRID ASSEMBLYS
         grid.add(block2Btn, 2, 0);
         grid.add(block1Btn, 3, 0);
 
@@ -362,17 +403,13 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         legend.setAlignment(Pos.CENTER);
         legend.setPadding(new Insets(10, 0, 0, 0));
         legend.getChildren().addAll(
-            createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
-            createLegendItem("VIP Balkon", "#fde047", "#d97706"),
-            createLegendItem("Innenraum (Sitzplätze)", "#e0e7ff", "#2563eb"),
-            createLegendItem("Bühne", "#0f172a", "#334155")
-        );
+                createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
+                createLegendItem("Balkon", "#fde047", "#d97706"),
+                createLegendItem("Innenraum (Sitzplätze)", "#e0e7ff", "#2563eb"),
+                createLegendItem("Bühne", "#0f172a", "#334155"));
         mapWrapper.getChildren().addAll(grid, legend);
         mapContainer.getChildren().add(mapWrapper);
 
         return mapContainer;
     }
-} 
-
-
-
+}

@@ -66,10 +66,13 @@ public class SeatSelectionScreen extends BaseScreen {
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartItems());
 
+        VBox gridWrapper = new VBox(seatGrid);
+        gridWrapper.setAlignment(Pos.CENTER);
+
         ScrollPane seatGridScrollPane = createTransparentScrollPane(seatGrid);
         seatGridScrollPane.setPannable(true);
         seatGridScrollPane.setFitToHeight(false);
-        seatGridScrollPane.setFitToWidth(false);
+        seatGridScrollPane.setFitToWidth(true);
         seatGridScrollPane.setPrefViewportHeight(420);
         seatGridScrollPane.setPrefViewportWidth(740);
 
@@ -77,8 +80,7 @@ public class SeatSelectionScreen extends BaseScreen {
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         selectionStatusLabel.setText("Kein Platz ausgewählt");
 
-        Button confirmButton = new Button("Sitzplatz bestätigen");
-        confirmButton.setStyle("-fx-background-color: #d4af37; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+        Button confirmButton = createSelectingButton("Sitzplatz bestätigen");
         confirmButton.setOnAction(e -> {
             List<Seat> newSeats = controller.getSelectedSeats();
 
@@ -99,13 +101,8 @@ public class SeatSelectionScreen extends BaseScreen {
         Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(
-                header,
-                stageLabel,
-                seatGridScrollPane,
-                confirmButton,
-                backButton,
-                selectionStatusLabel);
+        root.getChildren().addAll(title, instruction, stageLabel, seatGridScrollPane, selectionStatusLabel,
+                confirmButton, backButton);
 
         return createDefaultScene(root);
     }
