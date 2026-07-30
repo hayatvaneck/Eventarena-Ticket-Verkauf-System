@@ -38,12 +38,12 @@ public abstract class BaseScreen {
             "-fx-background-radius: 6px;" +
             "-fx-cursor: hand;";
 
-    protected static final String BACK_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-size: 14px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-padding: 10 20 10 20;" +
-            "-fx-background-radius: 6px;";
+    protected static final String BACK_BUTTON_STYLE =
+        "-fx-background-color: #a6a6ac;" +
+        "-fx-text-fill: black;" +
+        "-fx-font-size: 14px;" +
+        "-fx-padding: 10 20 10 20;" +
+        "-fx-background-radius: 6px;";
 
     protected static final String SECONDARY_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +

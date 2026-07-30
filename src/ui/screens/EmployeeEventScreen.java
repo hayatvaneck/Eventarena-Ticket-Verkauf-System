@@ -156,6 +156,10 @@ public class EmployeeEventScreen extends BaseScreen {
             Button delBtn = createDangerButton("Löschen");
             delBtn.setOnAction(e -> {
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                if (app.getPrimaryStage() != null) {
+                    confirm.initOwner(app.getPrimaryStage());
+                }
+                
                 confirm.setTitle("Löschen bestätigen");
                 confirm.setHeaderText("Event wirklich löschen?");
                 confirm.setContentText("Soll das Event '" + ev.getTitle() + "' unwiderruflich gelöscht werden?");

@@ -186,7 +186,7 @@ public class MyTicketsScreen extends BaseScreen {
 
         btnDownload.setOnAction(e -> saveTicketAsImage(ticket));
 
-        Button btnOpenEvent = createConfirmButton("Event öffnen");
+        Button btnOpenEvent = createConfirmButton("Ticket anzeigen");
         btnOpenEvent.setStyle(
                 "-fx-background-color: #2c3e50;" +
                         "-fx-text-fill: white;" +
@@ -207,6 +207,10 @@ public class MyTicketsScreen extends BaseScreen {
 
     private void cancelTicket(Ticket ticket, String eventTitle, User loggedInUser) {
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        if (app.getPrimaryStage() != null) {
+            confirmAlert.initOwner(app.getPrimaryStage());
+        }
+
         confirmAlert.setTitle("Ticket stornieren");
         confirmAlert.setHeaderText("Möchten Sie dieses Ticket wirklich stornieren?");
 

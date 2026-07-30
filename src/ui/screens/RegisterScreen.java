@@ -149,7 +149,7 @@ public class RegisterScreen extends BaseScreen {
 
             if (success) {
                 app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Registrierung erfolgreich!");
-                app.navigateTo(ScreenManager.Screen.LOGIN);
+                app.navigateTo(ScreenManager.Screen.CART);
             } else {
                 app.showAlert(Alert.AlertType.ERROR, "Fehler", "Diese E-Mail-Adresse ist bereits registriert.");
             }
