@@ -66,10 +66,13 @@ public class SeatSelectionScreen extends BaseScreen {
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartItems());
 
+        VBox gridWrapper = new VBox(seatGrid);
+        gridWrapper.setAlignment(Pos.CENTER);
+
         ScrollPane seatGridScrollPane = createTransparentScrollPane(seatGrid);
         seatGridScrollPane.setPannable(true);
         seatGridScrollPane.setFitToHeight(false);
-        seatGridScrollPane.setFitToWidth(false);
+        seatGridScrollPane.setFitToWidth(true);
         seatGridScrollPane.setPrefViewportHeight(420);
         seatGridScrollPane.setPrefViewportWidth(740);
 

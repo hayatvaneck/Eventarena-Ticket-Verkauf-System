@@ -12,6 +12,7 @@ import java.util.List;
 import java.time.LocalDateTime;
 
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
@@ -62,6 +63,8 @@ public class App extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Arena Ticketsystem OOP");
 
+        this.primaryStage.setMaximized(true);
+
         this.screenManager = new ScreenManager()
                 .register(ScreenManager.Screen.MAIN_MENU, this::showMainMenu)
                 .register(ScreenManager.Screen.BOOKING_CONFIRMATION, this::showBookingConfirmationView)
@@ -80,18 +83,13 @@ public class App extends Application {
 
     // --- SCREEN 1: HAUPTMENÜ ---
     private void showMainMenu() {
-        MainMenuScreen mainMenuScreen = new MainMenuScreen(
-                this,
-                eventRepo);
-
-        primaryStage.setScene(mainMenuScreen.buildScene());
-        primaryStage.show();
+        MainMenuScreen mainMenuScreen = new MainMenuScreen(this, eventRepo);
+        switchScene(mainMenuScreen.buildScene());
     }
 
     private void showBookingConfirmationView() {
         BookingConfirmationScreen bookingConfirmationScreen = new BookingConfirmationScreen(this);
-        primaryStage.setScene(bookingConfirmationScreen.buildScene());
-        primaryStage.show();
+        switchScene(bookingConfirmationScreen.buildScene());
     }
 
     public User getLoggedInUser() {
@@ -233,57 +231,49 @@ public class App extends Application {
     private void showMyTicketsView() {
         ensureLoggedIn(() -> {
             MyTicketsScreen myTicketsScreen = new MyTicketsScreen(this, bookingService, userRepo);
-            primaryStage.setScene(myTicketsScreen.buildScene());
-            primaryStage.show();
+            switchScene(myTicketsScreen.buildScene());
         });
     }
 
     // LOGIN SCREEN
     private void showLoginView() {
         LoginScreen loginScreen = new LoginScreen(this);
-        primaryStage.setScene(loginScreen.buildScene());
-        primaryStage.show();
+        switchScene(loginScreen.buildScene());
     }
 
     // REGISTRIERUNGS SCREEN
     private void showRegisterView() {
         RegisterScreen registerScreen = new RegisterScreen(this);
-        primaryStage.setScene(registerScreen.buildScene());
-        primaryStage.show();
+        switchScene(registerScreen.buildScene());
     }
 
     // --- SCREEN 2: SITZAUSWAHL ---
     public void showSeatSelection() {
         SeatSelectionScreen seatSelectionScreen = new SeatSelectionScreen(this);
-        primaryStage.setScene(seatSelectionScreen.buildScene());
-        primaryStage.show();
+        switchScene(seatSelectionScreen.buildScene());
     }
 
     // --- SCREEN 2b: STEHPLATZ-ANZAHL WÄHLEN ---
     public void showStandingAreaSelection() {
         StandingAreaSelectionScreen standingAreaSelectionScreen = new StandingAreaSelectionScreen(this);
-        primaryStage.setScene(standingAreaSelectionScreen.buildScene());
-        primaryStage.show();
+        switchScene(standingAreaSelectionScreen.buildScene());
     }
 
     // --- SCREEN 3: WARENKORB ANSICHT ---
     private void showCartView() {
         CartScreen cartScreen = new CartScreen(this);
-        primaryStage.setScene(cartScreen.buildScene());
-        primaryStage.show();
+        switchScene(cartScreen.buildScene());
     }
 
-    // --- NEU: SCREEN FÜR MITARBEITER ---
+    // --- SCREEN FÜR MITARBEITER ---
     private void showEmployeeEventsView() {
         ui.screens.EmployeeEventScreen employeeScreen = new ui.screens.EmployeeEventScreen(this, eventRepo);
-        primaryStage.setScene(employeeScreen.buildScene());
-        primaryStage.show();
+        switchScene(employeeScreen.buildScene());
     }
 
     private void showEmployeeLoginView() {
         ui.screens.EmployeeLoginScreen employeeLoginScreen = new ui.screens.EmployeeLoginScreen(this);
-        primaryStage.setScene(employeeLoginScreen.buildScene());
-        primaryStage.show();
+        switchScene(employeeLoginScreen.buildScene());
     }
 
     public boolean validateEmployeeCredentials(String username, String password) {
@@ -398,8 +388,7 @@ public class App extends Application {
 
     public void showGraphicSectionSelection() {
         GraphicSectionSelectionScreen graphicSectionSelectionScreen = new GraphicSectionSelectionScreen(this);
-        primaryStage.setScene(graphicSectionSelectionScreen.buildScene());
-        primaryStage.show();
+        switchScene(graphicSectionSelectionScreen.buildScene());
     }
 
     public Section findSectionByName(String name) {
@@ -449,5 +438,23 @@ public class App extends Application {
             default:
                 return CustomerType.STANDARD;
         }
+    }
+
+    private void switchScene(Scene newScene) {
+        if (primaryStage.getScene() == null) {
+            // Beim allerersten Start gibt es noch keine Szene
+            primaryStage.setScene(newScene);
+        } else {
+            // 1. Wir holen uns den Inhalt (Root) der neuen Szene
+            javafx.scene.Parent newRoot = newScene.getRoot();
+
+            // 2. TRICK: Wir geben der neuen Szene einen leeren Platzhalter,
+            // damit unser eigentlicher Inhalt "befreit" wird und keinen Besitzer mehr hat!
+            newScene.setRoot(new javafx.scene.layout.Region());
+
+            // 3. Jetzt können wir den befreiten Inhalt fehlerfrei in unser Fenster laden!
+            primaryStage.getScene().setRoot(newRoot);
+        }
+        primaryStage.show();
     }
 }
