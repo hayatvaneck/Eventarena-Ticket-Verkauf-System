@@ -45,8 +45,8 @@ public class SeatSelectionScreen extends BaseScreen {
 
         VBox root = createRoot(15, new Insets(20), Pos.CENTER);
 
-        Label header = new Label("Saalplan für: " + seatedSection.getName());
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        Label title = createTitle("Sitzplätze " + seatedSection.getName());
+        Label instruction = createSubtitle("Wählen Sie einen Sitzplatz aus:");
 
         Label stageLabel = new Label("--- BÜHNE / SPIELFELD ---");
         stageLabel.setStyle("-fx-background-color: #7f8c8d; -fx-padding: 5 50 5 50; -fx-text-fill: white;");
@@ -96,8 +96,7 @@ public class SeatSelectionScreen extends BaseScreen {
             }
         });
 
-        Button backButton = new Button("Zurück zum Saalplan");
-        backButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
+        Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
         root.getChildren().addAll(

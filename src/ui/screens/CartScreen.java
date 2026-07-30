@@ -11,6 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import ui.App;
 import domain.CartItem;
@@ -37,7 +38,7 @@ public class CartScreen extends BaseScreen {
 
         Label title = new Label("WARENKORB");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
+        
         VBox formContainer = new VBox(10);
         formContainer.setAlignment(Pos.CENTER);
 
@@ -82,8 +83,7 @@ public class CartScreen extends BaseScreen {
                     seatLabelText = "Ticket " + (i + 1);
                 }
 
-                VBox ticketInfoBox = new VBox(4);
-                ticketInfoBox.setAlignment(Pos.CENTER_LEFT);
+                VBox ticketInfoBox = createVBox(4, Pos.CENTER_LEFT);
 
                 Label lblEvent = new Label("Event: " + eventName);
                 lblEvent.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
@@ -115,6 +115,9 @@ public class CartScreen extends BaseScreen {
                     lblPrice.setText(String.format("%.2f €", finalPrice));
                 });
 
+                Region spacer = createHorizontalSpacer();
+                HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
                 javafx.scene.control.Button btnDelete = new javafx.scene.control.Button("X");
                 btnDelete.setStyle(
                     "-fx-background-color: #e74c3c;" +
@@ -125,13 +128,14 @@ public class CartScreen extends BaseScreen {
                     "-fx-cursor: hand"
                 );
                 btnDelete.setAlignment(Pos.CENTER_RIGHT);
+                VBox.setMargin(btnDelete, new Insets(0, 0, 0, 0));
 
                 btnDelete.setOnAction(e -> {
                     app.getCartItems().remove(index);
                     app.navigateTo(ScreenManager.Screen.CART);
                 });
 
-                row.getChildren().addAll(ticketInfoBox, lblPrice, discountBox, btnDelete);
+                row.getChildren().addAll(ticketInfoBox, lblPrice, discountBox, spacer, btnDelete);
                 formContainer.getChildren().add(row);
                 typeComboBoxes.add(cbType);
             }

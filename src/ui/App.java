@@ -114,6 +114,10 @@ public class App extends Application {
         return cartItems;
     }
 
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
     public Label getSelectionStatusLabel() {
         return selectionStatusLabel;
     }
@@ -383,6 +387,9 @@ public class App extends Application {
 
     public void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
+        if (primaryStage != null) {
+            alert.initOwner(primaryStage);
+        }
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);

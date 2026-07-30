@@ -49,8 +49,8 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         VBox root = createRoot(15, new Insets(20), Pos.CENTER);
         root.setStyle(ROOT_STYLE);
 
-        Label title = new Label("Blockauswahl für: " + app.getCurrentSelectedEvent().getTitle());
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        Label title = createTitle("Blockauswahl für: " + app.getCurrentSelectedEvent().getTitle());
+        Label instruction = createSubtitle("Wählen Sie einen Block aus:");
 
         StackPane mapContainer;
         if (app.getCurrentSelectedEvent().getMapType() == MapType.ARENA) {
@@ -72,7 +72,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         Button backButton = createBackButton("Zurück zu den Events");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
-        root.getChildren().addAll(title, mapContainer, backButton);
+        root.getChildren().addAll(title, instruction, mapContainer, backButton);
         return createDefaultScene(root);
     }
 
