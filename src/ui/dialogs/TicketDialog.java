@@ -72,7 +72,14 @@ public final class TicketDialog {
             lblDesc.setText("Beschreibung: " + shortDescription);
 
             Hyperlink toggleLink = new Hyperlink("Mehr anzeigen");
-            toggleLink.setStyle("-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-font-size: 12px; -fx-focus-color: transparent; -fx-faint-focus-color: transparent;");
+            toggleLink.setStyle(
+                "-fx-text-fill: #2c3e50; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 12px; " +
+                "-fx-focus-color: transparent; " +
+                "-fx-faint-focus-color: transparent; " +
+                "-fx-underline: false;"
+            );
 
             toggleLink.setOnAction(e -> {
                 if (toggleLink.getText().equals("Mehr anzeigen")) {
