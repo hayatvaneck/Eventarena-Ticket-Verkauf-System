@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -101,11 +102,12 @@ public class MyTicketsScreen extends BaseScreen {
         ticketCard.setPadding(new Insets(15));
         ticketCard.setStyle(
                 "-fx-background-color: white; " +
-                        "-fx-border-color: #2ecc71; " +
-                        "-fx-border-width: 1px 1px 1px 5px; " +
-                        "-fx-border-radius: 4px; " +
-                        "-fx-background-radius: 4px; " +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);");
+                "-fx-border-color: #2ecc71; " +
+                "-fx-border-width: 1px 1px 1px 5px; " +
+                "-fx-border-radius: 4px; " +
+                "-fx-background-radius: 4px; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);"
+            );
 
         VBox details = new VBox(5);
 
@@ -170,7 +172,8 @@ public class MyTicketsScreen extends BaseScreen {
                         "-fx-font-size: 12px;" +
                         "-fx-background-radius: 4px;" +
                         "-fx-padding: 6px 12px;" +
-                        "-fx-cursor: Hand;");
+                        "-fx-cursor: Hand;"
+                    );
 
         btnCancel.setOnAction(e -> cancelTicket(ticket, eventTitle, loggedInUser));
 
@@ -182,7 +185,8 @@ public class MyTicketsScreen extends BaseScreen {
                         "-fx-font-size: 12px;" +
                         "-fx-background-radius: 4px;" +
                         "-fx-padding: 6px 12px;" +
-                        "-fx-cursor: Hand;");
+                        "-fx-cursor: Hand;"
+                    );
 
         btnDownload.setOnAction(e -> saveTicketAsImage(ticket));
 
@@ -194,7 +198,8 @@ public class MyTicketsScreen extends BaseScreen {
                         "-fx-font-size: 12px;" +
                         "-fx-background-radius: 4px;" +
                         "-fx-padding: 6px 12px;" +
-                        "-fx-cursor: Hand;");
+                        "-fx-cursor: Hand;"
+                    );
         btnOpenEvent.setOnAction(e -> app.openTicketWindow(ticket));
 
         VBox actionBox = new VBox(8);
@@ -220,8 +225,44 @@ public class MyTicketsScreen extends BaseScreen {
 
         confirmAlert.setContentText(
                 "Event: " + eventTitle + "\n" +
-                        placeText + "\n" +
-                        "Preis: " + String.format("%.2f €", ticket.getFinalPrice()));
+                placeText + "\n" +
+                "Preis: " + String.format("%.2f €", ticket.getFinalPrice())
+            );
+
+        // --- Styling ---
+        DialogPane dialogPane = confirmAlert.getDialogPane();
+
+        dialogPane.setStyle("-fx-background-color: #ecf0f1; -fx-font-family: 'Segoe UI', sans-serif;");
+
+        dialogPane.lookup(".header-panel").setStyle("-fx-background-color: #ecf0f1;");
+        dialogPane.lookup(".header-panel .label").setStyle(
+            "-fx-text-fill: #e74c3c;" +
+            "-fx-font-weight: bold;" +
+            "-fx-font-size: 15px;"
+        );
+
+        dialogPane.lookup(".content.label").setStyle(
+            "-fx-text-fill: #2c3e50;" +
+            "-fx-font-size: 13px;" +
+            "-fx-line-spacing: 4px;"
+        );
+
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        okButton.setText("Ja, stornieren");
+        okButton.setStyle(
+            "-fx-background-color: #e74c3c;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-cursor: Hand;"
+        );
+
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+        cancelButton.setText("Abbrechen");
+        cancelButton.setStyle(
+            "-fx-background-color: #7f8c8d;" +
+            "-fx-text-fill: white;" +
+            "-fx-cursor: Hand;"
+        );
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
