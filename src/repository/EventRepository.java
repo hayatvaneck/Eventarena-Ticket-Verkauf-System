@@ -220,6 +220,36 @@ public class EventRepository {
         }
         return removed;
     }
+    // --- NEU: Bestehendes Event bearbeiten und aktualisieren ---
+    public synchronized boolean updateEvent(Event updatedEvent) {
+        if (updatedEvent == null || updatedEvent.getId() == null) {
+            return false;
+        }
+
+        // Wir suchen das Event in der Liste
+        for (int i = 0; i < this.events.size(); i++) {
+            if (this.events.get(i).getId().equals(updatedEvent.getId())) {
+                
+                // Wir erstellen das Event neu, damit der Saalplan (Sections) frisch angewendet wird
+                Event normalizedEvent = new Event(
+                        updatedEvent.getId(),
+                        updatedEvent.getTitle(),
+                        updatedEvent.getDescription(),
+                        updatedEvent.getEventType(),
+                        updatedEvent.getDateTime(),
+                        updatedEvent.getBasePrice(),
+                        updatedEvent.getMapType()
+                );
+                domain.layout.HallLayoutFactory.applyLayoutForMapType(normalizedEvent);
+                
+                // Das alte Event in der Liste durch das neue ersetzen
+                this.events.set(i, normalizedEvent);
+                saveAllToCsv(); // In die CSV schreiben
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 

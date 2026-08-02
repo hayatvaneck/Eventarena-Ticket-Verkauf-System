@@ -20,8 +20,10 @@ public class EmployeeEventScreen extends BaseScreen {
 
     private final App app;
     private final EventRepository eventRepo;
-    // Format für das Zusammenfügen von Datum und Uhrzeit
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+    // --- NEU: Zustand, um sich zu merken, welches Event gerade bearbeitet wird ---
+    private Long editingEventId = null;
 
     public EmployeeEventScreen(App app, EventRepository eventRepo) {
         this.app = app;
@@ -37,7 +39,7 @@ public class EmployeeEventScreen extends BaseScreen {
         mainContent.setAlignment(Pos.TOP_CENTER);
 
         // ==========================================
-        // LINKE SEITE: FORMULAR FÜR NEUES EVENT
+        // LINKE SEITE: FORMULAR FÜR NEUES/BEARBEITETES EVENT
         // ==========================================
         VBox formBox = createVBox(10, Pos.TOP_LEFT);
         formBox.setPrefWidth(350);
@@ -50,14 +52,12 @@ public class EmployeeEventScreen extends BaseScreen {
         TextField titleField = new TextField();
         titleField.setPromptText("Event Titel");
 
-        // TEXTAREA MIT 160 ZEICHEN LIMIT
         TextArea descArea = new TextArea();
-        descArea.setPromptText("Beschreibung (max. 160 Zeichen)");
+        descArea.setPromptText("Beschreibung (max. 350 Zeichen)");
         descArea.setPrefRowCount(3);
         descArea.setWrapText(true);
-        // Formatter verhindert das Eintippen von mehr als 160 Zeichen
         descArea.setTextFormatter(
-                new TextFormatter<String>(change -> change.getControlNewText().length() <= 160 ? change : null));
+                new TextFormatter<String>(change -> change.getControlNewText().length() <= 350 ? change : null));
 
         Label descHint = new Label("Maximal 160 Zeichen erlaubt.");
         descHint.setStyle("-fx-font-size: 10px; -fx-text-fill: #7f8c8d;");
@@ -72,7 +72,6 @@ public class EmployeeEventScreen extends BaseScreen {
         mapBox.setPromptText("Saalplan wählen");
         mapBox.setPrefWidth(Double.MAX_VALUE);
 
-        // GETRENNTE FELDER FÜR DATUM UND UHRZEIT
         HBox dateTimeBox = new HBox(10);
         TextField dateField = new TextField();
         dateField.setPromptText("Datum (z.B. 24.12.2026)");
@@ -91,16 +90,24 @@ public class EmployeeEventScreen extends BaseScreen {
         saveBtn.setStyle(
                 "-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
 
+        // --- NEU: Abbrechen-Button (Standardmäßig unsichtbar) ---
+        Button cancelBtn = createSecondaryButton("Bearbeiten abbrechen");
+        cancelBtn.setPrefWidth(Double.MAX_VALUE);
+        cancelBtn.setVisible(false);
+        cancelBtn.setManaged(false);
+
+        cancelBtn.setOnAction(e -> {
+            editingEventId = null;
+            app.navigateTo(ScreenManager.Screen.EMPLOYEE_EVENTS); // Lädt das Fenster neu und leert das Formular
+        });
+
         saveBtn.setOnAction(e -> {
             try {
                 String eventTitle = titleField.getText().trim();
                 String desc = descArea.getText().trim();
                 EventType eType = typeBox.getValue();
                 MapType mType = mapBox.getValue();
-
                 double price = Double.parseDouble(priceField.getText().trim().replace(",", "."));
-
-                // Datum und Uhrzeit zusammensetzen und parsen
                 String combinedDateTime = dateField.getText().trim() + " " + timeField.getText().trim();
                 LocalDateTime dateTime = LocalDateTime.parse(combinedDateTime, formatter);
 
@@ -109,13 +116,21 @@ public class EmployeeEventScreen extends BaseScreen {
                     return;
                 }
 
-                Long newId = eventRepo.nextEventId();
-                Event newEvent = new Event(newId, eventTitle, desc, eType, dateTime, price, mType);
-                eventRepo.save(newEvent);
+                if (editingEventId == null) {
+                    // MODUS: NEUES EVENT ANLEGEN
+                    Long newId = eventRepo.nextEventId();
+                    Event newEvent = new Event(newId, eventTitle, desc, eType, dateTime, price, mType);
+                    eventRepo.save(newEvent);
+                    app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Event erfolgreich hinzugefügt!");
+                } else {
+                    // MODUS: BESTEHENDES EVENT BEARBEITEN
+                    Event updatedEvent = new Event(editingEventId, eventTitle, desc, eType, dateTime, price, mType);
+                    eventRepo.updateEvent(updatedEvent);
+                    app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Event erfolgreich aktualisiert!");
+                    editingEventId = null; // Nach dem Update Zustand zurücksetzen
+                }
 
-                app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Event erfolgreich hinzugefügt!");
                 app.navigateTo(ScreenManager.Screen.EMPLOYEE_EVENTS);
-
             } catch (Exception ex) {
                 app.showAlert(Alert.AlertType.ERROR, "Eingabefehler",
                         "Bitte Eingaben prüfen.\nDatum muss sein: dd.MM.yyyy\nUhrzeit muss sein: HH:mm\nPreis muss eine Zahl sein.");
@@ -123,13 +138,13 @@ public class EmployeeEventScreen extends BaseScreen {
         });
 
         formBox.getChildren().addAll(formTitle, titleField, descArea, descHint, typeBox, mapBox, dateTimeBox,
-                priceField, saveBtn);
+                priceField, saveBtn, cancelBtn);
 
         // ==========================================
-        // RECHTE SEITE: LISTE ZUM LÖSCHEN
+        // RECHTE SEITE: LISTE ZUM BEARBEITEN & LÖSCHEN
         // ==========================================
         VBox listBox = createVBox(10, Pos.TOP_LEFT);
-        listBox.setPrefWidth(420);
+        listBox.setPrefWidth(490); // Etwas breiter gemacht für den zweiten Button
 
         Label listTitle = new Label("Bestehende Events");
         listTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
@@ -146,24 +161,49 @@ public class EmployeeEventScreen extends BaseScreen {
             VBox infoBox = new VBox(3);
             Label eTitle = new Label(ev.getTitle());
             eTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
             Label eDate = new Label(ev.getDateTime().format(formatter) + " | ID: " + ev.getId());
             eDate.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 11px;");
+
             infoBox.getChildren().addAll(eTitle, eDate);
 
             Region spacer = createHorizontalSpacer();
 
+            // --- NEU: Bearbeiten-Button ---
+            Button editBtn = createSelectingButton("Bearbeiten");
+            editBtn.setStyle(
+                    "-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 12 6 12; -fx-background-radius: 4; -fx-cursor: hand;");
+            editBtn.setOnAction(e -> {
+                // Füllt das linke Formular mit den Daten des ausgewählten Events!
+                editingEventId = ev.getId();
+                formTitle.setText("Event bearbeiten (ID: " + ev.getId() + ")");
+                titleField.setText(ev.getTitle());
+                String desc = ev.getDescription();
+                if (desc.length() > 160) {
+                    desc = desc.substring(0, 160); // Schneidet den Text radikal nach 160 Zeichen ab
+                }
+                descArea.setText(desc);
+                typeBox.setValue(ev.getEventType());
+                mapBox.setValue(ev.getMapType());
+                dateField.setText(ev.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                timeField.setText(ev.getDateTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+                priceField.setText(String.valueOf(ev.getBasePrice()));
+
+                saveBtn.setText("Änderungen speichern"); // Text des Speichern-Buttons anpassen
+                cancelBtn.setVisible(true); // Abbrechen-Button einblenden
+                cancelBtn.setManaged(true);
+            });
+
             Button delBtn = createDangerButton("Löschen");
+            delBtn.setStyle(
+                    "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 12 6 12; -fx-background-radius: 4; -fx-cursor: hand;");
             delBtn.setOnAction(e -> {
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
                 if (app.getPrimaryStage() != null) {
                     confirm.initOwner(app.getPrimaryStage());
                 }
-                
                 confirm.setTitle("Löschen bestätigen");
                 confirm.setHeaderText("Event wirklich löschen?");
                 confirm.setContentText("Soll das Event '" + ev.getTitle() + "' unwiderruflich gelöscht werden?");
-
                 confirm.showAndWait().ifPresent(res -> {
                     if (res == ButtonType.OK) {
                         eventRepo.deleteEvent(ev.getId());
@@ -172,7 +212,7 @@ public class EmployeeEventScreen extends BaseScreen {
                 });
             });
 
-            eventRow.getChildren().addAll(infoBox, spacer, delBtn);
+            eventRow.getChildren().addAll(infoBox, spacer, editBtn, delBtn);
             eventsContainer.getChildren().add(eventRow);
         }
 
