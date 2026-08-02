@@ -127,11 +127,8 @@ public class MainMenuScreen extends BaseScreen {
             }
         });
 
-        Label teamLabel = new Label("Entwickelt von: Lukas Beck, Maren Bohlig, Gian-Luca Levels, Hayat van Eck");
-        teamLabel.setStyle("-fx-text-fill: #2c3e50; -fx-font-style: italic;");
-        HBox footerBar = createHBox(0, Pos.BOTTOM_RIGHT);
-        footerBar.setPadding(new Insets(10, 0, 0, 0));
-        footerBar.getChildren().add(teamLabel);
+       // Lädt den Footer aus der BaseScreen
+        HBox footerBar = createStandardFooter();
 
         bottomBox.getChildren().addAll(nextButton, footerBar);
 

@@ -71,18 +71,7 @@ public class SeatSelectionScreen extends BaseScreen {
         }
 
         Label stageLabel = new Label(stageText);
-        stageLabel.setStyle(
-                "-fx-background-color: white; " +
-                        "-fx-text-fill: #2c3e50; " +
-                        "-fx-font-size: 14px; " +
-                        "-fx-font-weight: bold; " +
-                        "-fx-padding: 12 0 12 0; " +
-                        "-fx-alignment: center; " +
-                        "-fx-background-radius: 10; " +
-                        "-fx-border-color: #1a252f; " +
-                        "-fx-border-width: 2; " +
-                        "-fx-border-radius: 10; " +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
+        stageLabel.setStyle(ui.UIStyles.STAGE_LABEL_STYLE);
 
         // 2. Der Wrapper, um den Kasten nach links oder rechts zu schieben
         HBox stageContainer = new HBox();

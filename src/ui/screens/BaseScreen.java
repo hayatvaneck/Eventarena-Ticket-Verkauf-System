@@ -158,4 +158,22 @@ public abstract class BaseScreen {
     protected Scene createDefaultScene(Parent root) {
         return new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
+
+    
+    // Erstellt den standardisierten Footer für alle Screens
+    protected HBox createStandardFooter() {
+        Label teamLabel = new Label("Entwickelt von: Lukas Beck, Maren Bohlig, Gian-Luca Levels, Hayat van Eck");
+        teamLabel.setStyle("-fx-text-fill: #2c3e50; -fx-font-style: italic;");
+
+        HBox footerBar = new HBox();
+        footerBar.setAlignment(Pos.BOTTOM_RIGHT);
+        footerBar.setPadding(new Insets(10, 0, 0, 0));
+        footerBar.getChildren().add(teamLabel);
+        return footerBar;
+    }
+    protected HBox createInvisibleStandardFooter() {
+        HBox footerBar = createStandardFooter();
+        footerBar.setVisible(false); // Macht den Text unsichtbar, behält aber die exakten Maße
+        return footerBar;
+    }
 }

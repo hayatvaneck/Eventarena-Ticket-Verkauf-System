@@ -14,8 +14,9 @@ import ui.App;
 import ui.ScreenManager;
 
 /**
- * Die Klasse StandingAreaSelectionScreen erfasst die Anzahl von Stehplatz-Tickets für den Warenkorb.
-
+ * Die Klasse StandingAreaSelectionScreen erfasst die Anzahl von
+ * Stehplatz-Tickets für den Warenkorb.
+ * 
  */
 
 public class StandingAreaSelectionScreen extends BaseScreen {
@@ -35,14 +36,14 @@ public class StandingAreaSelectionScreen extends BaseScreen {
 
         Label title = createTitle("Stehplatz-Auswahl: " + selectedSection.getName());
         Label instruction = createSubtitle("Bitte wählen Sie die Anzahl der gewünschten Stehplatz-Tickets aus.");
-        
 
         Spinner<Integer> ticketSpinner = new Spinner<>(1, 10, 1);
         ticketSpinner.setStyle("-fx-font-size: 16px;");
         ticketSpinner.setPrefWidth(100);
 
         Button confirmButton = new Button("Auswahl bestätigen");
-        confirmButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
+        confirmButton.setStyle(
+                "-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
         confirmButton.setPrefWidth(200);
         confirmButton.setOnAction(e -> {
             int count = ticketSpinner.getValue();
@@ -61,6 +62,3 @@ public class StandingAreaSelectionScreen extends BaseScreen {
         return createDefaultScene(root);
     }
 }
-
-
-

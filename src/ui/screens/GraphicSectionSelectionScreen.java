@@ -84,14 +84,8 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         backButton.setMaxHeight(45);
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
-        // Der unsichtbare Klon, der exakt denselben Platz einnimmt wie im Hauptmenü
-        Label dummyLabel = new Label("Entwickelt von: Lukas Beck, Maren Bohlig, Gian-Luca Levels, Hayat van Eck");
-        dummyLabel.setStyle("-fx-text-fill: #2c3e50; -fx-font-style: italic;");
-        dummyLabel.setVisible(false); // Versteckt den Text!
-
-        HBox dummyFooter = createHBox(0, Pos.BOTTOM_RIGHT);
-        dummyFooter.setPadding(new Insets(10, 0, 0, 0));
-        dummyFooter.getChildren().add(dummyLabel);
+        // Lädt den unsichtbaren Footer aus der BaseScreen
+        HBox dummyFooter = createInvisibleStandardFooter();
 
         bottomBox.getChildren().addAll(backButton, dummyFooter);
 
