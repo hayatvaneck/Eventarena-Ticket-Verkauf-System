@@ -16,8 +16,9 @@ import ui.App;
 import ui.ScreenManager;
 
 /**
- * Die Klasse LoginScreen stellt die Benutzeranmeldung inklusive Rücksprung in den Buchungsfluss bereit.
-
+ * Die Klasse LoginScreen stellt die Benutzeranmeldung inklusive Rücksprung in
+ * den Buchungsfluss bereit.
+ * 
  */
 
 public class LoginScreen extends BaseScreen {
@@ -56,18 +57,20 @@ public class LoginScreen extends BaseScreen {
 
         Button loginBtn = new Button("Einloggen");
         loginBtn.setDefaultButton(true);
-        loginBtn.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
+        loginBtn.setStyle(
+                "-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         loginBtn.setPrefWidth(250);
 
         Label registerLink = new Label("Noch kein Konto? Hier registrieren");
         registerLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
 
         Label employeeLink = new Label("Mitarbeiter? Hier Einloggen");
-        employeeLink.setStyle("-fx-text-fill: #e74c3c; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+        employeeLink
+                .setStyle("-fx-text-fill: #e74c3c; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 10 0 0 0;");
         employeeLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.EMPLOYEE_LOGIN));
 
         Button btnBackToMain = createBackButton("Zurück zum Hauptmenü");
-        btnBackToMain.setPrefWidth(150);
+        btnBackToMain.setPrefWidth(250);
 
         loginBtn.setOnAction(e -> {
             String email = emailField.getText();
@@ -100,6 +103,3 @@ public class LoginScreen extends BaseScreen {
         return scene;
     }
 }
-
-
-

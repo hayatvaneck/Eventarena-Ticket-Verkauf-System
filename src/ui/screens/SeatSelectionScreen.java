@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
@@ -48,8 +49,49 @@ public class SeatSelectionScreen extends BaseScreen {
         Label title = createTitle("Sitzplätze " + seatedSection.getName());
         Label instruction = createSubtitle("Wählen Sie einen Sitzplatz aus:");
 
-        Label stageLabel = new Label("--- BÜHNE / SPIELFELD ---");
-        stageLabel.setStyle("-fx-background-color: #7f8c8d; -fx-padding: 5 50 5 50; -fx-text-fill: white;");
+        // 1. Der neue, schicke Kasten für die Bühne
+        Label stageLabel = new Label("B Ü H N E  /  S P I E L F E L D");
+        stageLabel.setAlignment(Pos.CENTER);
+        stageLabel.setStyle(
+                "-fx-background-color: white; " + // Gleiches Dunkelblau wie deine Bestätigen-Buttons
+                        "-fx-text-fill: #2c3e50; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 12 0 12 0; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-border-color: #1a252f; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
+
+        // 2. Der Wrapper, um den Kasten nach links oder rechts zu schieben
+        HBox stageContainer = new HBox();
+        stageContainer.setMaxWidth(680); // Passt sich der Breite deines Sitzplans an
+
+        // 3. Dynamische Anpassung je nach Block!
+        String blockName = seatedSection.getName().toLowerCase();
+
+        if (blockName.contains("block 1") || blockName.contains("block 3")) {
+            // Wenn man rechts sitzt, ist die Bühne/Spielfeld links von einem
+            stageContainer.setAlignment(Pos.CENTER_RIGHT);
+            stageLabel.setPrefWidth(500);
+            stageLabel.setMaxWidth(500);
+
+            // stageLabel.setMaxWidth(Double.MAX_VALUE);
+            // HBox.setHgrow(stageLabel, Priority.ALWAYS);
+        } else if (blockName.contains("block 2") || blockName.contains("block 4")) {
+            // Wenn man links sitzt, ist die Bühne/Spielfeld rechts von einem
+            stageContainer.setAlignment(Pos.CENTER_LEFT);
+            stageLabel.setPrefWidth(500);
+            stageLabel.setMaxWidth(500);
+        } else {
+            // Für alle anderen (z.B. Innenraum, Block 5, Block 6) bleibt es mittig
+            stageContainer.setAlignment(Pos.CENTER);
+            stageLabel.setPrefWidth(500);
+            stageLabel.setMaxWidth(500);
+        }
+
+        stageContainer.getChildren().add(stageLabel);
 
         GridPane seatGrid = new GridPane();
         seatGrid.setHgap(6);
@@ -101,7 +143,7 @@ public class SeatSelectionScreen extends BaseScreen {
         Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(title, instruction, stageLabel, seatGridScrollPane, selectionStatusLabel,
+        root.getChildren().addAll(title, instruction, stageContainer, seatGridScrollPane, selectionStatusLabel,
                 confirmButton, backButton);
 
         return createDefaultScene(root);
