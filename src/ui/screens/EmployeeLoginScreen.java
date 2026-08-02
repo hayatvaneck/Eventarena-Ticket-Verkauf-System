@@ -28,8 +28,8 @@ public class EmployeeLoginScreen extends BaseScreen {
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
         HBox bottomBar = new HBox();
-        bottomBar.setPadding(new Insets(20));
-        bottomBar.setAlignment(Pos.BOTTOM_LEFT);
+        bottomBar.setPadding(new Insets(20, 20, 50, 100));
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
 
         VBox loginRoot = createVBox(15, Pos.CENTER);
         loginRoot.setPadding(new Insets(40));
@@ -49,7 +49,8 @@ public class EmployeeLoginScreen extends BaseScreen {
 
         Button loginBtn = new Button("Einloggen");
         loginBtn.setDefaultButton(true);
-        loginBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
+        loginBtn.setStyle(
+                "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         loginBtn.setPrefWidth(250);
 
         Button btnBackToMain = createBackButton("Zurück zum Kunden-Login");

@@ -35,8 +35,9 @@ public class LoginScreen extends BaseScreen {
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
         HBox bottomBar = new HBox();
-        bottomBar.setPadding(new Insets(20));
-        bottomBar.setAlignment(Pos.BOTTOM_LEFT);
+
+        bottomBar.setPadding(new Insets(20, 20, 50, 100));
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
 
         javafx.scene.layout.VBox loginRoot = createVBox(15, Pos.CENTER);
         loginRoot.setPadding(new Insets(40));
