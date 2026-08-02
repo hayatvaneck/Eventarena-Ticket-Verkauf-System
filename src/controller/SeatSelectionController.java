@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Die Klasse SeatSelectionController steuert die Sitzplatzauswahl im Saalplan und synchronisiert den Auswahlstatus.
+ * Die Klasse SeatSelectionController steuert die Sitzplatzauswahl im Saalplan
+ * und synchronisiert den Auswahlstatus.
  */
 public class SeatSelectionController {
 
@@ -56,12 +57,22 @@ public class SeatSelectionController {
         rowHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         seatGrid.add(rowHeader, 0, 0);
 
+        // --- TRICK: Unsichtbarer Platzhalter ganz rechts (Spalte = seatsPerRow + 1)
+        // ---
+        Label dummyHeader = new Label("Reihe");
+        dummyHeader.setVisible(false);
+        seatGrid.add(dummyHeader, seatsPerRow + 1, 0);
+
         for (int r = 0; r < totalRows; r++) {
             int rowNum = r + 1;
-
             Label rowLabel = new Label(String.valueOf(rowNum));
             rowLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
             seatGrid.add(rowLabel, 0, r + 1);
+
+            // --- TRICK: Unsichtbare Zahl ganz rechts, um die linke Seite auszugleichen ---
+            Label dummyRowLabel = new Label(String.valueOf(rowNum));
+            dummyRowLabel.setVisible(false);
+            seatGrid.add(dummyRowLabel, seatsPerRow + 1, r + 1);
 
             for (int s = 0; s < seatsPerRow; s++) {
                 int seatNum = s + 1;

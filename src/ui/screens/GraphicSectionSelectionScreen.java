@@ -123,7 +123,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
         // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
         Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180 + 20);
-        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180 + 20);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180);
         Button standingBtn = createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8",
                 "INNENRAUM (Stehplätze)", 482, 200);
 
@@ -276,7 +276,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         // MIDDLE ROW: Block 6, VIP Balkon, SPIELFELD, Block 5
         Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100,
                 centerHeight);
-        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, centerHeight);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180);
 
         // SPIELFELD (Visuelles Element, nicht klickbar)
         StackPane courtBox = new StackPane();
@@ -332,7 +332,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         legend.setPadding(new Insets(10, 0, 0, 0));
         legend.getChildren().addAll(
                 createLegendItem("Sitzplatz Blöcke", "#bae6fd", "#0284c7"),
-                createLegendItem("VIP Balkon", "#fde047", "#d97706"),
+                createLegendItem("Balkon", "#fde047", "#d97706"),
                 createLegendItem("Veranstaltungsfläche", "#fef3c7", "#d97706"));
 
         mapWrapper.getChildren().addAll(grid, legend);
@@ -362,7 +362,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
         // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
         Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180 + 20);
-        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180 + 20);
+        Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180);
         Button blockInnerBtn = createBlockButton("Innenraum (Sitzplatz)", "#e0e7ff", "#2563eb", "#1d4ed8",
                 "INNENRAUM (Sitzplätze)", 482, 200);
         // Button text= createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb",

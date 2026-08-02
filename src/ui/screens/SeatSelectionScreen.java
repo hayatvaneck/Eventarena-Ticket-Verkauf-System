@@ -46,18 +46,38 @@ public class SeatSelectionScreen extends BaseScreen {
 
         VBox root = createRoot(15, new Insets(20), Pos.CENTER);
 
-        Label title = createTitle("Sitzplätze " + seatedSection.getName());
+        Label title = createTitle(seatedSection.getName());
         Label instruction = createSubtitle("Wählen Sie einen Sitzplatz aus:");
 
+        VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
+        headerBox.setAlignment(Pos.CENTER);
+        headerBox.setMaxWidth(400); // Breite des Kastens (kannst du beliebig anpassen)
+        headerBox.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-padding: 15 30 15 30; " + // Innenabstand, damit der Text Luft hat
+                        "-fx-background-radius: 10; " +
+                        // "-fx-border-color: #81b9ed; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
+        headerBox.getChildren().addAll(title, instruction);
+
         // 1. Der neue, schicke Kasten für die Bühne
-        Label stageLabel = new Label("B Ü H N E  /  S P I E L F E L D");
-        stageLabel.setAlignment(Pos.CENTER);
+        String stageText = "B Ü H N E";
+
+        // Wenn der Saalplan eine Arena ist, ändern wir den Text[cite: 1]
+        if (app.getCurrentSelectedEvent().getMapType() == domain.Event.MapType.ARENA) {
+            stageText = "S P I E L F E L D";
+        }
+
+        Label stageLabel = new Label(stageText);
         stageLabel.setStyle(
-                "-fx-background-color: white; " + // Gleiches Dunkelblau wie deine Bestätigen-Buttons
+                "-fx-background-color: white; " +
                         "-fx-text-fill: #2c3e50; " +
                         "-fx-font-size: 14px; " +
                         "-fx-font-weight: bold; " +
                         "-fx-padding: 12 0 12 0; " +
+                        "-fx-alignment: center; " +
                         "-fx-background-radius: 10; " +
                         "-fx-border-color: #1a252f; " +
                         "-fx-border-width: 2; " +
@@ -77,8 +97,6 @@ public class SeatSelectionScreen extends BaseScreen {
             stageLabel.setPrefWidth(500);
             stageLabel.setMaxWidth(500);
 
-            // stageLabel.setMaxWidth(Double.MAX_VALUE);
-            // HBox.setHgrow(stageLabel, Priority.ALWAYS);
         } else if (blockName.contains("block 2") || blockName.contains("block 4")) {
             // Wenn man links sitzt, ist die Bühne/Spielfeld rechts von einem
             stageContainer.setAlignment(Pos.CENTER_LEFT);
@@ -87,8 +105,8 @@ public class SeatSelectionScreen extends BaseScreen {
         } else {
             // Für alle anderen (z.B. Innenraum, Block 5, Block 6) bleibt es mittig
             stageContainer.setAlignment(Pos.CENTER);
-            stageLabel.setPrefWidth(500);
-            stageLabel.setMaxWidth(500);
+            stageLabel.setPrefWidth(650);
+            stageLabel.setMaxWidth(650);
         }
 
         stageContainer.getChildren().add(stageLabel);
@@ -108,10 +126,11 @@ public class SeatSelectionScreen extends BaseScreen {
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartItems());
 
-        VBox gridWrapper = new VBox(seatGrid);
+        VBox gridWrapper = new VBox(20); // 20 Pixel Abstand zwischen Bühne und Sitzen
         gridWrapper.setAlignment(Pos.CENTER);
+        gridWrapper.getChildren().addAll(stageContainer, seatGrid);
 
-        ScrollPane seatGridScrollPane = createTransparentScrollPane(seatGrid);
+        ScrollPane seatGridScrollPane = createTransparentScrollPane(gridWrapper);
         seatGridScrollPane.setPannable(true);
         seatGridScrollPane.setFitToHeight(false);
         seatGridScrollPane.setFitToWidth(true);
@@ -143,8 +162,7 @@ public class SeatSelectionScreen extends BaseScreen {
         Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(title, instruction, stageContainer, seatGridScrollPane, selectionStatusLabel,
-                confirmButton, backButton);
+        root.getChildren().addAll(headerBox, seatGridScrollPane, selectionStatusLabel, confirmButton, backButton);
 
         return createDefaultScene(root);
     }
