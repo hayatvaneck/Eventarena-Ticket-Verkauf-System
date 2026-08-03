@@ -192,4 +192,22 @@ public abstract class BaseScreen {
 
         return dummyHeader;
     }
+
+    protected VBox createHeaderBox(String titleText, String subtitleText) {
+        Label title = createTitle(titleText);
+        Label subtitle = createSubtitle(subtitleText);
+
+        VBox headerBox = new VBox(5);
+        headerBox.setAlignment(Pos.CENTER);
+        headerBox.setMaxWidth(javafx.scene.layout.Region.USE_PREF_SIZE);
+        headerBox.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-padding: 15 30 15 30; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
+        headerBox.getChildren().addAll(title, subtitle);
+        return headerBox;
+    }
 }

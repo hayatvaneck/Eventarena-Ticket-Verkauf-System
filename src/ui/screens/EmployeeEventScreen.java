@@ -32,8 +32,10 @@ public class EmployeeEventScreen extends BaseScreen {
 
     @Override
     public Scene buildScene() {
-        VBox root = createRoot(20, new Insets(30), Pos.TOP_CENTER);
-        Label title = createTitle("MITARBEITER PORTAL - EVENT VERWALTUNG");
+        javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
+        root.setStyle("-fx-background-color: #f5f5f7;");
+
+        VBox headerBox = createHeaderBox("MITARBEITER PORTAL", "Event Verwaltung");
 
         HBox mainContent = new HBox(30);
         mainContent.setAlignment(Pos.TOP_CENTER);
@@ -222,10 +224,28 @@ public class EmployeeEventScreen extends BaseScreen {
         listBox.getChildren().addAll(listTitle, scroll);
         mainContent.getChildren().addAll(formBox, listBox);
 
+        // --- 3. BUTTON WIE IN ANDEREN SCREENS FORMATIEREN ---
         Button backBtn = createBackButton("Abmelden / Zurück zum Login");
+        backBtn.setPrefWidth(300);
+        backBtn.setMinHeight(45);
+        backBtn.setMaxHeight(45);
         backBtn.setOnAction(e -> app.navigateTo(ScreenManager.Screen.LOGIN));
 
-        root.getChildren().addAll(title, mainContent, backBtn);
+        HBox buttonBox = new HBox();
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().add(backBtn);
+
+        // --- 4. LAYOUT ZUSAMMENBAUEN (MIT DUMMYS FÜR PERFEKTEN ABSTAND) ---
+        HBox dummyHeader = createInvisibleHeader();
+        VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
+        topBox.getChildren().addAll(dummyHeader, headerBox, mainContent);
+
+        HBox dummyFooter = createInvisibleStandardFooter();
+        VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
+        bottomBox.getChildren().addAll(buttonBox, dummyFooter);
+
+        root.setCenter(topBox);
+        root.setBottom(bottomBox);
 
         return createDefaultScene(root);
     }

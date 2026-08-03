@@ -80,12 +80,12 @@ public class MainMenuScreen extends BaseScreen {
 
         // --- 1. OBERE BOX (Mitte) ---
         VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
-        
+
         HBox headerBar = createHeaderBar();
         Label title = createTitle("ARENA TICKETSYSTEM");
         Label subtitle = createSubtitle("Wählen Sie ein Event aus:");
 
-         VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
+        VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
         headerBox.setAlignment(Pos.CENTER);
         headerBox.setMaxWidth(400); // Breite des Kastens (kannst du beliebig anpassen)
         headerBox.setStyle(
@@ -97,7 +97,7 @@ public class MainMenuScreen extends BaseScreen {
                         "-fx-border-radius: 10; " +
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
         headerBox.getChildren().addAll(title, subtitle);
-        
+
         FlowPane cardContainer = new FlowPane();
         cardContainer.setHgap(20);
         cardContainer.setVgap(20);
@@ -120,14 +120,13 @@ public class MainMenuScreen extends BaseScreen {
             }
         }
         scrollPane.setContent(cardContainer);
-        
+
         // Die obere Box ist fertig! (KEIN Spacer mehr nötig)
         topBox.getChildren().addAll(headerBar, headerBox, scrollPane);
 
-
         // --- 2. UNTERE BOX (Button + Footer) ---
         VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
-        
+
         Button nextButton = createConfirmButton("Blöcke anzeigen");
         nextButton.setPrefWidth(300);
         nextButton.setMinHeight(45);
@@ -140,11 +139,10 @@ public class MainMenuScreen extends BaseScreen {
             }
         });
 
-       // Lädt den Footer aus der BaseScreen
+        // Lädt den Footer aus der BaseScreen
         HBox footerBar = createStandardFooter();
 
         bottomBox.getChildren().addAll(nextButton, footerBar);
-
 
         // --- 3. ZUSAMMENBAUEN ---
         root.setCenter(topBox);
@@ -193,7 +191,7 @@ public class MainMenuScreen extends BaseScreen {
 
             Button logoutButton = new Button("Abmelden");
             logoutButton.setStyle(
-                    "-fx-background-color: #af645bea; -fx-text-fill: white; -fx-background-radius: 4px; -fx-cursor: hand;");
+                    "-fx-background-color: #af645bea; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 4px; -fx-cursor: hand;");
             logoutButton.setOnAction(e -> {
                 clockTimer.stop();
                 app.logoutUser();

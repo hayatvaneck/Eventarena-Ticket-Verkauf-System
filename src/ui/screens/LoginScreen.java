@@ -12,6 +12,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
 
@@ -34,14 +35,26 @@ public class LoginScreen extends BaseScreen {
         BorderPane mainRoot = new BorderPane();
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
+        // --- UNTERE LEISTE FÜR DEN ZURÜCK-BUTTON ---
         HBox bottomBar = new HBox();
-
         bottomBar.setPadding(new Insets(20, 20, 50, 100));
         bottomBar.setAlignment(Pos.CENTER_LEFT);
 
+        // --- ZENTRALER BEREICH FÜR DAS FORMULAR ---
         javafx.scene.layout.VBox loginRoot = createVBox(15, Pos.CENTER);
-        loginRoot.setPadding(new Insets(40));
         loginRoot.setStyle("-fx-background-color: transparent");
+
+        // Die neue weiße Box mit Schatten
+        VBox formBox = createVBox(15, Pos.CENTER);
+        formBox.setPadding(new Insets(40, 50, 40, 50));
+        formBox.setMaxWidth(400);
+        formBox.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-background-radius: 12; " +
+                        "-fx-border-color: #cbd5e1; " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 12; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4);");
 
         Label title = new Label("KUNDEN LOGIN");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
@@ -67,16 +80,16 @@ public class LoginScreen extends BaseScreen {
 
         Label employeeLink = new Label("Mitarbeiter? Hier Einloggen");
         employeeLink
-                .setStyle("-fx-text-fill: #e74c3c; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 10 0 0 0;");
-        employeeLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.EMPLOYEE_LOGIN));
+                .setStyle("-fx-text-fill: #e74c3c; -fx-cursor: hand; -fx-font-weight: bold;");
 
+        // --- DER ZURÜCK BUTTON ---
         Button btnBackToMain = createBackButton("Zurück zum Hauptmenü");
         btnBackToMain.setPrefWidth(250);
 
+        // --- AKTIONEN (KLICKS) ---
         loginBtn.setOnAction(e -> {
             String email = emailField.getText();
             String password = passwordField.getText();
-
             User user = app.validateUserCredentials(email, password);
             if (user != null) {
                 app.setLoggedInUser(user);
@@ -91,11 +104,20 @@ public class LoginScreen extends BaseScreen {
             app.navigateTo(ScreenManager.Screen.MAIN_MENU);
         });
 
+        employeeLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.EMPLOYEE_LOGIN));
         registerLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.REGISTER));
 
-        loginRoot.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink, employeeLink);
+        // --- ZUSAMMENBAU ---
+        // 1. Felder in die weiße Box packen
+        formBox.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink, employeeLink);
+
+        // 2. Weiße Box in den mittleren Bereich packen
+        loginRoot.getChildren().add(formBox);
+
+        // 3. Zurück-Button in die untere Leiste packen
         bottomBar.getChildren().add(btnBackToMain);
 
+        // 4. Alles dem Haupt-Layout übergeben
         mainRoot.setCenter(loginRoot);
         mainRoot.setBottom(bottomBar);
 

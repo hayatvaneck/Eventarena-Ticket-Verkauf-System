@@ -132,17 +132,32 @@ public class SeatSelectionController {
                         Seat existingSeat = findSelectedSeat(rowNum, seatNum);
 
                         if (existingSeat != null) {
+                            // Platz wieder abwählen
                             seatButton
-                                    .setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;-fx-cursor: hand;");
+                                    .setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-cursor: hand;");
                             selectedSeats.remove(existingSeat);
                             selectedButtons.remove(seatButton);
                         } else {
+                            // --- NEU: LIMIT-PRÜFUNG DIREKT BEIM KLICKEN ---
+                            int currentCartSize = (cartSeats != null) ? cartSeats.size() : 0;
+
+                            if (currentCartSize + selectedSeats.size() >= 10) {
+                                // Zeigt ein kurzes Pop-Up und bricht ab, ohne den Platz zu markieren
+                                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                                        javafx.scene.control.Alert.AlertType.WARNING);
+                                alert.setTitle("Limit erreicht");
+                                alert.setHeaderText(null);
+                                alert.setContentText("Sie können insgesamt maximal 10 Tickets in den Warenkorb legen.");
+                                alert.showAndWait();
+                                return;
+                            }
+
+                            // Wenn Limit noch nicht erreicht: Platz normal auswählen
                             seatButton
                                     .setStyle("-fx-background-color: #d4af37; -fx-text-fill: black; -fx-cursor: hand;");
                             selectedSeats.add(finalSeat);
                             selectedButtons.add(seatButton);
                         }
-
                         updateStatusLabel();
                     });
                 }

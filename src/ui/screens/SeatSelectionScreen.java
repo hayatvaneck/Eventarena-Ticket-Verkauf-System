@@ -80,9 +80,8 @@ public class SeatSelectionScreen extends BaseScreen {
 
         // 3. Dynamische Anpassung je nach Block!
         stageContainer.setAlignment(Pos.CENTER);
-            stageLabel.setPrefWidth(650);
-            stageLabel.setMaxWidth(650);
-
+        stageLabel.setPrefWidth(650);
+        stageLabel.setMaxWidth(650);
 
         stageContainer.getChildren().add(stageLabel);
 
@@ -125,6 +124,14 @@ public class SeatSelectionScreen extends BaseScreen {
             List<Seat> newSeats = controller.getSelectedSeats();
 
             if (!newSeats.isEmpty()) {
+                // PRÜFUNG AUF MAXIMAL 10 TICKETS
+                if (app.getCartItems().size() + newSeats.size() > 10) {
+                    app.showAlert(Alert.AlertType.WARNING, "Limit erreicht",
+                            "Sie können maximal 10 Tickets gleichzeitig kaufen. Sie haben bereits " +
+                                    app.getCartItems().size() + " Ticket(s) im Warenkorb.");
+                    return; // Bricht hier ab und speichert die Sitze nicht
+                }
+
                 for (Seat seat : newSeats) {
                     app.getCartItems().add(
                             new CartItem(app.getCurrentSelectedEvent(), selectedSection, seat));

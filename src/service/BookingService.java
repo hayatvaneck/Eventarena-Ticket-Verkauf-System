@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Die Klasse BookingService kapselt die zentrale Buchungslogik für Tickets, Preise und Stornierungen.
+ * Die Klasse BookingService kapselt die zentrale Buchungslogik für Tickets,
+ * Preise und Stornierungen.
  */
 public class BookingService {
-    
+
     private final EventRepository eventRepo;
     private final TicketRepository ticketRepo;
     private final List<Ticket> activeTickets;
@@ -25,7 +26,8 @@ public class BookingService {
         restoreBookedSeatsFromRepository();
     }
 
-    public Ticket bookTicket(Long eventId, String sectionName, Customer customer, String userEmail) throws SeatAlreadyBookedException {
+    public Ticket bookTicket(Long eventId, String sectionName, Customer customer, String userEmail)
+            throws SeatAlreadyBookedException {
         Event event = eventRepo.findById(eventId);
         if (event == null) {
             throw new IllegalArgumentException("Event mit ID " + eventId + " wurde nicht gefunden.");
@@ -61,8 +63,7 @@ public class BookingService {
                 seatInfo,
                 userEmail,
                 customerType.name(),
-                basePrice
-        );
+                basePrice);
 
         activeTickets.add(newTicket);
         ticketRepo.save(newTicket);
@@ -70,7 +71,8 @@ public class BookingService {
         return newTicket;
     }
 
-    public Ticket bookSpecificTicket(Long eventId, String sectionName, int row, int seatNumber, Customer customer, String userEmail) throws SeatAlreadyBookedException {
+    public Ticket bookSpecificTicket(Long eventId, String sectionName, int row, int seatNumber, Customer customer,
+            String userEmail) throws SeatAlreadyBookedException {
         Event event = eventRepo.findById(eventId);
         if (event == null) {
             throw new IllegalArgumentException("Event mit ID " + eventId + " wurde nicht gefunden.");
@@ -89,7 +91,8 @@ public class BookingService {
 
         Seat chosenSeat = seatedSection.getSeat(row, seatNumber);
         if (chosenSeat == null) {
-            throw new IllegalArgumentException("Der Platz (Reihe " + row + ", Platz " + seatNumber + ") existiert in diesem Block nicht.");
+            throw new IllegalArgumentException(
+                    "Der Platz (Reihe " + row + ", Platz " + seatNumber + ") existiert in diesem Block nicht.");
         }
 
         chosenSeat.book();
@@ -113,8 +116,7 @@ public class BookingService {
                 seatInfo,
                 userEmail,
                 customerType.name(),
-                basePrice
-        );
+                basePrice);
 
         activeTickets.add(newTicket);
         ticketRepo.save(newTicket);
@@ -122,7 +124,7 @@ public class BookingService {
         return newTicket;
     }
 
-    private double calculateDiscountFactor(CustomerType customerType) {
+    public double calculateDiscountFactor(CustomerType customerType) {
         if (customerType == null) {
             return 1.0;
         }
@@ -180,19 +182,19 @@ public class BookingService {
 
     private int[] parseRowAndSeat(String seatInfo) {
         if (seatInfo == null) {
-            return new int[]{0, 0};
+            return new int[] { 0, 0 };
         }
         try {
             String[] numbers = seatInfo.replaceAll("[^0-9]+", " ").trim().split("\\s+");
             if (numbers.length >= 2) {
                 int row = Integer.parseInt(numbers[0]);
                 int seat = Integer.parseInt(numbers[1]);
-                return new int[]{row, seat};
+                return new int[] { row, seat };
             }
         } catch (Exception e) {
             System.err.println("Fehler beim Parsen der Sitzplatz-Info: " + seatInfo);
         }
-        return new int[]{0, 0};
+        return new int[] { 0, 0 };
     }
 
     public void restoreBookedSeatsFromRepository() {

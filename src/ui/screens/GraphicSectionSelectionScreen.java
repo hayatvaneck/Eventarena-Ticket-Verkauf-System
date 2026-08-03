@@ -56,21 +56,8 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
         // HBox dummyHeader = createInvisibleHeader();
 
-        Label title = createTitle(app.getCurrentSelectedEvent().getTitle());
-        Label instruction = createSubtitle("Wählen Sie einen Block aus:");
-
-        VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
-        headerBox.setAlignment(Pos.CENTER);
-        headerBox.setMaxWidth(400); // Breite des Kastens (kannst du beliebig anpassen)
-        headerBox.setStyle(
-                "-fx-background-color: white; " +
-                        "-fx-padding: 15 30 15 30; " + // Innenabstand, damit der Text Luft hat
-                        "-fx-background-radius: 10; " +
-                        // "-fx-border-color: #81b9ed; " +
-                        "-fx-border-width: 2; " +
-                        "-fx-border-radius: 10; " +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
-        headerBox.getChildren().addAll(title, instruction);
+        // Nutzt unsere dynamische Box aus der BaseScreen!
+        VBox headerBox = createHeaderBox(app.getCurrentSelectedEvent().getTitle(), "Wählen Sie einen Block aus:");
 
         StackPane mapContainer;
         if (app.getCurrentSelectedEvent().getMapType() == MapType.ARENA) {

@@ -13,8 +13,9 @@ import javafx.stage.Stage;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Die Klasse TicketDialog zeigt die Details eines einzelnen Tickets in einem separaten Fenster.
-
+ * Die Klasse TicketDialog zeigt die Details eines einzelnen Tickets in einem
+ * separaten Fenster.
+ * 
  */
 
 public final class TicketDialog {
@@ -39,19 +40,20 @@ public final class TicketDialog {
         VBox root = new VBox(12);
         root.setPadding(new Insets(20));
         root.setStyle(
-            "-fx-background-color: #ecf0f1;" +
-            "-fx-font-family: 'Segoe UI', sans-serif;"
-        );
+                "-fx-background-color: #ecf0f1;" +
+                        "-fx-font-family: 'Segoe UI', sans-serif;");
 
         Label title = new Label("Ticket " + ticket.getTicketId());
         title.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
 
         String eventName = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "-";
-        String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) : "-";
+        String eventDate = ticket.getEvent() != null
+                ? ticket.getEvent().getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
+                : "-";
 
         final String fullDescription = (ticket.getEvent() != null && ticket.getEvent().getDescription() != null)
-            ? ticket.getEvent().getDescription().trim()
-            : "Keine Eventbeschreibung vorhanden.";
+                ? ticket.getEvent().getDescription().trim()
+                : "Keine Eventbeschreibung vorhanden.";
 
         String sectionName = ticket.getSection() != null ? ticket.getSection().getName() : "-";
         String customerType = ticket.getCustomerType() != null ? ticket.getCustomerType() : "Standard";
@@ -73,13 +75,12 @@ public final class TicketDialog {
 
             Hyperlink toggleLink = new Hyperlink("Mehr anzeigen");
             toggleLink.setStyle(
-                "-fx-text-fill: #2c3e50; " +
-                "-fx-font-weight: bold; " +
-                "-fx-font-size: 12px; " +
-                "-fx-focus-color: transparent; " +
-                "-fx-faint-focus-color: transparent; " +
-                "-fx-underline: false;"
-            );
+                    "-fx-text-fill: #2c3e50; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-font-size: 12px; " +
+                            "-fx-focus-color: transparent; " +
+                            "-fx-faint-focus-color: transparent; " +
+                            "-fx-underline: false;");
 
             toggleLink.setOnAction(e -> {
                 if (toggleLink.getText().equals("Mehr anzeigen")) {
@@ -101,26 +102,34 @@ public final class TicketDialog {
         Label lblSection = createContentLabel("Bereich: " + sectionName);
         Label lblSeat = createContentLabel("Platz: " + ticket.getSeatInfo());
         Label lblType = createContentLabel("Typ: " + customerType);
-        Label lblPrice = createContentLabel(String.format("Preis: %.2f EUR", ticket.getFinalPrice()));
-        lblPrice.setStyle("-fx-text-fill: #2c3e50; -fx-font-size: 13px; -fx-font-weight: bold;");
+        // --- STEUERBERECHNUNG FÜR EINZELTICKET ---
+        double brutto = ticket.getFinalPrice();
+        double netto = brutto / 1.19;
+        double steuer = brutto - netto;
+
+        Label lblPrice = createContentLabel(String.format("Preis (Brutto): %.2f EUR", brutto));
+        lblPrice.setStyle("-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+        Label lblTaxInfo = new Label(
+                String.format("Darin enthaltene 19%% MwSt.: %.2f EUR (Netto: %.2f EUR)", steuer, netto));
+        lblTaxInfo.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 11px; -fx-font-style: italic;");
 
         contentBox.getChildren().addAll(
-            lblEvent,
-            lblDate, 
-            descBox,
-            lblSection,
-            lblSeat,
-            lblType,
-            lblPrice   
-        );
+                lblEvent,
+                lblDate,
+                descBox,
+                lblSection,
+                lblSeat,
+                lblType,
+                lblPrice,
+                lblTaxInfo);
 
         Button btnClose = new Button("Schließen");
         btnClose.setStyle(
-            "-fx-background-color: #7f8c8d;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-cursor: Hand;"
-        );
+                "-fx-background-color: #7f8c8d;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: Hand;");
         btnClose.setOnAction(e -> stage.close());
 
         root.getChildren().addAll(title, contentBox, btnClose);
@@ -133,13 +142,9 @@ public final class TicketDialog {
     private static Label createContentLabel(String text) {
         Label label = new Label(text);
         label.setStyle(
-            "-fx-text-fill: #2c3e50;" +
-            "-fx-font-size: 13px;" +
-            "-fx-line-spacing: 4px;"
-        );
+                "-fx-text-fill: #2c3e50;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-line-spacing: 4px;");
         return label;
     }
 }
-
-
-

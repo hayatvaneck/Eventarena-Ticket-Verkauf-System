@@ -112,6 +112,10 @@ public class App extends Application {
         return cartItems;
     }
 
+    public BookingService getBookingService() {
+        return bookingService;
+    }
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }
@@ -409,8 +413,9 @@ public class App extends Application {
         } else {
             this.postLoginAction = onLoggedInAction;
 
-            showAlert(Alert.AlertType.INFORMATION, "Anmeldung erforderlich",
-                    "Bitte logge dich ein oder erstelle ein Konto, um die Buchung abzuschließen.");
+            showAlert(Alert.AlertType.INFORMATION, "Fast geschafft!",
+                    "Damit wir deine Tickets sicher für dich hinterlegen können, logge dich bitte kurz ein.\n\n" +
+                            "Du hast noch kein Konto? Kein Problem, die Registrierung dauert nur wenige Sekunden!");
 
             screenManager.navigateTo(ScreenManager.Screen.LOGIN);
         }
@@ -420,7 +425,7 @@ public class App extends Application {
         launch(args);
     }
 
-    private CustomerType mapCustomerType(String typeLabel) {
+    public CustomerType mapCustomerType(String typeLabel) {
         if (typeLabel == null) {
             return CustomerType.STANDARD;
         }

@@ -7,6 +7,7 @@ import domain.StandingSection;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -111,9 +112,9 @@ public class CartScreen extends BaseScreen {
                 lblPrice.setStyle("-fx-pref-width: 90px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
 
                 ComboBox<String> cbType = new ComboBox<>();
-                cbType.getItems().addAll("Standard", "Student", "Rentner", "Kind");
+                cbType.getItems().addAll("Standard", "Student (-20%)", "Rentner (-30%)", "Kind (-50%)");
                 cbType.setValue("Standard");
-                cbType.setPrefWidth(110);
+                cbType.setPrefWidth(140);
 
                 VBox discountBox = new VBox(3);
                 discountBox.setAlignment(Pos.CENTER_LEFT);
@@ -124,7 +125,11 @@ public class CartScreen extends BaseScreen {
 
                 cbType.setOnAction(e -> {
                     String selectedType = cbType.getValue();
-                    double discount = getDiscountFactor(selectedType);
+                    // 1. Text in den echten CustomerType (Enum) umwandeln
+                    domain.CustomerType cType = app.mapCustomerType(selectedType);
+                    // 2. Den echten Rabatt vom BookingService berechnen lassen
+                    double discount = app.getBookingService().calculateDiscountFactor(cType);
+
                     double finalPrice = singleTicketPrice * discount;
                     lblPrice.setText(String.format("%.2f €", finalPrice));
                 });
@@ -157,27 +162,25 @@ public class CartScreen extends BaseScreen {
         ScrollPane scrollPane = createTransparentScrollPane(formContainer);
         scrollPane.setPrefHeight(300);
 
-        VBox buttonBox = new VBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
+        // --- BUTTONS NEBENEINANDER & RICHTIGES DESIGN ---
+        Button btnAddMore = createBackButton("Weitere Tickets hinzufügen");
+        btnAddMore.setPrefWidth(300);
+        btnAddMore.setMinHeight(45);
+        btnAddMore.setMaxHeight(45);
+        btnAddMore.setOnAction(e -> {
+            // Wenn noch gar kein Event ausgewählt wurde (z.B. direkt nach Registrierung),
+            // schicken wir den Nutzer zurück ins Hauptmenü zur Event-Auswahl.
+            if (app.getCurrentSelectedEvent() == null) {
+                app.navigateTo(ScreenManager.Screen.MAIN_MENU);
+            } else {
+                app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION);
+            }
+        });
 
-        javafx.scene.control.Button btnAddMore = new javafx.scene.control.Button("Weitere Tickets hinzufügen");
-        btnAddMore.setStyle(
-                "-fx-background-color: #413f3ff7;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-pref-width: 250px;" +
-                        "-fx-pref-height: 35px;");
-        btnAddMore.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
-
-        javafx.scene.control.Button btnFinalBook = new javafx.scene.control.Button("Jetzt kostenpflichtig buchen");
-        btnFinalBook.setStyle(
-                "-fx-background-color: #2c3e50;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-pref-width: 250px;" +
-                        "-fx-pref-height: 35px;");
+        Button btnFinalBook = createSelectingButton("Jetzt kostenpflichtig buchen");
+        btnFinalBook.setPrefWidth(300);
+        btnFinalBook.setMinHeight(45);
+        btnFinalBook.setMaxHeight(45);
 
         if (cartItems == null || cartItems.isEmpty()) {
             btnFinalBook.setDisable(true);
@@ -191,7 +194,12 @@ public class CartScreen extends BaseScreen {
             app.bookCurrentCart(chosenTypes);
         });
 
-        buttonBox.getChildren().addAll(btnFinalBook, btnAddMore);
+        // Die Buttons in eine HBox packen, damit sie nebeneinander stehen!
+        HBox buttonBox = new HBox(20);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(btnAddMore, btnFinalBook);
+
+        // --- PERFEKTER ZUSAMMENBAU FÜR BORDERPANE ---
 
         VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
         topBox.getChildren().addAll(headerBox, scrollPane);
@@ -206,20 +214,4 @@ public class CartScreen extends BaseScreen {
         return createDefaultScene(root);
     }
 
-    private double getDiscountFactor(String CustomerType) {
-        if (CustomerType == null) {
-            return 1.0;
-        }
-
-        switch (CustomerType) {
-            case "Student (-20%)":
-                return 0.8;
-            case "Rentner (-30%)":
-                return 0.7;
-            case "Kind (-50%)":
-                return 0.5;
-            default:
-                return 1.0;
-        }
-    }
 }
