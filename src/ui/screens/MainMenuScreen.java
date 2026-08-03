@@ -84,6 +84,19 @@ public class MainMenuScreen extends BaseScreen {
         HBox headerBar = createHeaderBar();
         Label title = createTitle("ARENA TICKETSYSTEM");
         Label subtitle = createSubtitle("Wählen Sie ein Event aus:");
+
+         VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
+        headerBox.setAlignment(Pos.CENTER);
+        headerBox.setMaxWidth(400); // Breite des Kastens (kannst du beliebig anpassen)
+        headerBox.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-padding: 15 30 15 30; " + // Innenabstand, damit der Text Luft hat
+                        "-fx-background-radius: 10; " +
+                        // "-fx-border-color: #81b9ed; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
+        headerBox.getChildren().addAll(title, subtitle);
         
         FlowPane cardContainer = new FlowPane();
         cardContainer.setHgap(20);
@@ -109,7 +122,7 @@ public class MainMenuScreen extends BaseScreen {
         scrollPane.setContent(cardContainer);
         
         // Die obere Box ist fertig! (KEIN Spacer mehr nötig)
-        topBox.getChildren().addAll(headerBar, title, subtitle, scrollPane);
+        topBox.getChildren().addAll(headerBar, headerBox, scrollPane);
 
 
         // --- 2. UNTERE BOX (Button + Footer) ---

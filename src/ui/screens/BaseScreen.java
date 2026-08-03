@@ -176,4 +176,17 @@ public abstract class BaseScreen {
         footerBar.setVisible(false); // Macht den Text unsichtbar, behält aber die exakten Maße
         return footerBar;
     }
+    protected HBox createInvisibleHeader() {
+        HBox dummyHeader = createHBox(15, Pos.CENTER_RIGHT);
+        // Exakt gleiches Padding wie im Original-Header
+        dummyHeader.setPadding(new Insets(10, 15, 10, 15));
+
+        // Ein Dummy-Button erzwingt die exakt gleiche Höhe wie die Login/Abmelden-Buttons
+        Button dummyButton = new Button("Platzhalter");
+        
+        dummyHeader.getChildren().add(dummyButton);
+        dummyHeader.setVisible(false); // Macht alles unsichtbar, behält aber die Maße bei!
+        
+        return dummyHeader;
+    }
 }

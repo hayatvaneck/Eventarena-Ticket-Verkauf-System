@@ -53,8 +53,23 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         // --- 1. OBERE BOX (Mitte) ---
         VBox topBox = createRoot(25, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
 
-        Label title = createTitle("Blockauswahl für: " + app.getCurrentSelectedEvent().getTitle());
+        HBox dummyHeader = createInvisibleHeader();
+
+        Label title = createTitle(app.getCurrentSelectedEvent().getTitle());
         Label instruction = createSubtitle("Wählen Sie einen Block aus:");
+
+        VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
+        headerBox.setAlignment(Pos.CENTER);
+        headerBox.setMaxWidth(400); // Breite des Kastens (kannst du beliebig anpassen)
+        headerBox.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-padding: 15 30 15 30; " + // Innenabstand, damit der Text Luft hat
+                        "-fx-background-radius: 10; " +
+                        // "-fx-border-color: #81b9ed; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
+        headerBox.getChildren().addAll(title, instruction);
 
         StackPane mapContainer;
         if (app.getCurrentSelectedEvent().getMapType() == MapType.ARENA) {
@@ -73,7 +88,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
             mapContainer.setPrefSize(600, 400);
         }
 
-        topBox.getChildren().addAll(title, instruction, mapContainer);
+        topBox.getChildren().addAll(dummyHeader, headerBox, mapContainer);
 
         // --- 2. UNTERE BOX (Button + Dummy Footer) ---
         VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);

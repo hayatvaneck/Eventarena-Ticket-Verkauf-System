@@ -151,7 +151,8 @@ public class SeatSelectionScreen extends BaseScreen {
         Button backButton = createBackButton("Zurück zum Saalplan");
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(headerBox, seatGridScrollPane, selectionStatusLabel, confirmButton, backButton);
+        root.getChildren().addAll(headerBox, seatGridScrollPane, selectionStatusLabel, confirmButton,
+                backButton);
 
         return createDefaultScene(root);
     }
