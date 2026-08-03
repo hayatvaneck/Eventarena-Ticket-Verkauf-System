@@ -36,7 +36,6 @@ import java.io.IOException;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.paint.Color;
 
-
 public class MyTicketsScreen extends BaseScreen {
 
     private final App app;
@@ -51,7 +50,6 @@ public class MyTicketsScreen extends BaseScreen {
 
     @Override
     public Scene buildScene() {
-        VBox root = createRoot(20, new Insets(30), Pos.TOP_CENTER);
 
         Label title = createTitle("MEINE TICKETS");
 
@@ -80,19 +78,39 @@ public class MyTicketsScreen extends BaseScreen {
         // --- NEUER BUTTON ---
         Button downloadAllButton = createConfirmButton("Alle Tickets als PNG speichern");
         downloadAllButton.setDisable(myTickets == null || myTickets.isEmpty());
+        // Das harte Padding aus dem Style wurde entfernt, da es die Höhe stören würde
         downloadAllButton.setStyle(
-                "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 6px; -fx-cursor: hand;");
-
+                "-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6px; -fx-cursor: hand;");
+        downloadAllButton.setPrefWidth(300);
+        downloadAllButton.setMinHeight(45);
+        downloadAllButton.setMaxHeight(45);
         downloadAllButton.setOnAction(e -> saveAllTicketsAsImage(myTickets));
 
         Button backButton = createBackButton("Zurück zum Hauptmenü");
+        backButton.setPrefWidth(300);
+        backButton.setMinHeight(45);
+        backButton.setMaxHeight(45);
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
-        HBox actionButtons = createHBox(10, Pos.CENTER);
-        // downloadAllButton statt receiptsButton hinzufügen
-        actionButtons.getChildren().addAll(downloadAllButton, backButton);
+        HBox actionButtons = createHBox(20, Pos.CENTER); // 20 Pixel Abstand
+        actionButtons.getChildren().addAll(backButton, downloadAllButton); // "Zurück" typischerweise links
 
-        root.getChildren().addAll(title, scrollPane, actionButtons);
+        // --- PERFEKTES LAYOUT ZUSAMMENBAUEN (BORDERPANE) ---
+        javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
+        root.setStyle("-fx-background-color: #f5f5f7;");
+
+        // Obere Box mit Dummy-Header, Titel und dem ScrollPane für die Tickets
+        HBox dummyHeader = createInvisibleHeader();
+        VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
+        topBox.getChildren().addAll(dummyHeader, title, scrollPane);
+
+        // Untere Box mit den neuen großen Buttons und Dummy-Footer
+        HBox dummyFooter = createInvisibleStandardFooter();
+        VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
+        bottomBox.getChildren().addAll(actionButtons, dummyFooter);
+
+        root.setCenter(topBox);
+        root.setBottom(bottomBox);
 
         return createDefaultScene(root);
     }
@@ -102,12 +120,11 @@ public class MyTicketsScreen extends BaseScreen {
         ticketCard.setPadding(new Insets(15));
         ticketCard.setStyle(
                 "-fx-background-color: white; " +
-                "-fx-border-color: #2ecc71; " +
-                "-fx-border-width: 1px 1px 1px 5px; " +
-                "-fx-border-radius: 4px; " +
-                "-fx-background-radius: 4px; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);"
-            );
+                        "-fx-border-color: #2ecc71; " +
+                        "-fx-border-width: 1px 1px 1px 5px; " +
+                        "-fx-border-radius: 4px; " +
+                        "-fx-background-radius: 4px; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);");
 
         VBox details = new VBox(5);
 
@@ -172,8 +189,7 @@ public class MyTicketsScreen extends BaseScreen {
                         "-fx-font-size: 12px;" +
                         "-fx-background-radius: 4px;" +
                         "-fx-padding: 6px 12px;" +
-                        "-fx-cursor: Hand;"
-                    );
+                        "-fx-cursor: Hand;");
 
         btnCancel.setOnAction(e -> cancelTicket(ticket, eventTitle, loggedInUser));
 
@@ -185,8 +201,7 @@ public class MyTicketsScreen extends BaseScreen {
                         "-fx-font-size: 12px;" +
                         "-fx-background-radius: 4px;" +
                         "-fx-padding: 6px 12px;" +
-                        "-fx-cursor: Hand;"
-                    );
+                        "-fx-cursor: Hand;");
 
         btnDownload.setOnAction(e -> saveTicketAsImage(ticket));
 
@@ -198,8 +213,7 @@ public class MyTicketsScreen extends BaseScreen {
                         "-fx-font-size: 12px;" +
                         "-fx-background-radius: 4px;" +
                         "-fx-padding: 6px 12px;" +
-                        "-fx-cursor: Hand;"
-                    );
+                        "-fx-cursor: Hand;");
         btnOpenEvent.setOnAction(e -> app.openTicketWindow(ticket));
 
         VBox actionBox = new VBox(8);
@@ -225,9 +239,8 @@ public class MyTicketsScreen extends BaseScreen {
 
         confirmAlert.setContentText(
                 "Event: " + eventTitle + "\n" +
-                placeText + "\n" +
-                "Preis: " + String.format("%.2f €", ticket.getFinalPrice())
-            );
+                        placeText + "\n" +
+                        "Preis: " + String.format("%.2f €", ticket.getFinalPrice()));
 
         // --- Styling ---
         DialogPane dialogPane = confirmAlert.getDialogPane();
@@ -236,33 +249,29 @@ public class MyTicketsScreen extends BaseScreen {
 
         dialogPane.lookup(".header-panel").setStyle("-fx-background-color: #ecf0f1;");
         dialogPane.lookup(".header-panel .label").setStyle(
-            "-fx-text-fill: #e74c3c;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 15px;"
-        );
+                "-fx-text-fill: #e74c3c;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 15px;");
 
         dialogPane.lookup(".content.label").setStyle(
-            "-fx-text-fill: #2c3e50;" +
-            "-fx-font-size: 13px;" +
-            "-fx-line-spacing: 4px;"
-        );
+                "-fx-text-fill: #2c3e50;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-line-spacing: 4px;");
 
         Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
         okButton.setText("Ja, stornieren");
         okButton.setStyle(
-            "-fx-background-color: #e74c3c;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-cursor: Hand;"
-        );
+                "-fx-background-color: #e74c3c;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: Hand;");
 
         Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
         cancelButton.setText("Abbrechen");
         cancelButton.setStyle(
-            "-fx-background-color: #7f8c8d;" +
-            "-fx-text-fill: white;" +
-            "-fx-cursor: Hand;"
-        );
+                "-fx-background-color: #7f8c8d;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-cursor: Hand;");
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {

@@ -79,25 +79,10 @@ public class SeatSelectionScreen extends BaseScreen {
         stageContainer.setMaxWidth(680); // Passt sich der Breite deines Sitzplans an
 
         // 3. Dynamische Anpassung je nach Block!
-        String blockName = seatedSection.getName().toLowerCase();
-
-        if (blockName.contains("block 1") || blockName.contains("block 3")) {
-            // Wenn man rechts sitzt, ist die Bühne/Spielfeld links von einem
-            stageContainer.setAlignment(Pos.CENTER_RIGHT);
-            stageLabel.setPrefWidth(500);
-            stageLabel.setMaxWidth(500);
-
-        } else if (blockName.contains("block 2") || blockName.contains("block 4")) {
-            // Wenn man links sitzt, ist die Bühne/Spielfeld rechts von einem
-            stageContainer.setAlignment(Pos.CENTER_LEFT);
-            stageLabel.setPrefWidth(500);
-            stageLabel.setMaxWidth(500);
-        } else {
-            // Für alle anderen (z.B. Innenraum, Block 5, Block 6) bleibt es mittig
-            stageContainer.setAlignment(Pos.CENTER);
+        stageContainer.setAlignment(Pos.CENTER);
             stageLabel.setPrefWidth(650);
             stageLabel.setMaxWidth(650);
-        }
+
 
         stageContainer.getChildren().add(stageLabel);
 

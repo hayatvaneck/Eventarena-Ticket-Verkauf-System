@@ -120,7 +120,7 @@ public class SeatSelectionController {
                     Tooltip.install(seatButton, tooltip);
 
                 } else {
-                    seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
+                    seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-cursor: hand;");
 
                     Tooltip tooltip = new Tooltip("Reihe " + rowNum + ", Platz " + seatNum);
                     tooltip.setShowDelay(Duration.millis(100));
@@ -132,11 +132,13 @@ public class SeatSelectionController {
                         Seat existingSeat = findSelectedSeat(rowNum, seatNum);
 
                         if (existingSeat != null) {
-                            seatButton.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
+                            seatButton
+                                    .setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;-fx-cursor: hand;");
                             selectedSeats.remove(existingSeat);
                             selectedButtons.remove(seatButton);
                         } else {
-                            seatButton.setStyle("-fx-background-color: #d4af37; -fx-text-fill: black;");
+                            seatButton
+                                    .setStyle("-fx-background-color: #d4af37; -fx-text-fill: black; -fx-cursor: hand;");
                             selectedSeats.add(finalSeat);
                             selectedButtons.add(seatButton);
                         }

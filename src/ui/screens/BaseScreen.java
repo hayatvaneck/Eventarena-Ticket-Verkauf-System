@@ -50,7 +50,8 @@ public abstract class BaseScreen {
             "-fx-font-weight: bold;" +
             "-fx-font-size: 14px;" +
             "-fx-padding: 10 20 10 20;" +
-            "-fx-background-radius: 6px;";
+            "-fx-background-radius: 6px;" +
+            "-fx-cursor: hand;";
 
     protected static final String SECONDARY_BUTTON_STYLE = "-fx-background-color: #2c3e50;" +
             "-fx-text-fill: white;" +
@@ -159,7 +160,6 @@ public abstract class BaseScreen {
         return new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
-    
     // Erstellt den standardisierten Footer für alle Screens
     protected HBox createStandardFooter() {
         Label teamLabel = new Label("Entwickelt von: Lukas Beck, Maren Bohlig, Gian-Luca Levels, Hayat van Eck");
@@ -171,22 +171,25 @@ public abstract class BaseScreen {
         footerBar.getChildren().add(teamLabel);
         return footerBar;
     }
+
     protected HBox createInvisibleStandardFooter() {
         HBox footerBar = createStandardFooter();
         footerBar.setVisible(false); // Macht den Text unsichtbar, behält aber die exakten Maße
         return footerBar;
     }
+
     protected HBox createInvisibleHeader() {
         HBox dummyHeader = createHBox(15, Pos.CENTER_RIGHT);
         // Exakt gleiches Padding wie im Original-Header
         dummyHeader.setPadding(new Insets(10, 15, 10, 15));
 
-        // Ein Dummy-Button erzwingt die exakt gleiche Höhe wie die Login/Abmelden-Buttons
+        // Ein Dummy-Button erzwingt die exakt gleiche Höhe wie die
+        // Login/Abmelden-Buttons
         Button dummyButton = new Button("Platzhalter");
-        
+
         dummyHeader.getChildren().add(dummyButton);
         dummyHeader.setVisible(false); // Macht alles unsichtbar, behält aber die Maße bei!
-        
+
         return dummyHeader;
     }
 }

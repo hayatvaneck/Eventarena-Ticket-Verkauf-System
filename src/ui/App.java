@@ -424,19 +424,18 @@ public class App extends Application {
         if (typeLabel == null) {
             return CustomerType.STANDARD;
         }
+        String normalized = typeLabel.trim().toLowerCase();
 
-        switch (typeLabel.trim().toLowerCase()) {
-            case "student":
-                return CustomerType.STUDENT;
-            case "rentner":
-            case "senior":
-                return CustomerType.SENIOR;
-            case "vip":
-                return CustomerType.VIP;
-            case "kind":
-                return CustomerType.KIND;
-            default:
-                return CustomerType.STANDARD;
+        if (normalized.startsWith("student")) {
+            return CustomerType.STUDENT;
+        } else if (normalized.startsWith("rentner") || normalized.startsWith("senior")) {
+            return CustomerType.SENIOR;
+        } else if (normalized.startsWith("vip")) {
+            return CustomerType.VIP;
+        } else if (normalized.startsWith("kind")) {
+            return CustomerType.KIND;
+        } else {
+            return CustomerType.STANDARD;
         }
     }
 

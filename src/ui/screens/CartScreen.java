@@ -34,11 +34,26 @@ public class CartScreen extends BaseScreen {
 
     @Override
     public Scene buildScene() {
-        VBox root = createRoot(15, new Insets(30), Pos.CENTER);
+        // --- 1. NEUES LAYOUT: BORDERPANE ---
+        javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
+        root.setStyle("-fx-background-color: #f5f5f7;");
 
-        Label title = new Label("WARENKORB");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-        
+        // --- 2. SCHICKES KÄSTCHEN FÜR DEN TITEL ---
+        Label title = createTitle("WARENKORB");
+        Label subtitle = createSubtitle("Ihre ausgewählten Tickets im Überblick:");
+
+        VBox headerBox = new VBox(5);
+        headerBox.setAlignment(Pos.CENTER);
+        headerBox.setMaxWidth(400);
+        headerBox.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-padding: 15 30 15 30; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
+        headerBox.getChildren().addAll(title, subtitle);
+
         VBox formContainer = new VBox(10);
         formContainer.setAlignment(Pos.CENTER);
 
@@ -66,11 +81,10 @@ public class CartScreen extends BaseScreen {
                 row.setAlignment(Pos.CENTER_LEFT);
                 row.setPadding(new Insets(10, 14, 10, 14));
                 row.setStyle(
-                    "-fx-background-color: white;" +
-                    "-fx-border-color: #dcdde1;" +
-                    "-fx-border-radius: 4px;" +
-                    "-fx-background-radius: 4px;"
-                );
+                        "-fx-background-color: white;" +
+                                "-fx-border-color: #dcdde1;" +
+                                "-fx-border-radius: 4px;" +
+                                "-fx-background-radius: 4px;");
 
                 String seatLabelText;
                 if (seatSection instanceof StandingSection) {
@@ -120,13 +134,12 @@ public class CartScreen extends BaseScreen {
 
                 javafx.scene.control.Button btnDelete = new javafx.scene.control.Button("X");
                 btnDelete.setStyle(
-                    "-fx-background-color: #e74c3c;" +
-                    "-fx-text-fill: white;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-padding: 6px 10px;" +
-                    "-fx-background-radius: 4px;" +
-                    "-fx-cursor: hand"
-                );
+                        "-fx-background-color: #e74c3c;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-padding: 6px 10px;" +
+                                "-fx-background-radius: 4px;" +
+                                "-fx-cursor: hand");
                 btnDelete.setAlignment(Pos.CENTER_RIGHT);
                 VBox.setMargin(btnDelete, new Insets(0, 0, 0, 0));
 
@@ -149,24 +162,22 @@ public class CartScreen extends BaseScreen {
 
         javafx.scene.control.Button btnAddMore = new javafx.scene.control.Button("Weitere Tickets hinzufügen");
         btnAddMore.setStyle(
-            "-fx-background-color: #413f3ff7;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-cursor: hand;" +
-            "-fx-pref-width: 250px;" +
-            "-fx-pref-height: 35px;"
-        );
+                "-fx-background-color: #413f3ff7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-pref-width: 250px;" +
+                        "-fx-pref-height: 35px;");
         btnAddMore.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
         javafx.scene.control.Button btnFinalBook = new javafx.scene.control.Button("Jetzt kostenpflichtig buchen");
         btnFinalBook.setStyle(
-            "-fx-background-color: #2c3e50;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-cursor: hand;" +
-            "-fx-pref-width: 250px;" +
-            "-fx-pref-height: 35px;"
-        );
+                "-fx-background-color: #2c3e50;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-pref-width: 250px;" +
+                        "-fx-pref-height: 35px;");
 
         if (cartItems == null || cartItems.isEmpty()) {
             btnFinalBook.setDisable(true);
@@ -182,21 +193,30 @@ public class CartScreen extends BaseScreen {
 
         buttonBox.getChildren().addAll(btnFinalBook, btnAddMore);
 
-        root.getChildren().addAll(title, scrollPane, buttonBox);
+        VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
+        topBox.getChildren().addAll(headerBox, scrollPane);
+
+        HBox dummyFooter = createInvisibleStandardFooter();
+        VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
+        bottomBox.getChildren().addAll(buttonBox, dummyFooter);
+
+        root.setCenter(topBox);
+        root.setBottom(bottomBox);
+
         return createDefaultScene(root);
     }
 
-    private double getDiscountFactor(String customerType) {
-        if (customerType == null) {
+    private double getDiscountFactor(String CustomerType) {
+        if (CustomerType == null) {
             return 1.0;
         }
 
-        switch (customerType) {
-            case "Student":
+        switch (CustomerType) {
+            case "Student (-20%)":
                 return 0.8;
-            case "Rentner":
+            case "Rentner (-30%)":
                 return 0.7;
-            case "Kind":
+            case "Kind (-50%)":
                 return 0.5;
             default:
                 return 1.0;
