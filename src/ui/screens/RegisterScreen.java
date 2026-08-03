@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.BorderPane;
@@ -34,17 +35,22 @@ public class RegisterScreen extends BaseScreen {
 
     @Override
     public Scene buildScene() {
-        // --- 1. NEUES HAUPTLAYOUT FÜR DIE PLATZIERUNG ---
-        javafx.scene.layout.BorderPane mainRoot = new javafx.scene.layout.BorderPane();
+        BorderPane mainRoot = new BorderPane();
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
+        // --- UNTERE LEISTE FÜR DEN ZURÜCK-BUTTON (Exakt wie im LoginScreen) ---
+        HBox bottomBar = new HBox();
+        bottomBar.setPadding(new Insets(20, 20, 50, 100));
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
+
+        // --- ZENTRALER BEREICH FÜR DAS FORMULAR ---
         javafx.scene.layout.VBox registerRoot = createVBox(15, Pos.CENTER);
         registerRoot.setStyle("-fx-background-color: transparent");
 
-        // --- 2. DIE NEUE WEISSE BOX ---
+        // Die weiße Box mit Schatten
         VBox formBox = createVBox(15, Pos.CENTER);
         formBox.setPadding(new Insets(30, 40, 30, 40));
-        formBox.setMaxWidth(400); // Etwas breiter, da hier das Hinweiskästchen rechts daneben steht
+        formBox.setMaxWidth(400);
         formBox.setStyle(
                 "-fx-background-color: white; " +
                         "-fx-background-radius: 12; " +
@@ -56,39 +62,43 @@ public class RegisterScreen extends BaseScreen {
         Label title = new Label("NEUES KONTO ERSTELLEN");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        // --- 3. FELDER MIT ZEICHENLIMITS (TextFormatter) ---
+        // --- FELDER MIT STRIKTEM 30-ZEICHEN LIMIT ---
         TextField firstNameField = new TextField();
         firstNameField.setPromptText("Vorname");
         firstNameField.setPrefWidth(250);
         firstNameField.setMaxWidth(250);
-        firstNameField
-                .setTextFormatter(new TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
+        firstNameField.setTextFormatter(
+                new javafx.scene.control.TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
 
         TextField lastNameField = new TextField();
         lastNameField.setPromptText("Nachname");
         lastNameField.setPrefWidth(250);
         lastNameField.setMaxWidth(250);
-        lastNameField.setTextFormatter(new TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
+        lastNameField.setTextFormatter(
+                new javafx.scene.control.TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
 
         TextField emailField = new TextField();
         emailField.setPromptText("E-Mail-Adresse");
         emailField.setPrefWidth(250);
         emailField.setMaxWidth(250);
-        emailField.setTextFormatter(new TextFormatter<String>(c -> c.getControlNewText().length() <= 50 ? c : null));
+        emailField.setTextFormatter(
+                new javafx.scene.control.TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Passwort");
         passwordField.setPrefWidth(250);
         passwordField.setMaxWidth(250);
-        passwordField.setTextFormatter(new TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
+        passwordField.setTextFormatter(
+                new javafx.scene.control.TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
 
         PasswordField confirmPasswordField = new PasswordField();
         confirmPasswordField.setPromptText("Passwort bestätigen");
         confirmPasswordField.setPrefWidth(250);
         confirmPasswordField.setMaxWidth(250);
-        confirmPasswordField
-                .setTextFormatter(new TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
+        confirmPasswordField.setTextFormatter(
+                new javafx.scene.control.TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
 
+        // --- HINWEIS-BOX FÜR PASSWORT ---
         VBox hintBox = new VBox(5);
         hintBox.setPadding(new Insets(12));
         hintBox.setStyle(
@@ -104,24 +114,11 @@ public class RegisterScreen extends BaseScreen {
         Label rule2 = new Label("• Groß- und Kleinbuchstaben");
         Label rule3 = new Label("• Mindestens eine Zahl (0-9)");
         Label rule4 = new Label("• Ein Sonderzeichen (z.B. !@#$)");
-        Label rule5 = new Label("• Maximal 30 Zeichen");
         rule1.setStyle(ruleStyle);
         rule2.setStyle(ruleStyle);
         rule3.setStyle(ruleStyle);
         rule4.setStyle(ruleStyle);
-        rule5.setStyle(ruleStyle);
-        hintBox.getChildren().addAll(hintTitle, rule1, rule2, rule3, rule4, rule5);
-
-        GridPane formGrid = new GridPane();
-        formGrid.setVgap(15);
-        formGrid.setHgap(20);
-        formGrid.setAlignment(Pos.CENTER);
-        formGrid.add(firstNameField, 0, 0);
-        formGrid.add(lastNameField, 0, 1);
-        formGrid.add(emailField, 0, 2);
-        formGrid.add(passwordField, 0, 3);
-        formGrid.add(confirmPasswordField, 0, 4);
-        formGrid.add(hintBox, 1, 3, 1, 2);
+        hintBox.getChildren().addAll(hintTitle, rule1, rule2, rule3, rule4);
 
         Button registerBtn = new Button("Registrieren");
         registerBtn.setDefaultButton(true);
@@ -129,9 +126,11 @@ public class RegisterScreen extends BaseScreen {
                 "-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         registerBtn.setPrefWidth(250);
 
-        Label backToLoginLink = new Label("Bereits ein Konto? Zum Login");
-        backToLoginLink.setStyle("-fx-text-fill: #2980b9; -fx-cursor: hand;");
+        // --- DER ZURÜCK BUTTON (Jetzt wie im LoginScreen!) ---
+        Button btnBackToLogin = createBackButton("Zurück zum Login");
+        btnBackToLogin.setPrefWidth(250);
 
+        // --- AKTIONEN (KLICKS) ---
         registerBtn.setOnAction(e -> {
             String firstName = firstNameField.getText().trim();
             String lastName = lastNameField.getText().trim();
@@ -145,7 +144,7 @@ public class RegisterScreen extends BaseScreen {
                 return;
             }
 
-            // --- 4. NEUE, SICHERE E-MAIL-PRÜFUNG ---
+            // E-Mail-Prüfung (darf nicht fehlerhaft sein)
             String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[a-zA-Z]{2,6}$";
             if (!email.matches(emailRegex)) {
                 app.showAlert(Alert.AlertType.WARNING, "Fehler",
@@ -168,7 +167,7 @@ public class RegisterScreen extends BaseScreen {
                 return;
             }
 
-            String passwordHash = PasswordService.hashPassword(password);
+            String passwordHash = service.PasswordService.hashPassword(password);
             User newUser = new User(firstName, lastName, email, passwordHash);
             boolean success = app.registerUser(newUser);
 
@@ -180,23 +179,29 @@ public class RegisterScreen extends BaseScreen {
             }
         });
 
-        backToLoginLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.LOGIN));
+        btnBackToLogin.setOnAction(e -> app.navigateTo(ScreenManager.Screen.LOGIN));
 
-        // Wir packen einfach alle Elemente direkt und sauber untereinander in die weiße VBox!
+        // --- ZUSAMMENBAU ---
+        // 1. Felder in die weiße Box packen
         formBox.getChildren().addAll(
-                title, 
-                firstNameField, 
-                lastNameField, 
-                emailField, 
-                passwordField, 
+                title,
+                firstNameField,
+                lastNameField,
+                emailField,
+                passwordField,
                 confirmPasswordField,
-                hintBox, 
-                registerBtn, 
-                backToLoginLink
-        );
+                hintBox,
+                registerBtn);
+
+        // 2. Weiße Box in den mittleren Bereich packen
         registerRoot.getChildren().add(formBox);
 
+        // 3. Zurück-Button in die untere Leiste packen
+        bottomBar.getChildren().add(btnBackToLogin);
+
+        // 4. Alles dem Haupt-Layout übergeben
         mainRoot.setCenter(registerRoot);
+        mainRoot.setBottom(bottomBar);
 
         Scene scene = createDefaultScene(mainRoot);
         scene.setOnMouseClicked(e -> mainRoot.requestFocus());
