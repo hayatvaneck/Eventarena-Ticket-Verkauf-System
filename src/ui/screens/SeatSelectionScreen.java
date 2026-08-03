@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
 import domain.CartItem; // Falls CartItem woanders liegt, diesen Import anpassen
+import ui.screens.BaseScreen;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class SeatSelectionScreen extends BaseScreen {
 
         SeatedSection seatedSection = (SeatedSection) selectedSection;
 
-        VBox root = createRoot(15, new Insets(20), Pos.CENTER);
+        // VBox root = createRoot(15, new Insets(20), Pos.CENTER);
 
         Label title = createTitle(seatedSection.getName());
         Label instruction = createSubtitle("Wählen Sie einen Sitzplatz aus:");
@@ -123,14 +124,18 @@ public class SeatSelectionScreen extends BaseScreen {
         seatGridScrollPane.setPannable(true);
         seatGridScrollPane.setFitToHeight(false);
         seatGridScrollPane.setFitToWidth(true);
-        seatGridScrollPane.setPrefViewportHeight(420);
-        seatGridScrollPane.setPrefViewportWidth(740);
+        seatGridScrollPane.setPrefViewportHeight(550); // Vorher 420 -> Jetzt deutlich höher!
+        seatGridScrollPane.setPrefViewportWidth(800); // Vorher 740 -> Etwas breiter
 
         Label selectionStatusLabel = app.getSelectionStatusLabel();
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         selectionStatusLabel.setText("Kein Platz ausgewählt");
 
+        // --- 2. BUTTONS EXAKT WIE IN ANDEREN SCREENS MACHEN (300x45) ---
         Button confirmButton = createSelectingButton("Sitzplatz bestätigen");
+        confirmButton.setPrefWidth(300);
+        confirmButton.setMinHeight(45);
+        confirmButton.setMaxHeight(45);
         confirmButton.setOnAction(e -> {
             List<Seat> newSeats = controller.getSelectedSeats();
 
@@ -149,10 +154,31 @@ public class SeatSelectionScreen extends BaseScreen {
         });
 
         Button backButton = createBackButton("Zurück zum Saalplan");
+        backButton.setPrefWidth(300);
+        backButton.setMinHeight(45);
+        backButton.setMaxHeight(45);
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        root.getChildren().addAll(headerBox, seatGridScrollPane, selectionStatusLabel, confirmButton,
-                backButton);
+        // --- 3. BUTTONS NEBENEINANDER STELLEN ---
+        HBox buttonBox = new HBox(20); // 20 Pixel Abstand zwischen den beiden Buttons
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(backButton, confirmButton); // Zurück links, Bestätigen rechts
+
+        // --- 4. PERFEKTES LAYOUT ZUSAMMENBAUEN ---
+        javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
+        root.setStyle("-fx-background-color: #f5f5f7;");
+
+        // Obere Box mit Platzhalter, Titel, Saalplan und Status
+        VBox topBox = createRoot(15, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
+        topBox.getChildren().addAll(headerBox, seatGridScrollPane, selectionStatusLabel);
+
+        // Untere Box mit den Buttons und dem Platzhalter-Footer
+        VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
+        HBox dummyFooter = createInvisibleStandardFooter();
+        bottomBox.getChildren().addAll(buttonBox, dummyFooter);
+
+        root.setCenter(topBox);
+        root.setBottom(bottomBox);
 
         return createDefaultScene(root);
     }

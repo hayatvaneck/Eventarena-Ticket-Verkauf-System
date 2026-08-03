@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import ui.App;
 import ui.ScreenManager;
+import ui.screens.BaseScreen;
 
 /**
  * Die Klasse GraphicSectionSelectionScreen zeigt den grafischen Saalplan und
@@ -53,7 +54,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         // --- 1. OBERE BOX (Mitte) ---
         VBox topBox = createRoot(25, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
 
-        HBox dummyHeader = createInvisibleHeader();
+        // HBox dummyHeader = createInvisibleHeader();
 
         Label title = createTitle(app.getCurrentSelectedEvent().getTitle());
         Label instruction = createSubtitle("Wählen Sie einen Block aus:");
@@ -88,7 +89,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
             mapContainer.setPrefSize(600, 400);
         }
 
-        topBox.getChildren().addAll(dummyHeader, headerBox, mapContainer);
+        topBox.getChildren().addAll(headerBox, mapContainer);
 
         // --- 2. UNTERE BOX (Button + Dummy Footer) ---
         VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
