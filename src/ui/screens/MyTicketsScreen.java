@@ -51,7 +51,8 @@ public class MyTicketsScreen extends BaseScreen {
 
     @Override
     public Scene buildScene() {
-        Label title = createTitle("MEINE BESTELLUNGEN & TICKETS");
+        VBox headerBox = createHeaderBox("MEINE BESTELLUNGEN & TICKETS",
+                "Ihre gebuchten Tickets und Quittungen im Überblick:");
 
         VBox mainContainer = createVBox(25, Pos.TOP_CENTER);
         mainContainer.setPadding(new Insets(10, 20, 20, 20));
@@ -59,10 +60,10 @@ public class MyTicketsScreen extends BaseScreen {
 
         User loggedInUser = app.getLoggedInUser();
         List<Ticket> myActiveTickets = loggedInUser != null ? loggedInUser.getPurchasedTickets() : new ArrayList<>();
-        
+
         // 1. Alle Quittungen des Nutzers laden (Das sind unsere "Gruppen")
         List<Receipt> myReceipts = app.getReceiptsForLoggedInUser();
-        
+
         // Sortieren: Neueste Bestellungen ganz nach oben
         myReceipts.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
 
@@ -74,7 +75,7 @@ public class MyTicketsScreen extends BaseScreen {
 
             // 2. Wir iterieren über jede Quittung und bauen einen Bestell-Kasten
             for (Receipt receipt : myReceipts) {
-                
+
                 // Herausfinden, welche aktiven Tickets zu dieser Quittung gehören
                 List<Ticket> ticketsForThisOrder = new ArrayList<>();
                 for (Ticket t : myActiveTickets) {
@@ -83,33 +84,35 @@ public class MyTicketsScreen extends BaseScreen {
                     }
                 }
 
-                // Wenn alle Tickets dieser Bestellung storniert wurden, ignorieren wir sie (oder man könnte sie als storniert anzeigen)
+                // Wenn alle Tickets dieser Bestellung storniert wurden, ignorieren wir sie
+                // (oder man könnte sie als storniert anzeigen)
                 if (ticketsForThisOrder.isEmpty()) {
-                    continue; 
+                    continue;
                 }
 
                 // --- BESTELL-KASTEN (UI) ---
                 VBox orderCard = new VBox(15);
                 orderCard.setStyle(
                         "-fx-background-color: #ffffff; " +
-                        "-fx-border-color: #bdc3c7; " +
-                        "-fx-border-width: 2px; " +
-                        "-fx-border-radius: 8px; " +
-                        "-fx-background-radius: 8px; " +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);"
-                );
+                                "-fx-border-color: #bdc3c7; " +
+                                "-fx-border-width: 2px; " +
+                                "-fx-border-radius: 8px; " +
+                                "-fx-background-radius: 8px; " +
+                                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);");
                 orderCard.setPadding(new Insets(0, 0, 15, 0)); // Unten etwas Platz
 
                 // --- HEADER DER BESTELLUNG ---
                 HBox orderHeader = new HBox(15);
                 orderHeader.setAlignment(Pos.CENTER_LEFT);
                 orderHeader.setPadding(new Insets(15));
-                orderHeader.setStyle("-fx-background-color: #ecf0f1; -fx-background-radius: 6px 6px 0 0; -fx-border-color: #bdc3c7; -fx-border-width: 0 0 1px 0;");
+                orderHeader.setStyle(
+                        "-fx-background-color: #ecf0f1; -fx-background-radius: 6px 6px 0 0; -fx-border-color: #bdc3c7; -fx-border-width: 0 0 1px 0;");
 
                 VBox headerInfo = new VBox(3);
                 Label lblOrderTitle = new Label("Bestellung vom " + receipt.getCreatedAt().format(dtf));
                 lblOrderTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #2c3e50;");
-                Label lblOrderId = new Label("Quittungs-Nr: " + receipt.getReceiptId() + " | Gesamtbetrag: " + String.format("%.2f EUR", receipt.getTotalAmount()));
+                Label lblOrderId = new Label("Quittungs-Nr: " + receipt.getReceiptId() + " | Gesamtbetrag: "
+                        + String.format("%.2f EUR", receipt.getTotalAmount()));
                 lblOrderId.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
                 headerInfo.getChildren().addAll(lblOrderTitle, lblOrderId);
 
@@ -118,11 +121,13 @@ public class MyTicketsScreen extends BaseScreen {
 
                 // --- NEUE EXPORT BUTTONS FÜR DIE GRUPPE ---
                 Button btnDownloadReceipt = createConfirmButton("Quittung als PNG");
-                btnDownloadReceipt.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-cursor: hand;");
+                btnDownloadReceipt.setStyle(
+                        "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-cursor: hand;");
                 btnDownloadReceipt.setOnAction(e -> saveReceiptAsImage(receipt));
 
                 Button btnDownloadTickets = createConfirmButton("Alle Tickets dieser Bestellung (PNG)");
-                btnDownloadTickets.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-cursor: hand;");
+                btnDownloadTickets.setStyle(
+                        "-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-cursor: hand;");
                 btnDownloadTickets.setOnAction(e -> saveTicketGroupAsImage(receipt, ticketsForThisOrder));
 
                 orderHeader.getChildren().addAll(headerInfo, headerSpacer, btnDownloadReceipt, btnDownloadTickets);
@@ -134,7 +139,7 @@ public class MyTicketsScreen extends BaseScreen {
                 for (Ticket ticket : ticketsForThisOrder) {
                     ticketsContainer.getChildren().add(createTicketCard(ticket, dtf, loggedInUser));
                 }
-                
+
                 orderCard.getChildren().add(ticketsContainer);
                 mainContainer.getChildren().add(orderCard);
             }
@@ -153,9 +158,8 @@ public class MyTicketsScreen extends BaseScreen {
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle("-fx-background-color: #f5f5f7;");
 
-        HBox dummyHeader = createInvisibleHeader();
         VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
-        topBox.getChildren().addAll(dummyHeader, title, scrollPane);
+        topBox.getChildren().addAll(headerBox, scrollPane);
 
         HBox dummyFooter = createInvisibleStandardFooter();
         VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
@@ -173,31 +177,32 @@ public class MyTicketsScreen extends BaseScreen {
         ticketCard.setPadding(new Insets(15));
         ticketCard.setStyle(
                 "-fx-background-color: white; " +
-                "-fx-border-color: #ecf0f1; " +
-                "-fx-border-width: 1px; " +
-                "-fx-border-radius: 4px; " +
-                "-fx-background-radius: 4px;");
+                        "-fx-border-color: #ecf0f1; " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 4px; " +
+                        "-fx-background-radius: 4px;");
 
         VBox details = new VBox(5);
         String eventTitle = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "Event-Ticket";
-        
+
         Label lblEvent = new Label(eventTitle);
         lblEvent.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
-        
+
         String seatInfo;
         if (ticket.getSection() instanceof StandingSection) {
             seatInfo = ticket.getSection().getName();
         } else if (ticket.getSection() instanceof SeatedSection) {
             int[] rowAndSeat = parseRowAndSeat(ticket.getSeatInfo());
             if (rowAndSeat[0] > 0 && rowAndSeat[1] > 0) {
-                seatInfo = String.format("%s | Reihe %d | Sitz %d", ticket.getSection().getName(), rowAndSeat[0], rowAndSeat[1]);
+                seatInfo = String.format("%s | Reihe %d | Sitz %d", ticket.getSection().getName(), rowAndSeat[0],
+                        rowAndSeat[1]);
             } else {
                 seatInfo = "Bereich: " + ticket.getSection().getName() + " | " + ticket.getSeatInfo();
             }
         } else {
             seatInfo = "Bereich: " + ticket.getSection().getName();
         }
-        
+
         Label lblSeat = new Label(seatInfo);
         lblSeat.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 13px;");
 
@@ -214,7 +219,8 @@ public class MyTicketsScreen extends BaseScreen {
         lblPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
         Button btnCancel = createDangerButton("Stornieren");
-        btnCancel.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 4px; -fx-padding: 6px 12px; -fx-cursor: Hand;");
+        btnCancel.setStyle(
+                "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 4px; -fx-padding: 6px 12px; -fx-cursor: Hand;");
         btnCancel.setOnAction(e -> cancelTicket(ticket, eventTitle, loggedInUser));
 
         VBox actionBox = new VBox(8);
@@ -233,15 +239,16 @@ public class MyTicketsScreen extends BaseScreen {
         exportLayout.setAlignment(Pos.TOP_LEFT);
 
         Label headerLbl = new Label("KAUFBELEG / RECHNUNG");
-        headerLbl.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 20 0;");
+        headerLbl
+                .setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 20 0;");
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-        
+
         exportLayout.getChildren().addAll(
-            createExportLabel("Rechnungsnummer: " + receipt.getReceiptId(), true),
-            createExportLabel("Kunde: " + receipt.getCustomerName(), false),
-            createExportLabel("Datum: " + receipt.getCreatedAt().format(dtf), false),
-            new Label(" ") // Spacer
+                createExportLabel("Rechnungsnummer: " + receipt.getReceiptId(), true),
+                createExportLabel("Kunde: " + receipt.getCustomerName(), false),
+                createExportLabel("Datum: " + receipt.getCreatedAt().format(dtf), false),
+                new Label(" ") // Spacer
         );
 
         double brutto = receipt.getTotalAmount();
@@ -249,13 +256,12 @@ public class MyTicketsScreen extends BaseScreen {
         double steuer = brutto - netto;
 
         exportLayout.getChildren().addAll(
-            createExportLabel("========================================", false),
-            createExportLabel(String.format("Netto (exkl. MwSt.): %.2f EUR", netto), false),
-            createExportLabel(String.format("zzgl. 19%% MwSt.: %.2f EUR", steuer), false),
-            createExportLabel("----------------------------------------", false),
-            createExportLabel(String.format("GESAMTBETRAG: %.2f EUR", brutto), true),
-            createExportLabel("========================================", false)
-        );
+                createExportLabel("========================================", false),
+                createExportLabel(String.format("Netto (exkl. MwSt.): %.2f EUR", netto), false),
+                createExportLabel(String.format("zzgl. 19%% MwSt.: %.2f EUR", steuer), false),
+                createExportLabel("----------------------------------------", false),
+                createExportLabel(String.format("GESAMTBETRAG: %.2f EUR", brutto), true),
+                createExportLabel("========================================", false));
 
         new Scene(exportLayout);
         takeSnapshotAndSave(exportLayout, "Quittung_" + receipt.getReceiptId() + ".png", "Quittung speichern unter...");
@@ -269,7 +275,8 @@ public class MyTicketsScreen extends BaseScreen {
         exportLayout.setAlignment(Pos.TOP_CENTER);
 
         Label mainHeader = new Label("TICKETS - BESTELLUNG " + receipt.getReceiptId());
-        mainHeader.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;");
+        mainHeader
+                .setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;");
         exportLayout.getChildren().add(mainHeader);
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
@@ -277,18 +284,19 @@ public class MyTicketsScreen extends BaseScreen {
         for (Ticket ticket : tickets) {
             VBox ticketBox = new VBox(8);
             ticketBox.setPadding(new Insets(20));
-            ticketBox.setStyle("-fx-border-color: #2ecc71; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-background-color: #f9fbf9; -fx-background-radius: 8px; -fx-pref-width: 500px;");
-            
+            ticketBox.setStyle(
+                    "-fx-border-color: #2ecc71; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-background-color: #f9fbf9; -fx-background-radius: 8px; -fx-pref-width: 500px;");
+
             String eventTitle = ticket.getEvent() != null ? ticket.getEvent().getTitle() : "Event";
             String eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime().format(dtf) : "";
-            
+
             Label eventLbl = new Label(eventTitle);
             eventLbl.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
-            
+
             String seatInfo = ticket.getSeatInfo() != null ? ticket.getSeatInfo() : "Keine Platzinfo";
             Label seatLbl = new Label("Bereich: " + ticket.getSection().getName() + " | " + seatInfo);
             seatLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
-            
+
             Label idLbl = new Label("Ticket-ID: " + ticket.getTicketId() + " | Typ: " + ticket.getCustomerType());
             idLbl.setStyle("-fx-font-size: 13px; -fx-text-fill: #7f8c8d;");
 
@@ -317,7 +325,7 @@ public class MyTicketsScreen extends BaseScreen {
         fileChooser.setTitle(windowTitle);
         fileChooser.setInitialFileName(defaultName);
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Bild", "*.png"));
-        
+
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -332,11 +340,13 @@ public class MyTicketsScreen extends BaseScreen {
     // --- BESTEHENDE LOGIK ZUM STORNIEREN UND PARSEN (Unverändert) ---
     private void cancelTicket(Ticket ticket, String eventTitle, User loggedInUser) {
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        if (app.getPrimaryStage() != null) { confirmAlert.initOwner(app.getPrimaryStage()); }
+        if (app.getPrimaryStage() != null) {
+            confirmAlert.initOwner(app.getPrimaryStage());
+        }
         confirmAlert.setTitle("Ticket stornieren");
         confirmAlert.setHeaderText("Möchten Sie dieses Ticket wirklich stornieren?");
         confirmAlert.setContentText("Das Ticket wird dauerhaft storniert.");
-        
+
         DialogPane dialogPane = confirmAlert.getDialogPane();
         Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
         okButton.setText("Ja, stornieren");
@@ -358,14 +368,17 @@ public class MyTicketsScreen extends BaseScreen {
 
     private int[] parseRowAndSeat(String seatInfoStr) {
         int[] result = new int[] { 0, 0 };
-        if (seatInfoStr == null) return result;
+        if (seatInfoStr == null)
+            return result;
         try {
             String[] numbers = seatInfoStr.replaceAll("[^0-9]+", " ").trim().split("\\s+");
             if (numbers.length >= 2) {
                 result[0] = Integer.parseInt(numbers[0]);
                 result[1] = Integer.parseInt(numbers[1]);
             }
-        } catch (Exception e) { return result; }
+        } catch (Exception e) {
+            return result;
+        }
         return result;
     }
 }
