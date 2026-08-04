@@ -172,8 +172,16 @@ public class RegisterScreen extends BaseScreen {
             boolean success = app.registerUser(newUser);
 
             if (success) {
-                app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Registrierung erfolgreich!");
-                app.navigateTo(ScreenManager.Screen.MAIN_MENU);
+                app.setLoggedInUser(newUser);
+                app.showAlert(Alert.AlertType.INFORMATION, "Erfolg",
+                        "Registrierung erfolgreich! Bitte logge dich nun ein.");
+                // Wenn schon Tickets im Warenkorb liegen, geht es zum Cart, sonst ins
+                // Hauptmenü!
+                if (app.getCartItems() != null && !app.getCartItems().isEmpty()) {
+                    app.navigateTo(ScreenManager.Screen.CART);
+                } else {
+                    app.navigateTo(ScreenManager.Screen.MAIN_MENU);
+                }
             } else {
                 app.showAlert(Alert.AlertType.ERROR, "Fehler", "Diese E-Mail-Adresse ist bereits registriert.");
             }
