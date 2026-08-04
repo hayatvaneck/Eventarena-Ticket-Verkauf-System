@@ -113,6 +113,12 @@ public class EmployeeEventScreen extends BaseScreen {
                 String combinedDateTime = dateField.getText().trim() + " " + timeField.getText().trim();
                 LocalDateTime dateTime = LocalDateTime.parse(combinedDateTime, formatter);
 
+                if (dateTime.isBefore(LocalDateTime.now())) {
+                    app.showAlert(Alert.AlertType.WARNING, "Ungültiges Datum",
+                            "Das Event darf nicht in der Vergangenheit liegen.");
+                    return; // Bricht das Speichern ab
+                }
+
                 if (eventTitle.isEmpty() || eType == null || mType == null) {
                     app.showAlert(Alert.AlertType.WARNING, "Fehler", "Bitte alle Pflichtfelder ausfüllen.");
                     return;
