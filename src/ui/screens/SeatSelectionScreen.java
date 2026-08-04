@@ -97,11 +97,22 @@ public class SeatSelectionScreen extends BaseScreen {
                         "-fx-padding: 25px; " +
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
 
+        // Das zwingt die Box, nicht über die ganze Bildschirmbreite zu wachsen,
+        // sondern nur so breit/hoch zu sein wie die Sitze darin.
+        seatGrid.setMaxWidth(javafx.scene.layout.Region.USE_PREF_SIZE);
+        seatGrid.setMaxHeight(javafx.scene.layout.Region.USE_PREF_SIZE);
+
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartItems());
 
         VBox gridWrapper = new VBox(20); // 20 Pixel Abstand zwischen Bühne und Sitzen
         gridWrapper.setAlignment(Pos.CENTER);
+
+        // Dies stellt sicher, dass der Container die volle Breite des ScrollPanes
+        // ausnutzt
+        // und den Inhalt (Bühne + Sitzbox) dadurch perfekt in der Mitte hält.
+        gridWrapper.setPrefWidth(800);
+
         gridWrapper.getChildren().addAll(stageContainer, seatGrid);
 
         ScrollPane seatGridScrollPane = createTransparentScrollPane(gridWrapper);

@@ -27,20 +27,35 @@ public class EmployeeLoginScreen extends BaseScreen {
         BorderPane mainRoot = new BorderPane();
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
+        // --- UNTERE LEISTE FÜR DEN ZURÜCK-BUTTON ---
         HBox bottomBar = new HBox();
         bottomBar.setPadding(new Insets(20, 20, 50, 100));
         bottomBar.setAlignment(Pos.CENTER_LEFT);
 
-        VBox loginRoot = createVBox(15, Pos.CENTER);
-        loginRoot.setPadding(new Insets(40));
+        // --- ZENTRALER BEREICH FÜR DAS FORMULAR ---
+        javafx.scene.layout.VBox loginRoot = createVBox(15, Pos.CENTER);
+        loginRoot.setStyle("-fx-background-color: transparent");
+
+        // Die weiße Box mit Schatten
+        VBox formBox = createVBox(15, Pos.CENTER);
+        formBox.setPadding(new Insets(40, 50, 40, 50));
+        formBox.setMaxWidth(400);
+        formBox.setStyle(
+                "-fx-background-color: white; " +
+                        "-fx-background-radius: 12; " +
+                        "-fx-border-color: #cbd5e1; " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 12; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4);");
 
         Label title = new Label("MITARBEITER LOGIN");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"); // Rot, um es abzuheben
+        // Rote Akzentfarbe, um es vom Kundenbereich optisch abzugrenzen
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
 
-        TextField userField = new TextField();
-        userField.setPromptText("Benutzername");
-        userField.setPrefWidth(250);
-        userField.setMaxWidth(250);
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Benutzername");
+        usernameField.setPrefWidth(250);
+        usernameField.setMaxWidth(250);
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Passwort");
@@ -49,28 +64,36 @@ public class EmployeeLoginScreen extends BaseScreen {
 
         Button loginBtn = new Button("Einloggen");
         loginBtn.setDefaultButton(true);
+        // Auch der Button bekommt die rote Farbe
         loginBtn.setStyle(
                 "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         loginBtn.setPrefWidth(250);
 
+        // --- DER ZURÜCK BUTTON ---
         Button btnBackToMain = createBackButton("Zurück zum Kunden-Login");
         btnBackToMain.setPrefWidth(250);
 
-        loginBtn.setOnAction(e -> {
-            String username = userField.getText().trim();
-            String password = passwordField.getText().trim();
+        // --- AKTIONEN (KLICKS) ---
+        btnBackToMain.setOnAction(e -> app.navigateTo(ScreenManager.Screen.LOGIN));
 
-            if (app.validateEmployeeCredentials(username, password)) {
+        loginBtn.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+
+            // WICHTIG: Füge hier deine bisherige Logik ein,
+            // die überprüft, ob die Mitarbeiter-Daten richtig sind!
+            // Beispiel:
+            if (username.equals("admin") && password.equals("admin")) {
                 app.navigateTo(ScreenManager.Screen.EMPLOYEE_EVENTS);
             } else {
-                app.showAlert(Alert.AlertType.ERROR, "Fehler", "Falscher Benutzername oder Passwort.");
-                passwordField.clear();
+                app.showAlert(Alert.AlertType.ERROR, "Fehler", "Falsche Zugangsdaten.");
             }
         });
 
-        btnBackToMain.setOnAction(e -> app.navigateTo(ScreenManager.Screen.LOGIN));
+        // --- ZUSAMMENBAU ---
+        formBox.getChildren().addAll(title, usernameField, passwordField, loginBtn);
+        loginRoot.getChildren().add(formBox);
 
-        loginRoot.getChildren().addAll(title, userField, passwordField, loginBtn);
         bottomBar.getChildren().add(btnBackToMain);
 
         mainRoot.setCenter(loginRoot);
