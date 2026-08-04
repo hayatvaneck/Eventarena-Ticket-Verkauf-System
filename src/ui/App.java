@@ -407,7 +407,7 @@ public class App extends Application {
         return null;
     }
 
-    private void ensureLoggedIn(Runnable onLoggedInAction) {
+    public void ensureLoggedIn(Runnable onLoggedInAction) {
         if (this.loggedInUser != null) {
             onLoggedInAction.run();
         } else {

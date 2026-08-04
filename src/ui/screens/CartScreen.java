@@ -186,7 +186,15 @@ public class CartScreen extends BaseScreen {
             btnFinalBook.setDisable(true);
         }
 
-        btnFinalBook.setOnAction(e -> {
+       btnFinalBook.setOnAction(e -> {
+            // --- NEU: ZUERST DEN LOGIN-STATUS PRÜFEN ---
+            if (app.getLoggedInUser() == null) {
+                // Wenn nicht eingeloggt: Login aufrufen und danach zurück in den Warenkorb leiten!
+                app.ensureLoggedIn(() -> app.navigateTo(ScreenManager.Screen.CART));
+                return; // Kauf-Aktion hier zwingend abbrechen, damit nicht im Hintergrund gebucht wird
+            }
+
+            // --- WENN EINGELOGGT: GANZ NORMAL BUCHEN ---
             List<String> chosenTypes = new ArrayList<>();
             for (ComboBox<String> cb : typeComboBoxes) {
                 chosenTypes.add(cb.getValue());

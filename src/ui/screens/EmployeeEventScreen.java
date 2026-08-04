@@ -55,13 +55,13 @@ public class EmployeeEventScreen extends BaseScreen {
         titleField.setPromptText("Event Titel");
 
         TextArea descArea = new TextArea();
-        descArea.setPromptText("Beschreibung (max. 350 Zeichen)");
+        descArea.setPromptText("Beschreibung (max. 600 Zeichen)");
         descArea.setPrefRowCount(3);
         descArea.setWrapText(true);
         descArea.setTextFormatter(
-                new TextFormatter<String>(change -> change.getControlNewText().length() <= 350 ? change : null));
+                new TextFormatter<String>(change -> change.getControlNewText().length() <= 600 ? change : null));
 
-        Label descHint = new Label("Maximal 160 Zeichen erlaubt.");
+        Label descHint = new Label("Maximal 600 Zeichen erlaubt.");
         descHint.setStyle("-fx-font-size: 10px; -fx-text-fill: #7f8c8d;");
 
         ComboBox<EventType> typeBox = new ComboBox<>();
@@ -180,8 +180,8 @@ public class EmployeeEventScreen extends BaseScreen {
                 formTitle.setText("Event bearbeiten (ID: " + ev.getId() + ")");
                 titleField.setText(ev.getTitle());
                 String desc = ev.getDescription();
-                if (desc.length() > 160) {
-                    desc = desc.substring(0, 160); // Schneidet den Text radikal nach 160 Zeichen ab
+                if (desc.length() > 600) {
+                    desc = desc.substring(0, 600); // Schneidet den Text radikal nach 160 Zeichen ab
                 }
                 descArea.setText(desc);
                 typeBox.setValue(ev.getEventType());
