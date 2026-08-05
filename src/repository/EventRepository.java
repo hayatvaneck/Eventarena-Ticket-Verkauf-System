@@ -56,6 +56,7 @@ public class EventRepository {
         saveAllToCsv();
     }
 
+
     /**
      * Liest Events aus der vorhandenen CSV-Datei und rekonstruiert ihre Saalpläne.
      *
@@ -71,6 +72,7 @@ public class EventRepository {
 
             if (eventLines.size() <= 1) {
                 return false;
+                
             }
 
             for (int i = 1; i < eventLines.size(); i++) {

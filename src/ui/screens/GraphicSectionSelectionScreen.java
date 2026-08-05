@@ -20,7 +20,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import ui.App;
 import ui.ScreenManager;
-import ui.screens.BaseScreen;
 
 /**
  * Die Klasse GraphicSectionSelectionScreen zeigt den grafischen Saalplan und
