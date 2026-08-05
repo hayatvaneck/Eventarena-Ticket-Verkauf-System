@@ -6,11 +6,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse TicketRepository verwaltet die Persistenz von Tickets in der CSV-Datei.
+
+ */
+
 public class TicketRepository {
 
     private static TicketRepository instance;
     private final List<Ticket> tickets;
-    private static final String CSV_FILE_PATH = "tickets.csv";
+    private static final String CSV_FILE_PATH = "data/tickets.csv";
     private static final String CSV_SEPARATOR = ";";
 
     private TicketRepository() {
@@ -55,7 +60,7 @@ public class TicketRepository {
                     String.valueOf(ticket.getCustomer().getId()),
                     customer.getFirstName(),
                     customer.getLastName(),
-                    customer.getCustomerType(),
+                    customer.getCustomerType().name(),
                     String.valueOf(ticket.getFinalPrice()),
                     ticket.getSeatInfo(),
                     ticket.getUserEmail()
@@ -105,27 +110,25 @@ public class TicketRepository {
                 Long customerId = Long.parseLong(data[3]);
                 String customerFirstName = data[4];
                 String customerLastName = data[5];
-                String customerType = data[6];
+                String customerTypeRaw = data[6];
                 double finalPrice = Double.parseDouble(data[7]);
                 String seatInfo = data[8];
                 String userEmail = data[9];
 
                 Event event = eventRepo.findById(eventId);
                 if (event == null) {
-                    System.err.println("Event mit ID " + eventId + " für Ticket " + ticketId + "existiert nicht mehr. Ticket übersprungen.");
+                    System.err.println("Event mit ID " + eventId + " für Ticket " + ticketId + " existiert nicht mehr. Ticket übersprungen.");
                     continue;
                 }
 
                 Section section = event.findSectionByName(sectionName);
-                if (section instanceof StandingSection) {
-                    ((StandingSection) section).incrementSoldTickets();
-                }
                 
                 if (section == null) {
                     System.err.println("Bereich " + sectionName + " für Ticket " + ticketId + " existiert nicht mehr. Ticket übersprungen.");
                     continue;
                 }
 
+                CustomerType customerType = parseCustomerType(customerTypeRaw);
                 Customer customer = new Customer(customerId, customerFirstName, customerLastName, customerType);
 
                 Ticket ticket = new Ticket(ticketId, event, section, customer, finalPrice, seatInfo, userEmail);
@@ -156,7 +159,7 @@ public class TicketRepository {
              OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
              BufferedWriter writer = new BufferedWriter(osw)) {
             
-            writer.write("ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice,seatInfo;userEmail");
+            writer.write("ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice;seatInfo;userEmail");
             writer.newLine();
 
             for (Ticket ticket : this.tickets) {
@@ -168,7 +171,7 @@ public class TicketRepository {
                         String.valueOf(ticket.getCustomer().getId()),
                         customer.getFirstName(),
                         customer.getLastName(),
-                        customer.getCustomerType(),
+                        customer.getCustomerType().name(),
                         String.valueOf(ticket.getFinalPrice()),
                         ticket.getSeatInfo(),
                         ticket.getUserEmail()
@@ -180,4 +183,31 @@ public class TicketRepository {
             System.err.println("Fehler beim Aktualisieren der ticets.csv: " + e.getMessage());
         }
     }
+
+    private CustomerType parseCustomerType(String rawType) {
+        if (rawType == null) {
+            return CustomerType.STANDARD;
+        }
+
+        String normalized = rawType.trim().toLowerCase();
+        switch (normalized) {
+            case "student":
+            case "stud":
+            case "studentin":
+                return CustomerType.STUDENT;
+            case "rentner":
+            case "senior":
+                return CustomerType.SENIOR;
+            case "vip":
+                return CustomerType.VIP;
+            case "kind":
+                return CustomerType.KIND;
+            case "standard":
+            default:
+                return CustomerType.STANDARD;
+        }
+    }
 }
+
+
+

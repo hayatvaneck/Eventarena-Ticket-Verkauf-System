@@ -6,5 +6,5 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar"
     ],
-    "java.launch.config.vmArgs": "--module-path \"${workspaceFolder}\\lib\\javafx-sdk\\lib\" --add-modules javafx.controls,javafx.fxml"
+    "java.launch.config.vmArgs": "--module-path \"${workspaceFolder}/lib/javafx-sdk/lib\" --add-modules javafx.controls,javafx.fxml"
 }

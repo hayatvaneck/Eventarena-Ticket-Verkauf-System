@@ -1,6 +1,11 @@
 package domain;
 import exceptions.SeatAlreadyBookedException;
 
+/**
+ * Die Klasse SeatedSection verwaltet einen Bereich mit festen Sitzreihen und konkreten Sitzplätzen.
+
+ */
+
 public class SeatedSection extends Section {
     private final Seat[][] seats;
 
@@ -84,3 +89,6 @@ public class SeatedSection extends Section {
     }
     
 }
+
+
+

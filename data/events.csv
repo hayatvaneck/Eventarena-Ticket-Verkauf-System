@@ -1,0 +1,38 @@
+event_id,title,description,event_type,date_time,base_price,map_type
+1,"Don Toliver Octane Tour Leg 2","Erleben Sie Don Toliver live mit seinem unverwechselbaren Mix aus Hip-Hop, Trap und R&B.
+Freuen Sie sich auf eine energiegeladene Show mit seinen größten Hits, beeindruckenden Lichteffekten und einer mitreißenden Atmosphäre.
+Ein unvergesslicher Abend für alle Fans moderner Rap-Musik.
+",KONZERT,2026-11-02T19:00,100.0,STAGE_STANDING
+2,"Klassik Gala","Erleben Sie einen festlichen Abend mit einem abwechslungsreichen Programm aus den bekanntesten Werken der klassischen Musik.
+Freuen Sie sich auf herausragende Solistinnen und Solisten, ein renommiertes Orchester sowie eine stilvolle Atmosphäre,
+die Musikliebhaberinnen und Musikliebhaber gleichermaßen begeistern wird.
+",GALA,2026-12-15T20:00,150.0,STAGE_SEATED
+3,"Alba Berlin vs. FC Bayern München","Im Rahmen der regulären Saison der Basketball-Bundesliga treffen ALBA Berlin und der FC Bayern Basketball aufeinander.
+Beide Mannschaften zählen seit Jahren zu den erfolgreichsten Teams der Liga und versprechen ein intensives Duell auf hohem sportlichem Niveau.
+Das Spiel findet in einer modernen Arena mit nummerierten Sitzplätzen und guter Sicht auf das Spielfeld statt.
+",SPORTS,2026-08-11T18:00,80.0,ARENA
+4,"Dance Masters","Erleben Sie die besten Tänzerinnen und Tänzer in einem spannenden Wettbewerb, bei dem verschiedene Tanzstile von klassischem Ballett bis hin zu modernem Streetdance präsentiert werden.
+Die Teilnehmerinnen und Teilnehmer zeigen ihr Können in beeindruckenden Choreografien und treten gegeneinander an, um den Titel des Dance Masters zu gewinnen.
+",TANZ,2026-07-30T18:30,35.0,ARENA
+5,"Battle of the Rhymes","Mach dich bereit für einen Abend voller Punchlines, Flow und harter Konter.
+Erlebe, wie die MCs Runde für Runde um den Sieg battlen und mit kreativen Bars und spontanen Freestyles das Publikum überzeugen.
+Ob du wegen der Technik, der Energie oder der Atmosphäre kommst – hier feierst du Battle-Rap so, wie er sein soll: laut, direkt und mit einer Crowd, die jede starke Line spürbar macht.
+",KONZERT,2026-10-04T19:30,25.0,STAGE_STANDING
+6,"Hamlet","Erleben Sie das zeitlose Drama 'Hamlet' von William Shakespeare in einer fesselnden Inszenierung.
+Tauchen Sie ein in die Welt von Intrigen, Rache und Tragik, während talentierte Schauspielerinnen und Schauspieler die komplexen Charaktere zum Leben erwecken.
+",THEATER,2026-09-12T18:00,45.0,STAGE_SEATED
+7,"Starlight Dreams","""Starlight Dreams"" erzählt die Geschichte einer jungen Musikerin, die ihren Traum von einer Karriere auf der großen Bühne verfolgt.
+Begleitet wird die Handlung von eigens komponierten Songs, aufwendigen Choreografien und einem abwechslungsreichen Bühnenbild.
+Das Musical richtet sich an Besucherinnen und Besucher jeden Alters und entführt das Publikum in eine faszinierende Welt von Liebe, Leidenschaft und Geheimnissen.
+",MUSICAL,2026-08-22T20:00,50.0,STAGE_SEATED
+8,"Comedy Show: The Laugh Factory","Genießen Sie einen Abend voller Humor mit bekannten Comedians und aufstrebenden Nachwuchstalenten.
+Freuen Sie sich auf schlagfertige Stand-up-Comedy, spontane Improvisationen und unterhaltsame Geschichten aus dem Alltag.
+Ob feinsinniger Wortwitz oder pointierte Gesellschaftssatire – hier bleibt garantiert kein Auge trocken.
+",COMEDY,2026-11-19T19:00,45.0,STAGE_SEATED
+9,"TechTalks","Erleben Sie die beliebte TechTalks-Podcastreihe live auf der Bühne.
+Hören Sie spannende Diskussionen über aktuelle Technologietrends, Innovationen und die Zukunft der digitalen Welt.
+Die Hosts und Gäste teilen ihre Erfahrungen, beantworten Fragen aus dem Publikum und bieten exklusive Einblicke hinter die Kulissen der Tech-Branche.
+",OTHER,2026-12-06T18:30,30.0,STAGE_SEATED
+10,"Electronic Pulse Festival","Erleben Sie ein mitreißendes Elektronikfestival mit pulsierenden Beats, starken Lichtshows und einer energiegeladenen Atmosphäre.
+Verschiedene DJs und Live-Acts sorgen für einen unvergesslichen Abend voller Bewegung und Stimmung auf der gesamten Fläche.
+",KONZERT,2026-09-27T21:00,110.0,STAGE_STANDING

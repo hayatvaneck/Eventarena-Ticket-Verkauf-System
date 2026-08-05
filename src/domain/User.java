@@ -3,22 +3,31 @@ package domain;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse User repräsentiert ein Benutzerkonto mit Login-Daten und gekauften Tickets.
+
+ */
+
+
 public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private String password; // hier nicht verschlüsselt
-    private List<Ticket> purchasedTickets = new ArrayList<>(); // Liste der gekauften Tickets
+    private String passwordHash;
+    private List<Ticket> purchasedTickets = new ArrayList<>();
 
-    public User (String firstName, String lastName, String email, String password) {
+    public User(String firstName, String lastName, String email, String passwordHash) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("E-Mail darf nicht leer sein.");
         }
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.password = password;
-        this.purchasedTickets = new ArrayList<>();
+        this.passwordHash = passwordHash;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     // Getter Methoden
@@ -27,9 +36,7 @@ public class User {
     }
     public String getLastName() {
         return lastName;
-    }
-    public String getPassword() {
-        return password;
+    
     }
     public String getEmail() {
         return email;
@@ -52,3 +59,6 @@ public class User {
     
     
 }
+
+
+

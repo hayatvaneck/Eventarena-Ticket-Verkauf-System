@@ -1,0 +1,11 @@
+ticketId;eventId;sectionName;customerId;customerFirstName;customerLastName;customerType;finalPrice;seatInfo;userEmail
+T-1014;2;Block 3;1;test;test;STUDENT;144.0;Reihe 7, Platz 5;test@test.de
+T-1015;2;Block 3;2;test;test;SENIOR;125.99999999999999;Reihe 7, Platz 6;test@test.de
+T-1016;7;VIP;1;test;test;STANDARD;125.0;Reihe 3, Platz 3;test@test.de
+T-1017;7;VIP;2;test;test;STANDARD;125.0;Reihe 3, Platz 4;test@test.de
+T-1018;3;Block 2;3;hayat;hayat;STANDARD;96.0;Reihe 2, Platz 7;hayat@hayat.de
+T-1019;3;Block 2;4;hayat;hayat;STANDARD;96.0;Reihe 2, Platz 8;hayat@hayat.de
+T-1007;4;Block 2;1;hayat;hayat;STANDARD;42.0;Reihe 1, Platz 10;hayat@hayat.de
+T-1008;4;Block 2;2;hayat;hayat;STANDARD;42.0;Reihe 1, Platz 11;hayat@hayat.de
+T-1009;2;Block 2;1;test;test;STANDARD;180.0;Reihe 5, Platz 9;test@tset.de
+T-1010;2;Block 1;2;test;test;STANDARD;180.0;Reihe 3, Platz 12;test@tset.de

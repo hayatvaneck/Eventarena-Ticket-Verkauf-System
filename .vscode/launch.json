@@ -3,10 +3,18 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TicketSystemConsole",
+            "request": "launch",
+            "mainClass": "ui.TicketSystemConsole",
+            "projectName": "Eventhalle_ebf7aba3"
+        },
+        {
+            "type": "java",
             "name": "Launch Arena App",
             "request": "launch",
             "mainClass": "ui.App",
-            "vmArgs": "--module-path \"${workspaceFolder}\\lib\\javafx-sdk\\lib\" --add-modules javafx.controls,javafx.fxml"
+            "cwd": "${workspaceFolder}",
+            "vmArgs": "--module-path \"${workspaceFolder}/lib/javafx-sdk/lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }

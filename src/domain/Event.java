@@ -1,29 +1,52 @@
 package domain;
+
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Die Klasse Event repräsentiert eine Veranstaltung mit Basispreis, Termin und Bereichen.
+ */
 public class Event {
+
     private Long id;
     private String title;
+    private String description;
+    private EventType eventType;
     private LocalDateTime dateTime;
     private double basePrice;
     private List<Section> sections;
-    private EventType eventType;
+    private MapType mapType;
 
-    public Event(Long id, String title, LocalDateTime dateTime, double basePrice, EventType eventType) {
+    public Event(Long id, String title, String description, EventType eventType,
+                 LocalDateTime dateTime, double basePrice, MapType mapType) {
         this.id = id;
         this.title = title;
+        this.description = description != null ? description : "";
+        this.eventType = eventType;
         this.dateTime = dateTime;
         this.basePrice = basePrice;
         this.sections = new ArrayList<>();
-        this.eventType = eventType;
+        this.mapType = mapType;
+    }
+
+    public Event(Long id, String title, EventType eventType,
+                 LocalDateTime dateTime, double basePrice, MapType mapType) {
+        this(id, title, "", eventType, dateTime, basePrice, mapType);
     }
 
     public void addSection(Section section) {
+        if (section == null) {
+            throw new IllegalArgumentException("Section darf nicht null sein.");
+        }
         this.sections.add(section);
     }
 
     public Section findSectionByName(String name) {
+        if (name == null) {
+            return null;
+        }
+
         for (Section section : sections) {
             if (section.getName().equalsIgnoreCase(name)) {
                 return section;
@@ -36,14 +59,8 @@ public class Event {
         int totalSeats = 0;
         for (Section section : sections) {
             totalSeats += section.getAvailableSeats();
-            // Jede section muss eine Methode getAvailableSeats() haben, 
-            // die die Anzahl der verfügbaren Plätze in dieser Section zurückgibt.
         }
         return totalSeats;
-    }
-
-    public enum EventType {
-        CONCERT, BASKETBALL, GALA
     }
 
     public boolean isSoldOut() {
@@ -53,19 +70,50 @@ public class Event {
     public Long getId() {
         return id;
     }
+
     public String getTitle() {
         return title;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public EventType getEventType() {
+        return eventType;
+    }
+
     public LocalDateTime getDateTime() {
         return dateTime;
     }
+
     public double getBasePrice() {
         return basePrice;
     }
+
     public List<Section> getSections() {
-        return sections;
+        return new ArrayList<>(sections);
     }
-    public EventType getEventType() {
-        return eventType;
+
+    public MapType getMapType() {
+        return mapType;
+    }
+
+    public enum MapType {
+        STAGE_SEATED,
+        ARENA,
+        STAGE_STANDING
+    }
+
+    public enum EventType {
+        KONZERT,
+        THEATER,
+        SPORTS,
+        COMEDY,
+        GALA,
+        TANZ,
+        FIRMENEVENT,
+        MUSICAL,
+        OTHER
     }
 }
