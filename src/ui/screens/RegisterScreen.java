@@ -174,7 +174,7 @@ public class RegisterScreen extends BaseScreen {
             if (success) {
                 app.setLoggedInUser(newUser);
                 app.showAlert(Alert.AlertType.INFORMATION, "Erfolg",
-                        "Registrierung erfolgreich! Bitte logge dich nun ein.");
+                        "Registrierung erfolgreich! Sie sind nun eingeloggt.");
                 // Wenn schon Tickets im Warenkorb liegen, geht es zum Cart, sonst ins
                 // Hauptmenü!
                 if (app.getCartItems() != null && !app.getCartItems().isEmpty()) {
