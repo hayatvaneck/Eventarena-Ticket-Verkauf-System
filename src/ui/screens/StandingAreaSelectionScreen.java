@@ -35,9 +35,13 @@ public class StandingAreaSelectionScreen extends BaseScreen {
 
         // Wenn der Warenkorb schon voll ist, direkt zurück in den Warenkorb leiten
         if (maxAllowed <= 0) {
-            app.showAlert(Alert.AlertType.WARNING, "Warenkorb voll",
-                    "Sie haben bereits die maximale Anzahl von 10 Tickets im Warenkorb.");
-            app.navigateTo(ScreenManager.Screen.CART);
+            // FIX: Popup und Navigation in Platform.runLater auslagern, um Abstürze zu
+            // verhindern!
+            javafx.application.Platform.runLater(() -> {
+                app.showAlert(Alert.AlertType.WARNING, "Warenkorb voll",
+                        "Sie haben bereits die maximale Anzahl von 10 Tickets im Warenkorb.");
+                app.navigateTo(ScreenManager.Screen.CART);
+            });
             return createDefaultScene(createRoot(10, Insets.EMPTY, Pos.CENTER));
         }
 

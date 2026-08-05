@@ -7,6 +7,7 @@ import domain.StandingSection;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -168,6 +169,13 @@ public class CartScreen extends BaseScreen {
         btnAddMore.setMinHeight(45);
         btnAddMore.setMaxHeight(45);
         btnAddMore.setOnAction(e -> {
+            // --- NEU: LIMIT-PRÜFUNG WIE VOM KOLLEGEN VORGESCHLAGEN ---
+            if (app.getCartItems().size() >= 10) {
+                app.showAlert(Alert.AlertType.WARNING, "Limit erreicht",
+                        "Sie haben bereits die maximale Anzahl von 10 Tickets im Warenkorb.");
+                return; // Bricht ab, der Nutzer bleibt direkt im Warenkorb!
+            }
+
             // Wenn noch gar kein Event ausgewählt wurde (z.B. direkt nach Registrierung),
             // schicken wir den Nutzer zurück ins Hauptmenü zur Event-Auswahl.
             if (app.getCurrentSelectedEvent() == null) {
