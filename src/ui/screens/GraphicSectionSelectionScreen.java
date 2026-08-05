@@ -30,16 +30,33 @@ import ui.screens.BaseScreen;
 
 public class GraphicSectionSelectionScreen extends BaseScreen {
 
+    /** Hintergrundstil des gesamten Screens. */
     private static final String ROOT_STYLE = "-fx-background-color: #f5f5f7;";
+
+    /** Stil der Karte, in der der jeweilige Hallenplan dargestellt wird. */
     private static final String CARD_STYLE = "-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-border-color: #cbd5e1; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 8, 0, 0, 2);";
+
+    /** Formatvorlage für anklickbare Bereichsschaltflächen im Hallenplan. */
     private static final String BLOCK_BUTTON_STYLE = "-fx-background-color: %s; -fx-border-color: %s; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 4, 0, 0, 1);";
 
+    /** Anwendungskontext für Eventzustand, Bereichssuche und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt die grafische Bereichsauswahl des gewählten Events.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public GraphicSectionSelectionScreen(App app) {
         this.app = app;
     }
 
+    /**
+     * Wählt anhand des Hallenplantyps das passende Layout und baut den
+     * vollständigen Auswahl-Screen auf.
+     *
+     * @return vollständige Szene der grafischen Bereichsauswahl
+     */
     @Override
     public Scene buildScene() {
         if (app.getCurrentSelectedEvent() == null) {
@@ -51,12 +68,9 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle(ROOT_STYLE);
 
-        // --- 1. OBERE BOX (Mitte) ---
+        // Zentraler Inhalt aus Eventtitel und typabhängigem Hallenplan.
         VBox topBox = createRoot(25, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
 
-        // HBox dummyHeader = createInvisibleHeader();
-
-        // Nutzt unsere dynamische Box aus der BaseScreen!
         VBox headerBox = createHeaderBox(app.getCurrentSelectedEvent().getTitle(), "Wählen Sie einen Block aus:");
 
         StackPane mapContainer;
@@ -78,7 +92,7 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
         topBox.getChildren().addAll(headerBox, mapContainer);
 
-        // --- 2. UNTERE BOX (Button + Dummy Footer) ---
+        // Fester Rückweg mit Layoutplatzhalter für eine symmetrische Ausrichtung.
         VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
 
         Button backButton = createBackButton("Zurück zu den Events");
@@ -87,18 +101,23 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         backButton.setMaxHeight(45);
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.MAIN_MENU));
 
-        // Lädt den unsichtbaren Footer aus der BaseScreen
         HBox dummyFooter = createInvisibleStandardFooter();
 
         bottomBox.getChildren().addAll(backButton, dummyFooter);
 
-        // --- 3. ZUSAMMENBAUEN ---
+        // Zusammensetzen des Inhalts- und Navigationsbereichs.
         root.setCenter(topBox);
         root.setBottom(bottomBox);
 
         return createDefaultScene(root);
     }
 
+    /**
+     * Erstellt den Hallenplan für Bühnenveranstaltungen mit Stehplätzen im
+     * Innenraum.
+     *
+     * @return grafisch aufgebauter Hallenplan
+     */
     private StackPane createStageStandingLayout() {
         StackPane mapContainer = new StackPane();
         VBox mapWrapper = new VBox(20);
@@ -106,25 +125,25 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         mapWrapper.setPadding(new Insets(24));
         mapWrapper.setStyle(CARD_STYLE);
 
-        // GRID OF SECTIONS
+        // Raster der auswählbaren Hallenbereiche.
         GridPane grid = new GridPane();
         grid.setHgap(12);
         grid.setVgap(12);
         grid.setAlignment(Pos.CENTER);
 
-        // TOP ROW: Block 2 & Block 1
+        // Obere Reihe: Block 2 und Block 1.
         Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
                 85 + 10);
         Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
                 85 + 10);
 
-        // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
+        // Mittlere Reihe: Block 6, VIP-Balkon, Innenraum und Bühne.
         Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180 + 20);
         Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180);
         Button standingBtn = createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb", "#1d4ed8",
                 "INNENRAUM (Stehplätze)", 482, 200);
 
-        // BÜHNE Block
+        // Die Bühne dient nur der Orientierung und ist nicht auswählbar.
         StackPane stageBox = new StackPane();
         Rectangle stageRect = new Rectangle(90, 180, Color.web("#0f172a"));
         stageRect.setArcWidth(14);
@@ -138,24 +157,24 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         stageLabel.setRotate(-90);
         stageBox.getChildren().addAll(stageRect, stageLabel);
 
-        // BOTTOM ROW: Block 3 & Block 4
+        // Untere Reihe: Block 3 und Block 4.
         Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
                 85 + 10);
         Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215, 85 + 10);
 
-        // GRID ASSEMBLY
+        // Positionierung der Bereiche im Hallenraster.
         grid.add(block2Btn, 2, 0);
         grid.add(block1Btn, 3, 0);
 
         grid.add(block6Btn, 0, 1);
         grid.add(vipBtn, 1, 1);
-        grid.add(standingBtn, 2, 1, 2, 1); // Spans cols 2 & 3
+        grid.add(standingBtn, 2, 1, 2, 1); // Der Innenraum belegt zwei Spalten.
         grid.add(stageBox, 4, 1);
 
         grid.add(block3Btn, 2, 2);
         grid.add(block4Btn, 3, 2);
 
-        // Legend
+        // Farblegende des Hallenplans.
         HBox legend = new HBox(28);
         legend.setAlignment(Pos.CENTER);
         legend.setPadding(new Insets(10, 0, 0, 0));
@@ -170,6 +189,19 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         return mapContainer;
     }
 
+    /**
+     * Erstellt einen auswählbaren Hallenblock inklusive Typ, Preis, Tooltip und
+     * passender Folgeschritt-Navigation.
+     *
+     * @param name fachlicher Name des Bereichs
+     * @param bgHex Hintergrundfarbe
+     * @param borderHex Rahmen- und Preisfarbe
+     * @param textHex Textfarbe
+     * @param subtitle erklärende Bereichsart
+     * @param width Breite der Schaltfläche
+     * @param height Höhe der Schaltfläche
+     * @return konfigurierte Bereichsschaltfläche
+     */
     private Button createBlockButton(String name, String bgHex, String borderHex, String textHex, String subtitle,
             double width, double height) {
         Button btn = new Button();
@@ -226,6 +258,14 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         return btn;
     }
 
+    /**
+     * Erstellt einen farblich codierten Eintrag für die Hallenplanlegende.
+     *
+     * @param labelText Beschreibung der Flächenart
+     * @param bgHex Flächenfarbe des Symbols
+     * @param borderHex Rahmenfarbe des Symbols
+     * @return formatierter Legendeneintrag
+     */
     private HBox createLegendItem(String labelText, String bgHex, String borderHex) {
         HBox box = new HBox(8);
         box.setAlignment(Pos.CENTER);
@@ -244,6 +284,11 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         return box;
     }
 
+    /**
+     * Erstellt einen umlaufenden Arena-Hallenplan mit zentralem Spielfeld.
+     *
+     * @return grafisch aufgebauter Arena-Hallenplan
+     */
     private StackPane createArenaLayout() {
         StackPane mapContainer = new StackPane();
 
@@ -252,38 +297,37 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         mapWrapper.setPadding(new Insets(24));
         mapWrapper.setStyle(CARD_STYLE);
 
-        // GRID OF SECTIONS
+        // Raster der auswählbaren Hallenbereiche.
         GridPane grid = new GridPane();
         grid.setHgap(12);
         grid.setVgap(12);
         grid.setAlignment(Pos.CENTER);
 
-        // Wir berechnen die Breite des Spielfelds passend zu Block 1 & 2 (235 + 235 +
-        // 12 Lücke = 482)
+        // Zwei Blockbreiten zuzüglich Rasterabstand ergeben die Spielfeldbreite.
         double blockWidth = 235;
         double blockHeight = 95;
         double centerHeight = 200;
 
-        // TOP ROW: Block 2 & Block 1
+        // Obere Reihe: Block 2 und Block 1.
         Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
                 blockHeight);
         Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
                 blockHeight);
 
-        // MIDDLE ROW: Block 6, VIP Balkon, SPIELFELD, Block 5
+        // Mittlere Reihe: Block 6, VIP-Balkon, Spielfeld und Block 5.
         Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100,
                 centerHeight);
         Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180);
 
-        // SPIELFELD (Visuelles Element, nicht klickbar)
+        // Das Spielfeld dient als nicht auswählbare Orientierungshilfe.
         StackPane courtBox = new StackPane();
-        Rectangle courtRect = new Rectangle(482, centerHeight, Color.web("#fef3c7")); // Helle Holz-Farbe (Parkett)
+        Rectangle courtRect = new Rectangle(482, centerHeight, Color.web("#fef3c7"));
         courtRect.setArcWidth(14);
         courtRect.setArcHeight(14);
-        courtRect.setStroke(Color.web("#d97706")); // Dunkelorange Begrenzungslinie
+        courtRect.setStroke(Color.web("#d97706"));
         courtRect.setStrokeWidth(3);
 
-        // Arena-Flair: Mittellinie und Mittelkreis
+        // Mittellinie und Mittelkreis verdeutlichen das Arena-Layout.
         Rectangle centerLine = new Rectangle(3, centerHeight, Color.web("#d97706"));
         javafx.scene.shape.Circle centerCircle = new javafx.scene.shape.Circle(25, Color.TRANSPARENT);
         centerCircle.setStroke(Color.web("#d97706"));
@@ -291,39 +335,37 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
 
         Label courtLabel = new Label("S P I E L F E L D");
         courtLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
-        courtLabel.setTextFill(Color.web("#b45309")); // Dunkelbraun/Orange für Text
-        courtLabel.setTranslateY(-centerHeight / 2 + 60); // Positioniert den Text oben im Spielfeld
-        courtLabel.setTranslateX(-4); // Positioniert den Text leicht links
+        courtLabel.setTextFill(Color.web("#b45309"));
+        courtLabel.setTranslateY(-centerHeight / 2 + 60);
+        courtLabel.setTranslateX(-4);
 
-        // Alles übereinanderlegen
+        // Alle Spielfeldbestandteile werden innerhalb des StackPane überlagert.
         courtBox.getChildren().addAll(courtRect, centerLine, centerCircle, courtLabel);
 
-        // RECHTE SEITE: Block 5 (statt der Bühne)
+        // Block 5 schließt das Arena-Layout auf der rechten Seite ab.
         Button block5Btn = createBlockButton("Block 5", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100,
                 centerHeight);
 
-        // BOTTOM ROW: Block 3 & Block 4
+        // Untere Reihe: Block 3 und Block 4.
         Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
                 blockHeight);
         Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", blockWidth,
                 blockHeight);
 
-        // GRID ASSEMBLY
-        // Reihe 0: Block 2 und 1
+        // Positionierung der Bereiche im Arena-Raster.
         grid.add(block2Btn, 2, 0);
         grid.add(block1Btn, 3, 0);
 
-        // Reihe 1: Block 6, VIP, Spielfeld (nimmt 2 Spalten ein), Block 5
+        // Das Spielfeld belegt in der mittleren Reihe zwei Spalten.
         grid.add(block6Btn, 0, 1);
         grid.add(vipBtn, 1, 1);
-        grid.add(courtBox, 2, 1, 2, 1); // Spans cols 2 & 3
+        grid.add(courtBox, 2, 1, 2, 1);
         grid.add(block5Btn, 4, 1);
 
-        // Reihe 2: Block 3 und 4
         grid.add(block3Btn, 2, 2);
         grid.add(block4Btn, 3, 2);
 
-        // Legende (Angepasst für Arena)
+        // Farblegende des Arena-Hallenplans.
         HBox legend = new HBox(28);
         legend.setAlignment(Pos.CENTER);
         legend.setPadding(new Insets(10, 0, 0, 0));
@@ -338,6 +380,11 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         return mapContainer;
     }
 
+    /**
+     * Erstellt den Hallenplan für Bühnenveranstaltungen mit bestuhltem Innenraum.
+     *
+     * @return grafisch aufgebauter Hallenplan
+     */
     private StackPane createStageSeatedLayout() {
         StackPane mapContainer = new StackPane();
 
@@ -345,27 +392,24 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         mapWrapper.setAlignment(Pos.CENTER);
         mapWrapper.setPadding(new Insets(24));
         mapWrapper.setStyle(CARD_STYLE);
-        // GRID OF SECTIONS
+        // Raster der auswählbaren Hallenbereiche.
         GridPane grid = new GridPane();
         grid.setHgap(12);
         grid.setVgap(12);
         grid.setAlignment(Pos.CENTER);
 
-        // TOP ROW: Block 2 & Block 1
+        // Obere Reihe: Block 2 und Block 1.
         Button block2Btn = createBlockButton("Block 2", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
                 85 + 10);
         Button block1Btn = createBlockButton("Block 1", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 215 + 20,
                 85 + 10);
 
-        // MIDDLE ROW: Block 6, VIP Balkon, INNENRAUM, BÜHNE
+        // Mittlere Reihe: Block 6, VIP-Balkon, Innenraum und Bühne.
         Button block6Btn = createBlockButton("Block 6", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 100, 180 + 20);
         Button vipBtn = createBlockButton("VIP", "#fde047", "#d97706", "#78350f", "VIP BALKON", 70, 180);
         Button blockInnerBtn = createBlockButton("Innenraum (Sitzplatz)", "#e0e7ff", "#2563eb", "#1d4ed8",
                 "INNENRAUM (Sitzplätze)", 482, 200);
-        // Button text= createBlockButton("Innenraum (Stehplatz)", "#e0e7ff", "#2563eb",
-        // "#1d4ed8", "INNENRAUM (Sitzplätze)", 442, 180);
-
-        // BÜHNE Block
+        // Die Bühne dient nur der Orientierung und ist nicht auswählbar.
         StackPane stageBox = new StackPane();
         Rectangle stageRect = new Rectangle(90, 180, Color.web("#0f172a"));
         stageRect.setArcWidth(14);
@@ -379,23 +423,23 @@ public class GraphicSectionSelectionScreen extends BaseScreen {
         stageLabel.setRotate(-90);
         stageBox.getChildren().addAll(stageRect, stageLabel);
 
-        // BOTTOM ROW: Block 3 & Block 4
+        // Untere Reihe: Block 3 und Block 4.
         Button block3Btn = createBlockButton("Block 3", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 235, 85 + 10);
         Button block4Btn = createBlockButton("Block 4", "#bae6fd", "#0284c7", "#0369a1", "Sitzplätze", 235, 85 + 10);
 
-        // GRID ASSEMBLYS
+        // Positionierung der Bereiche im Hallenraster.
         grid.add(block2Btn, 2, 0);
         grid.add(block1Btn, 3, 0);
 
         grid.add(block6Btn, 0, 1);
         grid.add(vipBtn, 1, 1);
-        grid.add(blockInnerBtn, 2, 1, 2, 1); // Spans cols 2 & 3
+        grid.add(blockInnerBtn, 2, 1, 2, 1); // Der Innenraum belegt zwei Spalten.
         grid.add(stageBox, 4, 1);
 
         grid.add(block3Btn, 2, 2);
         grid.add(block4Btn, 3, 2);
 
-        // Legend
+        // Farblegende des Hallenplans.
         HBox legend = new HBox(28);
         legend.setAlignment(Pos.CENTER);
         legend.setPadding(new Insets(10, 0, 0, 0));

@@ -15,28 +15,44 @@ import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
 
+/**
+ * Stellt die getrennte Anmeldung für Mitarbeitende bereit und leitet bei
+ * erfolgreicher Prüfung zur Eventverwaltung weiter.
+ */
 public class EmployeeLoginScreen extends BaseScreen {
+
+    /** Anwendungskontext für Zugangsprüfung, Hinweise und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt die Mitarbeiteranmeldung.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public EmployeeLoginScreen(App app) {
         this.app = app;
     }
 
+    /**
+     * Baut das Mitarbeiter-Anmeldeformular mit Rückweg zur Kundenanmeldung auf.
+     *
+     * @return vollständige Mitarbeiter-Anmeldeszene
+     */
     @Override
     public Scene buildScene() {
         BorderPane mainRoot = new BorderPane();
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
-        // --- UNTERE LEISTE FÜR DEN ZURÜCK-BUTTON ---
+        // Separater Fußbereich für den Rückweg zur Kundenanmeldung.
         HBox bottomBar = new HBox();
         bottomBar.setPadding(new Insets(20, 20, 50, 100));
         bottomBar.setAlignment(Pos.CENTER_LEFT);
 
-        // --- ZENTRALER BEREICH FÜR DAS FORMULAR ---
+        // Zentral ausgerichteter Formularbereich.
         javafx.scene.layout.VBox loginRoot = createVBox(15, Pos.CENTER);
         loginRoot.setStyle("-fx-background-color: transparent");
 
-        // Die weiße Box mit Schatten
+        // Eine abgesetzte Karte grenzt die Mitarbeiteranmeldung optisch ab.
         VBox formBox = createVBox(15, Pos.CENTER);
         formBox.setPadding(new Insets(40, 50, 40, 50));
         formBox.setMaxWidth(400);
@@ -49,7 +65,7 @@ public class EmployeeLoginScreen extends BaseScreen {
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4);");
 
         Label title = new Label("MITARBEITER LOGIN");
-        // Rote Akzentfarbe, um es vom Kundenbereich optisch abzugrenzen
+        // Die rote Akzentfarbe kennzeichnet den internen Mitarbeiterbereich.
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
 
         TextField usernameField = new TextField();
@@ -64,25 +80,22 @@ public class EmployeeLoginScreen extends BaseScreen {
 
         Button loginBtn = new Button("Einloggen");
         loginBtn.setDefaultButton(true);
-        // Auch der Button bekommt die rote Farbe
+        // Die primäre Aktion übernimmt die Akzentfarbe des Mitarbeiterbereichs.
         loginBtn.setStyle(
                 "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         loginBtn.setPrefWidth(250);
 
-        // --- DER ZURÜCK BUTTON ---
+        // Navigation zurück zur Kundenanmeldung.
         Button btnBackToMain = createBackButton("Zurück zum Kunden-Login");
         btnBackToMain.setPrefWidth(250);
 
-        // --- AKTIONEN (KLICKS) ---
+        // Prüfung der aktuell als Demo-Zugang hinterlegten Anmeldedaten.
         btnBackToMain.setOnAction(e -> app.navigateTo(ScreenManager.Screen.LOGIN));
 
         loginBtn.setOnAction(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
 
-            // WICHTIG: Füge hier deine bisherige Logik ein,
-            // die überprüft, ob die Mitarbeiter-Daten richtig sind!
-            // Beispiel:
             if (username.equals("admin") && password.equals("admin")) {
                 app.navigateTo(ScreenManager.Screen.EMPLOYEE_EVENTS);
             } else {
@@ -90,7 +103,7 @@ public class EmployeeLoginScreen extends BaseScreen {
             }
         });
 
-        // --- ZUSAMMENBAU ---
+        // Formular, Inhaltsbereich und Fußleiste zusammensetzen.
         formBox.getChildren().addAll(title, usernameField, passwordField, loginBtn);
         loginRoot.getChildren().add(formBox);
 

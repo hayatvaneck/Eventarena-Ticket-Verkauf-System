@@ -37,18 +37,40 @@ import java.io.IOException;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.paint.Color;
 
+/**
+ * Zeigt die Bestellungen des angemeldeten Kunden gruppiert nach Quittungen an
+ * und ermöglicht Ticketstornierungen sowie PNG-Exporte.
+ */
 public class MyTicketsScreen extends BaseScreen {
 
+    /** Anwendungskontext für Kundendaten, Dialoge und Navigation. */
     private final App app;
+
+    /** Service zur fachlich korrekten Stornierung von Tickets. */
     private final BookingService bookingService;
+
+    /** Repository zum dauerhaften Speichern veränderter Benutzertickets. */
     private final UserRepository userRepo;
 
+    /**
+     * Erstellt die persönliche Ticket- und Bestellübersicht.
+     *
+     * @param app zentraler Anwendungskontext
+     * @param bookingService Service für Ticketstornierungen
+     * @param userRepo Repository für Benutzerdaten
+     */
     public MyTicketsScreen(App app, BookingService bookingService, UserRepository userRepo) {
         this.app = app;
         this.bookingService = bookingService;
         this.userRepo = userRepo;
     }
 
+    /**
+     * Baut die nach Quittung gruppierte Bestellübersicht mit Export- und
+     * Stornierungsaktionen auf.
+     *
+     * @return vollständige Szene der eigenen Tickets
+     */
     @Override
     public Scene buildScene() {
         VBox headerBox = createHeaderBox("MEINE BESTELLUNGEN & TICKETS",
@@ -61,10 +83,10 @@ public class MyTicketsScreen extends BaseScreen {
         User loggedInUser = app.getLoggedInUser();
         List<Ticket> myActiveTickets = loggedInUser != null ? loggedInUser.getPurchasedTickets() : new ArrayList<>();
 
-        // 1. Alle Quittungen des Nutzers laden (Das sind unsere "Gruppen")
+        // Quittungen bilden die fachlichen Gruppen der Bestellübersicht.
         List<Receipt> myReceipts = app.getReceiptsForLoggedInUser();
 
-        // Sortieren: Neueste Bestellungen ganz nach oben
+        // Neueste Bestellungen werden zuerst angezeigt.
         myReceipts.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
 
         if (myReceipts.isEmpty() && myActiveTickets.isEmpty()) {
@@ -73,10 +95,10 @@ public class MyTicketsScreen extends BaseScreen {
         } else {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm 'Uhr'");
 
-            // 2. Wir iterieren über jede Quittung und bauen einen Bestell-Kasten
+            // Für jede Quittung wird eine eigenständige Bestellkarte aufgebaut.
             for (Receipt receipt : myReceipts) {
 
-                // Herausfinden, welche aktiven Tickets zu dieser Quittung gehören
+                // Nur noch aktive Tickets der jeweiligen Quittung werden zugeordnet.
                 List<Ticket> ticketsForThisOrder = new ArrayList<>();
                 for (Ticket t : myActiveTickets) {
                     if (receipt.getTicketIds().contains(t.getTicketId())) {
@@ -84,13 +106,12 @@ public class MyTicketsScreen extends BaseScreen {
                     }
                 }
 
-                // Wenn alle Tickets dieser Bestellung storniert wurden, ignorieren wir sie
-                // (oder man könnte sie als storniert anzeigen)
+                // Vollständig stornierte Bestellungen enthalten keine anzeigbaren Tickets.
                 if (ticketsForThisOrder.isEmpty()) {
                     continue;
                 }
 
-                // --- BESTELL-KASTEN (UI) ---
+                // Visuelle Gruppierung einer Bestellung.
                 VBox orderCard = new VBox(15);
                 orderCard.setStyle(
                         "-fx-background-color: #ffffff; " +
@@ -99,9 +120,9 @@ public class MyTicketsScreen extends BaseScreen {
                                 "-fx-border-radius: 8px; " +
                                 "-fx-background-radius: 8px; " +
                                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);");
-                orderCard.setPadding(new Insets(0, 0, 15, 0)); // Unten etwas Platz
+                orderCard.setPadding(new Insets(0, 0, 15, 0));
 
-                // --- HEADER DER BESTELLUNG ---
+                // Kopfbereich mit Quittungsnummer, Datum und Gesamtbetrag.
                 HBox orderHeader = new HBox(15);
                 orderHeader.setAlignment(Pos.CENTER_LEFT);
                 orderHeader.setPadding(new Insets(15));
@@ -119,7 +140,7 @@ public class MyTicketsScreen extends BaseScreen {
                 Region headerSpacer = new Region();
                 HBox.setHgrow(headerSpacer, Priority.ALWAYS);
 
-                // --- NEUE EXPORT BUTTONS FÜR DIE GRUPPE ---
+                // Exportaktionen gelten jeweils für die gesamte Bestellung.
                 Button btnDownloadReceipt = createConfirmButton("Quittung als PNG");
                 btnDownloadReceipt.setStyle(
                         "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-cursor: hand;");
@@ -133,7 +154,7 @@ public class MyTicketsScreen extends BaseScreen {
                 orderHeader.getChildren().addAll(headerInfo, headerSpacer, btnDownloadReceipt, btnDownloadTickets);
                 orderCard.getChildren().add(orderHeader);
 
-                // --- EINZELNE TICKETS IN DIE KARTE EINFÜGEN ---
+                // Einzelkarten der aktiven Tickets.
                 VBox ticketsContainer = new VBox(10);
                 ticketsContainer.setPadding(new Insets(0, 15, 0, 15));
                 for (Ticket ticket : ticketsForThisOrder) {
@@ -154,7 +175,7 @@ public class MyTicketsScreen extends BaseScreen {
         HBox actionButtons = createHBox(20, Pos.CENTER);
         actionButtons.getChildren().addAll(backButton);
 
-        // --- ZUSAMMENBAU ---
+        // Scrollbarer Inhalt und feste Navigation werden getrennt angeordnet.
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle("-fx-background-color: #f5f5f7;");
 
@@ -171,7 +192,14 @@ public class MyTicketsScreen extends BaseScreen {
         return createDefaultScene(root);
     }
 
-    // Erstellt die visuelle Einzelkarte eines Tickets innerhalb der Bestellung
+    /**
+     * Erstellt die visuelle Einzelkarte eines Tickets innerhalb einer Bestellung.
+     *
+     * @param ticket darzustellendes Ticket
+     * @param dtf Formatierung des Eventzeitpunkts
+     * @param loggedInUser Besitzer des Tickets
+     * @return formatierte Ticketkarte
+     */
     private HBox createTicketCard(Ticket ticket, DateTimeFormatter dtf, User loggedInUser) {
         HBox ticketCard = createHBox(20, Pos.CENTER_LEFT);
         ticketCard.setPadding(new Insets(15));
@@ -231,7 +259,12 @@ public class MyTicketsScreen extends BaseScreen {
         return ticketCard;
     }
 
-    // 3. GENERIERUNG DES QUITTUNGS-PNGS (Inkl. Steuern)
+    /**
+     * Erstellt aus den Quittungsdaten eine druckbare Ansicht inklusive
+     * Steueraufteilung und öffnet den PNG-Speicherdialog.
+     *
+     * @param receipt zu exportierende Quittung
+     */
     private void saveReceiptAsImage(Receipt receipt) {
         VBox exportLayout = new VBox(10);
         exportLayout.setPadding(new Insets(40));
@@ -248,7 +281,7 @@ public class MyTicketsScreen extends BaseScreen {
                 createExportLabel("Rechnungsnummer: " + receipt.getReceiptId(), true),
                 createExportLabel("Kunde: " + receipt.getCustomerName(), false),
                 createExportLabel("Datum: " + receipt.getCreatedAt().format(dtf), false),
-                new Label(" ") // Spacer
+                new Label(" ") // Optischer Abstand vor der Betragsaufstellung.
         );
 
         double brutto = receipt.getTotalAmount();
@@ -267,7 +300,12 @@ public class MyTicketsScreen extends BaseScreen {
         takeSnapshotAndSave(exportLayout, "Quittung_" + receipt.getReceiptId() + ".png", "Quittung speichern unter...");
     }
 
-    // 4. GENERIERUNG DES TICKET-GRUPPEN-PNGS
+    /**
+     * Erstellt eine gemeinsame PNG-Ansicht aller aktiven Tickets einer Bestellung.
+     *
+     * @param receipt Quittung zur Benennung und Zuordnung des Exports
+     * @param tickets zu exportierende Tickets der Bestellung
+     */
     private void saveTicketGroupAsImage(Receipt receipt, List<Ticket> tickets) {
         VBox exportLayout = new VBox(20);
         exportLayout.setPadding(new Insets(30));
@@ -308,14 +346,27 @@ public class MyTicketsScreen extends BaseScreen {
         takeSnapshotAndSave(exportLayout, "Tickets_" + receipt.getReceiptId() + ".png", "Tickets speichern unter...");
     }
 
-    // Helfer für Labels im Export
+    /**
+     * Erstellt eine einheitlich formatierte Textzeile für PNG-Exporte.
+     *
+     * @param text anzuzeigender Text
+     * @param bold {@code true} für hervorgehobene Schrift
+     * @return formatierte Exportbeschriftung
+     */
     private Label createExportLabel(String text, boolean bold) {
         Label lbl = new Label(text);
         lbl.setStyle("-fx-font-size: 16px; -fx-text-fill: #34495e;" + (bold ? " -fx-font-weight: bold;" : ""));
         return lbl;
     }
 
-    // Helfer für den physischen Datei-Export
+    /**
+     * Erstellt einen Schnappschuss des vorbereiteten Layouts und speichert ihn nach
+     * Benutzerauswahl als PNG-Datei.
+     *
+     * @param layout zu rendernder JavaFX-Container
+     * @param defaultName vorgeschlagener Dateiname
+     * @param windowTitle Titel des Speicherdialogs
+     */
     private void takeSnapshotAndSave(VBox layout, String defaultName, String windowTitle) {
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(Color.WHITE);
@@ -337,7 +388,14 @@ public class MyTicketsScreen extends BaseScreen {
         }
     }
 
-    // --- BESTEHENDE LOGIK ZUM STORNIEREN UND PARSEN (Unverändert) ---
+    /**
+     * Fragt die Stornierung eines Tickets ab, führt sie über den Service aus und
+     * speichert den geänderten Benutzerzustand.
+     *
+     * @param ticket zu stornierendes Ticket
+     * @param eventTitle Titel des zugehörigen Events
+     * @param loggedInUser Besitzer des Tickets
+     */
     private void cancelTicket(Ticket ticket, String eventTitle, User loggedInUser) {
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         if (app.getPrimaryStage() != null) {
@@ -366,6 +424,13 @@ public class MyTicketsScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Extrahiert Reihen- und Sitznummer aus der textuellen Platzbeschreibung eines
+     * Tickets.
+     *
+     * @param seatInfoStr Platzbeschreibung des Tickets
+     * @return Array mit Reihe an Index 0 und Sitz an Index 1; jeweils 0 bei Fehlern
+     */
     private int[] parseRowAndSeat(String seatInfoStr) {
         int[] result = new int[] { 0, 0 };
         if (seatInfoStr == null)

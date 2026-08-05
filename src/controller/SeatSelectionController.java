@@ -20,17 +20,34 @@ import java.util.function.Consumer;
  */
 public class SeatSelectionController {
 
+    /** JavaFX-Raster, in das Reihen und Sitzschaltflächen eingefügt werden. */
     private final GridPane seatGrid;
+    /** Callback zur Aktualisierung des Auswahltexts im übergeordneten Screen. */
     private final Consumer<String> statusUpdater;
 
+    /** Domain-Sitze, die im aktuellen Screen neu ausgewählt wurden. */
     private final List<Seat> selectedSeats = new ArrayList<>();
+    /** Zugehörige Buttons zur Synchronisierung des visuellen Auswahlzustands. */
     private final List<Button> selectedButtons = new ArrayList<>();
 
+    /**
+     * Erstellt den Controller für ein vorhandenes Sitzraster.
+     *
+     * @param seatGrid zu steuerndes JavaFX-Raster
+     * @param statusUpdater Empfänger für den lesbaren Auswahlstatus
+     */
     public SeatSelectionController(GridPane seatGrid, Consumer<String> statusUpdater) {
         this.seatGrid = seatGrid;
         this.statusUpdater = statusUpdater;
     }
 
+    /**
+     * Baut den Sitzplan neu auf und berücksichtigt verkaufte sowie bereits im
+     * Warenkorb befindliche Plätze.
+     *
+     * @param section darzustellender Bereich; nur Sitzbereiche werden verarbeitet
+     * @param cartSeats aktuelle Warenkorbeinträge zur Vermeidung doppelter Auswahl
+     */
     public void populateSeatPlan(Section section, List<CartItem> cartSeats) {
         seatGrid.getChildren().clear();
         selectedSeats.clear();
@@ -57,8 +74,7 @@ public class SeatSelectionController {
         rowHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         seatGrid.add(rowHeader, 0, 0);
 
-        // --- TRICK: Unsichtbarer Platzhalter ganz rechts (Spalte = seatsPerRow + 1)
-        // ---
+        // Ein unsichtbarer Platzhalter rechts gleicht die Reihenbeschriftung links aus.
         Label dummyHeader = new Label("Reihe");
         dummyHeader.setVisible(false);
         seatGrid.add(dummyHeader, seatsPerRow + 1, 0);
@@ -69,7 +85,7 @@ public class SeatSelectionController {
             rowLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
             seatGrid.add(rowLabel, 0, r + 1);
 
-            // --- TRICK: Unsichtbare Zahl ganz rechts, um die linke Seite auszugleichen ---
+            // Die unsichtbare Nummer hält den Sitzplan trotz linker Reihennummer mittig.
             Label dummyRowLabel = new Label(String.valueOf(rowNum));
             dummyRowLabel.setVisible(false);
             seatGrid.add(dummyRowLabel, seatsPerRow + 1, r + 1);
@@ -138,11 +154,11 @@ public class SeatSelectionController {
                             selectedSeats.remove(existingSeat);
                             selectedButtons.remove(seatButton);
                         } else {
-                            // --- NEU: LIMIT-PRÜFUNG DIREKT BEIM KLICKEN ---
+                            // Das Ticketlimit wird bereits bei der Auswahl durchgesetzt.
                             int currentCartSize = (cartSeats != null) ? cartSeats.size() : 0;
 
                             if (currentCartSize + selectedSeats.size() >= 10) {
-                                // Zeigt ein kurzes Pop-Up und bricht ab, ohne den Platz zu markieren
+                                // Der Sitz bleibt bei erreichtem Limit unverändert.
                                 javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
                                         javafx.scene.control.Alert.AlertType.WARNING);
                                 alert.setTitle("Limit erreicht");
@@ -152,7 +168,7 @@ public class SeatSelectionController {
                                 return;
                             }
 
-                            // Wenn Limit noch nicht erreicht: Platz normal auswählen
+                            // Freie Kapazität: Sitz markieren und in die Auswahl aufnehmen.
                             seatButton
                                     .setStyle("-fx-background-color: #d4af37; -fx-text-fill: black; -fx-cursor: hand;");
                             selectedSeats.add(finalSeat);
@@ -167,6 +183,13 @@ public class SeatSelectionController {
         }
     }
 
+    /**
+     * Sucht einen aktuell ausgewählten Sitz anhand seiner Position.
+     *
+     * @param row Reihennummer
+     * @param seat Platznummer
+     * @return ausgewählter Sitz oder {@code null}
+     */
     private Seat findSelectedSeat(int row, int seat) {
         for (Seat s : selectedSeats) {
             if (s.getRowNumber() == row && s.getSeatNumber() == seat) {
@@ -176,6 +199,7 @@ public class SeatSelectionController {
         return null;
     }
 
+    /** Übermittelt eine lesbare Zusammenfassung der aktuellen Auswahl an die UI. */
     private void updateStatusLabel() {
         if (selectedSeats.isEmpty()) {
             statusUpdater.accept("Keine Plätze ausgewählt");
@@ -188,6 +212,7 @@ public class SeatSelectionController {
         }
     }
 
+    /** @return defensive Kopie aller aktuell ausgewählten Sitze */
     public List<Seat> getSelectedSeats() {
         return new ArrayList<>(selectedSeats);
     }

@@ -21,15 +21,24 @@ import java.util.List;
  */
 
 public class EventRepository {
+    /** Einzige Repository-Instanz innerhalb der Anwendung. */
     private static EventRepository instance;
+    /** Im Arbeitsspeicher verwaltete Veranstaltungen. */
     private final List<Event> events;
+    /** Pfad zur CSV-Datei der Veranstaltungen. */
     private static final Path EVENTS_CSV = Paths.get("data", "events.csv");
 
+    /** Initialisiert den Speicher und lädt den definierten Startbestand. */
     private EventRepository() {
         this.events = new ArrayList<>();
         loadEventsFromCsvOrSeed();
     }
 
+    /**
+     * Liefert die zentrale Repository-Instanz.
+     *
+     * @return Singleton-Instanz des Event-Repositories
+     */
     public static synchronized EventRepository getInstance() {
         if(instance == null) {
             instance = new EventRepository();
@@ -37,6 +46,9 @@ public class EventRepository {
         return instance;
     }
 
+    /**
+     * Setzt den Startbestand auf die Demo-Events und synchronisiert die CSV-Datei.
+     */
     private void loadEventsFromCsvOrSeed() {
         this.events.clear();
         // Demo-Daten sind die einzige Quelle beim Start: CSV wird damit synchronisiert.
@@ -44,6 +56,11 @@ public class EventRepository {
         saveAllToCsv();
     }
 
+    /**
+     * Liest Events aus der vorhandenen CSV-Datei und rekonstruiert ihre Saalpläne.
+     *
+     * @return {@code true}, wenn mindestens ein Event erfolgreich geladen wurde
+     */
     private boolean loadFromCsv() {
         if (!Files.exists(EVENTS_CSV)) {
             return false;
@@ -104,6 +121,7 @@ public class EventRepository {
         }
     }
 
+    /** Schreibt alle Events sortiert und UTF-8-kodiert in die CSV-Datei. */
     private void saveAllToCsv() {
         List<String> eventLines = new ArrayList<>();
         eventLines.add("event_id,title,description,event_type,date_time,base_price,map_type");
@@ -130,6 +148,12 @@ public class EventRepository {
         }
     }
 
+    /**
+     * Zerlegt eine CSV-Zeile und berücksichtigt in Anführungszeichen stehende Kommata.
+     *
+     * @param line einzulesende CSV-Zeile
+     * @return extrahierte Spalten
+     */
     private String[] parseCsvLine(String line) {
         List<String> result = new ArrayList<>();
         StringBuilder current = new StringBuilder();
@@ -156,6 +180,12 @@ public class EventRepository {
         return result.toArray(new String[0]);
     }
 
+    /**
+     * Maskiert einen Text für die sichere Ausgabe in einer CSV-Spalte.
+     *
+     * @param value zu maskierender Wert
+     * @return von Anführungszeichen umschlossener CSV-Wert
+     */
     private String escapeCsv(String value) {
         if (value == null) {
             return "";
@@ -164,12 +194,17 @@ public class EventRepository {
         return "\"" + escaped + "\"";
     }
 
-    // Liste aller geladenen Events
+    /** @return defensive, nach internem Stand gefüllte Kopie aller Events */
     public List<Event> getAllEvents() {
         return new ArrayList<>(this.events);
     }
 
-    // Event nach ID suchen
+    /**
+     * Sucht eine Veranstaltung über ihre ID.
+     *
+     * @param id gesuchte Event-ID
+     * @return gefundenes Event oder {@code null}
+     */
     public Event findById(Long id) {
         for (Event event : events) {
             if (event.getId().equals(id)) {
@@ -179,7 +214,11 @@ public class EventRepository {
         return null;
     }
 
-    // Event waehrend der Laufzeit hinzufuegen
+    /**
+     * Speichert ein neues Event mit frisch erzeugtem Standardlayout.
+     *
+     * @param event zu speicherndes Event; {@code null} wird ignoriert
+     */
     public void save(Event event) {
         if (event != null) {
             Event normalizedEvent = new Event(
@@ -198,6 +237,11 @@ public class EventRepository {
         }
     }
 
+    /**
+     * Ermittelt die nächste freie positive Event-ID.
+     *
+     * @return höchste vorhandene ID plus eins
+     */
     public Long nextEventId() {
         long maxId = 0L;
         for (Event event : this.events) {
@@ -208,29 +252,40 @@ public class EventRepository {
         return maxId + 1;
     }
    
+    /**
+     * Entfernt ein Event aus Speicher und CSV-Datei.
+     *
+     * @param eventId ID des zu löschenden Events
+     * @return {@code true}, wenn ein Event entfernt wurde
+     */
     public synchronized boolean deleteEvent(Long eventId) {
         if (eventId == null) return false;
         
-        // Entfernt das Event aus der Liste, wenn die ID übereinstimmt
+        // Die ID identifiziert den zu entfernenden Eintrag eindeutig.
         boolean removed = this.events.removeIf(e -> e.getId().equals(eventId));
         
-        // Wenn es erfolgreich entfernt wurde, überschreiben wir die CSV
+        // Nur eine tatsächliche Änderung der Liste wird persistiert.
         if (removed) {
             saveAllToCsv();
         }
         return removed;
     }
-    // --- NEU: Bestehendes Event bearbeiten und aktualisieren ---
+    /**
+     * Ersetzt ein vorhandenes Event und baut dessen Layout vollständig neu auf.
+     *
+     * @param updatedEvent Event mit bestehender ID und aktualisierten Daten
+     * @return {@code true}, wenn das Event gefunden und ersetzt wurde
+     */
     public synchronized boolean updateEvent(Event updatedEvent) {
         if (updatedEvent == null || updatedEvent.getId() == null) {
             return false;
         }
 
-        // Wir suchen das Event in der Liste
+        // Das bestehende Event wird anhand seiner ID gesucht.
         for (int i = 0; i < this.events.size(); i++) {
             if (this.events.get(i).getId().equals(updatedEvent.getId())) {
                 
-                // Wir erstellen das Event neu, damit der Saalplan (Sections) frisch angewendet wird
+                // Ein Neuaufbau stellt ein zum geänderten Kartentyp passendes Hallenlayout sicher.
                 Event normalizedEvent = new Event(
                         updatedEvent.getId(),
                         updatedEvent.getTitle(),
@@ -242,9 +297,9 @@ public class EventRepository {
                 );
                 domain.layout.HallLayoutFactory.applyLayoutForMapType(normalizedEvent);
                 
-                // Das alte Event in der Liste durch das neue ersetzen
+                // Der rekonstruierte Datensatz ersetzt das bisherige Event.
                 this.events.set(i, normalizedEvent);
-                saveAllToCsv(); // In die CSV schreiben
+                saveAllToCsv();
                 return true;
             }
         }

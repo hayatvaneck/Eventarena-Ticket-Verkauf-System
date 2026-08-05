@@ -1,11 +1,16 @@
 package ui;
 
-// Diese Klasse sammelt alle wiederkehrenden Designs der App
+/**
+ * Stellt zentral definierte JavaFX-Styles bereit, die von mehreren Screens
+ * verwendet werden. Die gemeinsame Ablage verhindert abweichende Farben und
+ * Formatierungen bei wiederkehrenden Oberflächenelementen.
+ */
 public class UIStyles {
-    
+
+    /** Primärfarbe der Anwendung für hervorgehobene Flächen und Bedienelemente. */
     public static final String COLOR_PRIMARY = "#2c3e50";
 
-    // Das ist dein langer Style für das Bühne/Spielfeld-Kästchen
+    /** Einheitlicher Stil für die Bühnen- beziehungsweise Spielfeldanzeige. */
     public static final String STAGE_LABEL_STYLE = 
             "-fx-background-color: " + COLOR_PRIMARY + "; " +
             "-fx-text-fill: white; " +

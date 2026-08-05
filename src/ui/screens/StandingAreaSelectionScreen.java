@@ -22,18 +22,30 @@ import ui.ScreenManager;
 
 public class StandingAreaSelectionScreen extends BaseScreen {
 
+    /** Anwendungskontext für Bereichsauswahl, Warenkorb und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt die Mengenauswahl für Stehplatztickets.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public StandingAreaSelectionScreen(App app) {
         this.app = app;
     }
 
+    /**
+     * Baut die auf die verbleibende Warenkorbkapazität begrenzte Mengenauswahl
+     * auf und erzeugt daraus einzelne Warenkorbpositionen.
+     *
+     * @return vollständige Stehplatzauswahlszene
+     */
     @Override
     public Scene buildScene() {
         int currentCartSize = app.getCartItems().size();
         int maxAllowed = 10 - currentCartSize;
 
-        // Wenn der Warenkorb schon voll ist, direkt zurück in den Warenkorb leiten
+        // Ein voller Warenkorb verhindert eine weitere Mengenauswahl.
         if (maxAllowed <= 0) {
             app.showAlert(Alert.AlertType.WARNING, "Warenkorb voll",
                     "Sie haben bereits die maximale Anzahl von 10 Tickets im Warenkorb.");
@@ -49,7 +61,7 @@ public class StandingAreaSelectionScreen extends BaseScreen {
         Label title = createTitle("Stehplatz-Auswahl: " + selectedSection.getName());
         Label instruction = createSubtitle("Bitte wählen Sie die Anzahl (max. " + maxAllowed + " weitere möglich):");
 
-        // Spinner wird direkt auf das errechnete Limit gesetzt!
+        // Der Spinner begrenzt die Eingabe auf die verbleibende Warenkorbkapazität.
         Spinner<Integer> ticketSpinner = new Spinner<>(1, maxAllowed, 1);
         ticketSpinner.setStyle("-fx-font-size: 16px;");
         ticketSpinner.setPrefWidth(100);

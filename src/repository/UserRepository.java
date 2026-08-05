@@ -12,9 +12,12 @@ import java.util.List;
  * Die Klasse UserRepository verwaltet Benutzerdaten, Registrierung und Validierung von Logins.
  */
 public class UserRepository {
+    /** Im Arbeitsspeicher verwaltete Benutzerkonten. */
     private final List<User> users;
+    /** Relativer Pfad zur Benutzerdatei. */
     private static final String FILE_PATH = "data/users.csv";
 
+    /** Lädt Benutzerkonten und legt bei Bedarf das vorgesehene Demokonto an. */
     public UserRepository() {
         this.users = new ArrayList<>();
 
@@ -28,6 +31,12 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Registriert ein Konto, sofern seine E-Mail noch nicht vergeben ist.
+     *
+     * @param newUser bereits validiertes und mit Passwort-Hash versehenes Konto
+     * @return {@code true}, wenn das Konto gespeichert wurde
+     */
     public boolean registerUser(User newUser) {
         if (findUserByEmail(newUser.getEmail()) != null) {
             return false;
@@ -37,6 +46,13 @@ public class UserRepository {
         return true;
     }
 
+    /**
+     * Authentifiziert einen Benutzer und stellt anschließend seine Ticketliste wieder her.
+     *
+     * @param email eingegebene E-Mail-Adresse
+     * @param password eingegebenes Klartextpasswort
+     * @return angemeldeter Benutzer oder {@code null} bei ungültigen Daten
+     */
     public User validateUser(String email, String password) {
         User user = findUserByEmail(email);
 
@@ -57,6 +73,12 @@ public class UserRepository {
         return user;
     }
 
+    /**
+     * Sucht ein Konto ohne Beachtung der Groß- und Kleinschreibung.
+     *
+     * @param email gesuchte E-Mail-Adresse
+     * @return gefundenes Konto oder {@code null}
+     */
     public User findUserByEmail(String email) {
         if (email == null) {
             return null;
@@ -70,10 +92,12 @@ public class UserRepository {
         return null;
     }
 
+    /** @return defensive Kopie aller registrierten Benutzer */
     public List<User> getAllUsers() {
         return new ArrayList<>(users);
     }
 
+    /** Schreibt alle Kontostammdaten und Passwort-Hashes in die CSV-Datei. */
     public void saveUsersToFile() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
             for (User user : users) {
@@ -87,6 +111,7 @@ public class UserRepository {
         }
     }
 
+    /** Liest alle gültigen und noch nicht vorhandenen Konten aus der CSV-Datei. */
     public void loadUsersFromFile() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
