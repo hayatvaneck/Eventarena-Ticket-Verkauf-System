@@ -9,24 +9,47 @@ import java.util.Map;
 
 public class ScreenManager {
 
+    /**
+     * Eindeutige Bezeichner aller Ansichten, zwischen denen die Anwendung
+     * navigieren kann.
+     */
     public enum Screen {
+        /** Hauptmenü mit der Eventauswahl. */
         MAIN_MENU,
+        /** Zusammenfassung einer abgeschlossenen Buchung. */
         BOOKING_CONFIRMATION,
+        /** Übersicht der Tickets des angemeldeten Benutzers. */
         MY_TICKETS,
+        /** Anmeldemaske für Kunden. */
         LOGIN,
+        /** Registrierungsmaske für neue Kunden. */
         REGISTER,
+        /** Grafische Auswahl eines Hallenbereichs. */
         GRAPHIC_SECTION_SELECTION,
+        /** Sitzplatzauswahl innerhalb eines Sitzbereichs. */
         SEAT_SELECTION,
+        /** Ticketauswahl für einen Stehbereich. */
         STANDING_AREA_SELECTION,
+        /** Warenkorb mit den vorgemerkten Tickets. */
         CART,
+        /** Verwaltungsansicht für Events. */
         EMPLOYEE_EVENTS,
+        /** Anmeldemaske für Mitarbeitende. */
         EMPLOYEE_LOGIN
     }
 
-    //Map-Array, das jeden Screen mit einer zugehörigen Aktion verknüpft.
+    /** Ordnet jedem Screen die Aktion zum Erzeugen und Anzeigen seiner Szene zu. */
     private final Map<Screen, Runnable> routes = new EnumMap<>(Screen.class);
 
-    //Methode zum mappen. Jeder Screen erhält eine zugehörige Aktion, die ausgeführt wird, wenn zu diesem Screen navigiert wird.
+    /**
+     * Registriert die Aktion, die beim Aufruf eines Screens ausgeführt werden
+     * soll.
+     *
+     * @param screen eindeutiger Bezeichner des Screens
+     * @param action auszuführende Navigationsaktion
+     * @return diese Instanz für verkettete Registrierungsaufrufe
+     * @throws IllegalArgumentException wenn Screen oder Aktion fehlen
+     */
     public ScreenManager register(Screen screen, Runnable action) {
         if (screen == null) {
             throw new IllegalArgumentException("Screeneingabe fehlt");
@@ -39,7 +62,13 @@ public class ScreenManager {
         return this;
     }
 
-    //Navigiert zu einem registrierten Screen und führt die zugehörige Aktion aus.
+    /**
+     * Navigiert zum angegebenen Screen, indem dessen registrierte Aktion
+     * ausgeführt wird.
+     *
+     * @param screen Ziel der Navigation
+     * @throws IllegalStateException wenn für das Ziel keine Aktion registriert ist
+     */
     public void navigateTo(Screen screen) {
         Runnable action = routes.get(screen);
         if (action == null) {

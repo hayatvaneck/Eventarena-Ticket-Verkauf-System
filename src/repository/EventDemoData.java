@@ -14,9 +14,15 @@ import java.util.List;
  */
 public final class EventDemoData {
 
+    /** Verhindert die Instanziierung der reinen Demo-Datenklasse. */
     private EventDemoData() {
     }
 
+    /**
+     * Befüllt die übergebene Liste mit den vordefinierten Beispielveranstaltungen.
+     *
+     * @param target Zielliste für die Demo-Events
+     */
     public static void seedInto(List<Event> target) {
         if (target == null) {
             return;
@@ -150,6 +156,18 @@ public final class EventDemoData {
             MapType.STAGE_STANDING);
     }
 
+    /**
+     * Erzeugt ein Demo-Event, wendet das passende Hallenlayout an und fügt es ein.
+     *
+     * @param target Zielliste
+     * @param id Event-ID
+     * @param title Titel
+     * @param description Beschreibung
+     * @param eventType Eventkategorie
+     * @param dateTime Beginn
+     * @param basePrice Basispreis
+     * @param mapType Saalplantyp
+     */
     private static void add(List<Event> target, Long id, String title, String description, EventType eventType, LocalDateTime dateTime, double basePrice, MapType mapType) {
         Event event = new Event(id, title, description, eventType, dateTime, basePrice, mapType);
         HallLayoutFactory.applyLayoutForMapType(event);

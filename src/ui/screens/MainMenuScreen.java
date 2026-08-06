@@ -19,7 +19,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 import repository.EventRepository;
 import ui.App;
@@ -38,6 +37,7 @@ import java.util.Locale;
 
 public class MainMenuScreen extends BaseScreen {
 
+    /** Standarddarstellung einer noch nicht ausgewählten Eventkarte. */
     private static final String CARD_DEFAULT_STYLE = "-fx-background-color: white;" +
             "-fx-border-color: #bdc3c7;" +
             "-fx-border-width: 2px;" +
@@ -46,6 +46,7 @@ public class MainMenuScreen extends BaseScreen {
             "-fx-cursor: Hand;" +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 3);";
 
+    /** Darstellung einer Eventkarte, über der sich der Mauszeiger befindet. */
     private static final String CARD_HOVER_STYLE = "-fx-background-color: #fdfdfd;" +
             "-fx-border-color: #2c3e50;" +
             "-fx-border-width: 2px;" +
@@ -54,6 +55,7 @@ public class MainMenuScreen extends BaseScreen {
             "-fx-cursor: hand;" +
             "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.2), 8, 0, 0, 4);";
 
+    /** Hervorgehobene Darstellung der aktuell ausgewählten Eventkarte. */
     private static final String CARD_SELECTED_STYLE = "-fx-background-color: #ebf5fb;" +
             "-fx-border-color: #2c3e50;" +
             "-fx-border-width: 2px;" +
@@ -62,9 +64,18 @@ public class MainMenuScreen extends BaseScreen {
             "-fx-cursor: Hand;" +
             "-fx-effect: dropshadow(three-pass-box, rgba(41,128,185,0.3), 10, 0, 0, 5);";
 
+    /** Anwendungskontext für Anmeldung, Auswahlzustand und Navigation. */
     private final App app;
+
+    /** Datenzugriff auf alle im Hauptmenü anzuzeigenden Events. */
     private final EventRepository eventRepo;
 
+    /**
+     * Erstellt das Hauptmenü mit der verfügbaren Eventauswahl.
+     *
+     * @param app zentraler Anwendungskontext
+     * @param eventRepo Repository für die angebotenen Events
+     */
     public MainMenuScreen(
             App app,
             EventRepository eventRepo) {
@@ -72,27 +83,31 @@ public class MainMenuScreen extends BaseScreen {
         this.eventRepo = eventRepo;
     }
 
+    /**
+     * Baut Kopfzeile, Eventkarten, Navigation und Projektfußzeile auf.
+     *
+     * @return vollständige Hauptmenüszene
+     */
     @Override
     public Scene buildScene() {
-        // Das Hauptlayout, das Mitte und Unten strikt voneinander trennt!
+        // Das BorderPane trennt die scrollbare Eventauswahl von der festen Navigation.
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle("-fx-background-color: #f5f5f7;");
 
-        // --- 1. OBERE BOX (Mitte) ---
+        // Kopfzeile, Titel und Eventkarten bilden den zentralen Inhaltsbereich.
         VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
 
         HBox headerBar = createHeaderBar();
         Label title = createTitle("ARENA TICKETSYSTEM");
         Label subtitle = createSubtitle("Wählen Sie ein Event aus:");
 
-        VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
+        VBox headerBox = new VBox(5);
         headerBox.setAlignment(Pos.CENTER);
-        headerBox.setMaxWidth(400); // Breite des Kastens (kannst du beliebig anpassen)
+        headerBox.setMaxWidth(400);
         headerBox.setStyle(
                 "-fx-background-color: white; " +
-                        "-fx-padding: 15 30 15 30; " + // Innenabstand, damit der Text Luft hat
+                        "-fx-padding: 15 30 15 30; " +
                         "-fx-background-radius: 10; " +
-                        // "-fx-border-color: #81b9ed; " +
                         "-fx-border-width: 2; " +
                         "-fx-border-radius: 10; " +
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
@@ -121,10 +136,9 @@ public class MainMenuScreen extends BaseScreen {
         }
         scrollPane.setContent(cardContainer);
 
-        // Die obere Box ist fertig! (KEIN Spacer mehr nötig)
         topBox.getChildren().addAll(headerBar, headerBox, scrollPane);
 
-        // --- 2. UNTERE BOX (Button + Footer) ---
+        // Feste Aktionsleiste mit Navigation und Projektfußzeile.
         VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
 
         Button nextButton = createConfirmButton("Blöcke anzeigen");
@@ -139,18 +153,23 @@ public class MainMenuScreen extends BaseScreen {
             }
         });
 
-        // Lädt den Footer aus der BaseScreen
         HBox footerBar = createStandardFooter();
 
         bottomBox.getChildren().addAll(nextButton, footerBar);
 
-        // --- 3. ZUSAMMENBAUEN ---
+        // Zusammensetzen der unabhängig angeordneten Layoutbereiche.
         root.setCenter(topBox);
-        root.setBottom(bottomBox); // Nagelt die untere Box absolut fest an den Bildschirmrand!
+        root.setBottom(bottomBox);
 
         return createDefaultScene(root);
     }
 
+    /**
+     * Erstellt die Kopfzeile mit Uhrzeit und den zum Anmeldestatus passenden
+     * Benutzeraktionen.
+     *
+     * @return konfigurierte Kopfzeile
+     */
     private HBox createHeaderBar() {
         HBox headerBar = createHBox(15, Pos.CENTER_RIGHT);
         headerBar.setPadding(new Insets(10, 15, 10, 15));
@@ -217,9 +236,15 @@ public class MainMenuScreen extends BaseScreen {
         return headerBar;
     }
 
-    // Erstellt die Event-Karten für die Eventauswahl. Jede Karte zeigt den Titel,
-    // das Datum und die Beschreibung des Events an. Außerdem wird der Typ des
-    // Events angezeigt.
+    /**
+     * Erstellt eine auswählbare Eventkarte mit den wichtigsten Veranstaltungsdaten
+     * sowie Hover-, Einfachklick- und Doppelklickverhalten.
+     *
+     * @param event darzustellendes Event
+     * @param formatter Formatierung des Veranstaltungszeitpunkts
+     * @param eventCards alle Karten zur Rücksetzung des Auswahlstils
+     * @return interaktive Eventkarte
+     */
     private VBox createEventCard(Event event, DateTimeFormatter formatter, List<VBox> eventCards) {
         VBox card = createVBox(8, Pos.TOP_LEFT);
         card.setPadding(new Insets(10));

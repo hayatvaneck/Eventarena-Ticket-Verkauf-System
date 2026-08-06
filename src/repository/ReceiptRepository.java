@@ -23,19 +23,26 @@ import java.util.List;
 
 public class ReceiptRepository {
 
+    /** Einzige Repository-Instanz innerhalb der Anwendung. */
     private static ReceiptRepository instance;
+    /** Im Arbeitsspeicher verfügbare Quittungen. */
     private final List<Receipt> receipts;
+    /** Laufender Zähler für neue Quittungsnummern. */
     private long receiptCounter;
 
+    /** Relativer Pfad zur Quittungsdatei. */
     private static final String CSV_FILE_PATH = "data/receipts.csv";
+    /** Spaltentrennzeichen des Quittungsformats. */
     private static final String CSV_SEPARATOR = ";";
 
+    /** Lädt vorhandene Quittungen und initialisiert den Nummernzähler. */
     private ReceiptRepository() {
         this.receipts = new ArrayList<>();
         loadReceiptsFromCSV();
         this.receiptCounter = 1000L + receipts.size();
     }
 
+    /** @return zentrale Singleton-Instanz des Quittungs-Repositories */
     public static synchronized ReceiptRepository getInstance() {
         if (instance == null) {
             instance = new ReceiptRepository();
@@ -43,16 +50,32 @@ public class ReceiptRepository {
         return instance;
     }
 
+    /**
+     * Reserviert eine neue fortlaufende Quittungsnummer.
+     *
+     * @return neue ID im Format {@code R-<Nummer>}
+     */
     public synchronized String nextReceiptId() {
         receiptCounter++;
         return "R-" + receiptCounter;
     }
 
+    /**
+     * Fügt eine Quittung dem Speicher hinzu und hängt sie an die CSV-Datei an.
+     *
+     * @param receipt zu speichernde Quittung
+     */
     public synchronized void save(Receipt receipt) {
         receipts.add(receipt);
         appendReceiptToCSV(receipt);
     }
 
+    /**
+     * Sucht alle Quittungen eines Benutzerkontos.
+     *
+     * @param userEmail E-Mail des Benutzerkontos
+     * @return neu erzeugte Liste passender Quittungen
+     */
     public synchronized List<Receipt> findByUserEmail(String userEmail) {
         List<Receipt> result = new ArrayList<>();
         if (userEmail == null) {
@@ -66,6 +89,11 @@ public class ReceiptRepository {
         return result;
     }
 
+    /**
+     * Serialisiert eine einzelne Quittung am Ende der CSV-Datei.
+     *
+     * @param receipt zu serialisierende Quittung
+     */
     private void appendReceiptToCSV(Receipt receipt) {
         File file = new File(CSV_FILE_PATH);
         boolean isNewFile = !file.exists() || file.length() == 0;
@@ -96,6 +124,7 @@ public class ReceiptRepository {
         }
     }
 
+    /** Liest beim Start alle gültigen Quittungen aus der CSV-Datei ein. */
     private void loadReceiptsFromCSV() {
         File file = new File(CSV_FILE_PATH);
         if (!file.exists()) {

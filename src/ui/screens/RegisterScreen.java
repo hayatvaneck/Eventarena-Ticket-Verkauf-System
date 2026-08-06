@@ -10,12 +10,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.BorderPane;
-import service.PasswordService;
 import ui.App;
 import ui.ScreenManager;
 
@@ -27,27 +24,39 @@ import ui.ScreenManager;
 
 public class RegisterScreen extends BaseScreen {
 
+    /** Anwendungskontext für Registrierung, Anmeldung und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt die Registrierung für ein neues Kundenkonto.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public RegisterScreen(App app) {
         this.app = app;
     }
 
+    /**
+     * Baut das Registrierungsformular mit Eingabebegrenzungen und fachlicher
+     * Validierung auf.
+     *
+     * @return vollständige Registrierungsszene
+     */
     @Override
     public Scene buildScene() {
         BorderPane mainRoot = new BorderPane();
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
-        // --- UNTERE LEISTE FÜR DEN ZURÜCK-BUTTON (Exakt wie im LoginScreen) ---
+        // Separater Fußbereich für den Rückweg zur Anmeldung.
         HBox bottomBar = new HBox();
         bottomBar.setPadding(new Insets(20, 20, 50, 100));
         bottomBar.setAlignment(Pos.CENTER_LEFT);
 
-        // --- ZENTRALER BEREICH FÜR DAS FORMULAR ---
+        // Zentral ausgerichteter Formularbereich.
         javafx.scene.layout.VBox registerRoot = createVBox(15, Pos.CENTER);
         registerRoot.setStyle("-fx-background-color: transparent");
 
-        // Die weiße Box mit Schatten
+        // Eine abgesetzte Karte bündelt Eingaben, Hinweise und Bestätigung.
         VBox formBox = createVBox(15, Pos.CENTER);
         formBox.setPadding(new Insets(30, 40, 30, 40));
         formBox.setMaxWidth(400);
@@ -62,7 +71,7 @@ public class RegisterScreen extends BaseScreen {
         Label title = new Label("NEUES KONTO ERSTELLEN");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        // --- FELDER MIT STRIKTEM 30-ZEICHEN LIMIT ---
+        // Eingabebegrenzungen verhindern überlange Persistenzwerte bereits in der GUI.
         TextField firstNameField = new TextField();
         firstNameField.setPromptText("Vorname");
         firstNameField.setPrefWidth(250);
@@ -98,7 +107,7 @@ public class RegisterScreen extends BaseScreen {
         confirmPasswordField.setTextFormatter(
                 new javafx.scene.control.TextFormatter<String>(c -> c.getControlNewText().length() <= 30 ? c : null));
 
-        // --- HINWEIS-BOX FÜR PASSWORT ---
+        // Sichtbare Passwortregeln unterstützen eine fehlerarme Eingabe.
         VBox hintBox = new VBox(5);
         hintBox.setPadding(new Insets(12));
         hintBox.setStyle(
@@ -126,11 +135,11 @@ public class RegisterScreen extends BaseScreen {
                 "-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: Hand;");
         registerBtn.setPrefWidth(250);
 
-        // --- DER ZURÜCK BUTTON (Jetzt wie im LoginScreen!) ---
+        // Navigation zurück zur bestehenden Kundenanmeldung.
         Button btnBackToLogin = createBackButton("Zurück zum Login");
         btnBackToLogin.setPrefWidth(250);
 
-        // --- AKTIONEN (KLICKS) ---
+        // Fachliche Validierung und Speicherung der Registrierungsdaten.
         registerBtn.setOnAction(e -> {
             String firstName = firstNameField.getText().trim();
             String lastName = lastNameField.getText().trim();
@@ -144,7 +153,7 @@ public class RegisterScreen extends BaseScreen {
                 return;
             }
 
-            // E-Mail-Prüfung (darf nicht fehlerhaft sein)
+            // Das Format wird vor dem Repository-Aufruf geprüft.
             String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[a-zA-Z]{2,6}$";
             if (!email.matches(emailRegex)) {
                 app.showAlert(Alert.AlertType.WARNING, "Fehler",
@@ -175,8 +184,7 @@ public class RegisterScreen extends BaseScreen {
                 app.setLoggedInUser(newUser);
                 app.showAlert(Alert.AlertType.INFORMATION, "Erfolg",
                         "Registrierung erfolgreich! Sie sind nun eingeloggt.");
-                // Wenn schon Tickets im Warenkorb liegen, geht es zum Cart, sonst ins
-                // Hauptmenü!
+                // Ein bestehender Warenkorb setzt den begonnenen Buchungsfluss fort.
                 if (app.getCartItems() != null && !app.getCartItems().isEmpty()) {
                     app.navigateTo(ScreenManager.Screen.CART);
                 } else {
@@ -189,8 +197,7 @@ public class RegisterScreen extends BaseScreen {
 
         btnBackToLogin.setOnAction(e -> app.navigateTo(ScreenManager.Screen.LOGIN));
 
-        // --- ZUSAMMENBAU ---
-        // 1. Felder in die weiße Box packen
+        // Formular, Inhaltsbereich und Fußleiste zusammensetzen.
         formBox.getChildren().addAll(
                 title,
                 firstNameField,
@@ -201,13 +208,10 @@ public class RegisterScreen extends BaseScreen {
                 hintBox,
                 registerBtn);
 
-        // 2. Weiße Box in den mittleren Bereich packen
         registerRoot.getChildren().add(formBox);
 
-        // 3. Zurück-Button in die untere Leiste packen
         bottomBar.getChildren().add(btnBackToLogin);
 
-        // 4. Alles dem Haupt-Layout übergeben
         mainRoot.setCenter(registerRoot);
         mainRoot.setBottom(bottomBar);
 
@@ -217,6 +221,13 @@ public class RegisterScreen extends BaseScreen {
         return scene;
     }
 
+    /**
+     * Prüft ein Passwort gegen die in der Oberfläche kommunizierten
+     * Sicherheitsanforderungen.
+     *
+     * @param password zu prüfendes Klartextpasswort
+     * @return Fehlermeldung bei Regelverstoß oder {@code null} bei gültigem Passwort
+     */
     private String validatePassword(String password) {
         if (password.length() < 8) {
             return "Das Passwort muss mindestens 8 Zeichen lang sein.";
@@ -230,11 +241,11 @@ public class RegisterScreen extends BaseScreen {
         if (!password.matches(".*\\d.*")) {
             return "Das Passwort muss mindestens eine Zahl (0-9) enthalten.";
         }
-        // Prüft auf mindestens ein Sonderzeichen
+        // Mindestens ein Sonderzeichen ergänzt Buchstaben und Ziffern.
         if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
             return "Das Passwort muss mindestens ein Sonderzeichen enthalten.";
         }
 
-        return null; // Passwort ist stark genug
+        return null;
     }
 }

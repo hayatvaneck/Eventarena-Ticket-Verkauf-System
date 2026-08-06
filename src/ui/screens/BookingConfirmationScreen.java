@@ -25,21 +25,31 @@ import java.util.List;
 
 public class BookingConfirmationScreen extends BaseScreen {
 
+    /** Anwendungskontext für Buchungsdaten, Dialoge und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt den Screen für die zuletzt abgeschlossene Buchung.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public BookingConfirmationScreen(App app) {
         this.app = app;
     }
 
-    
-
+    /**
+     * Baut die Bestätigungsansicht mit Ticketkarten und weiterführenden Aktionen
+     * auf.
+     *
+     * @return vollständige Buchungsbestätigungsszene
+     */
     @Override
     public Scene buildScene() {
-        // --- 1. NEUES LAYOUT: BORDERPANE ---
+        // Grundlayout mit getrenntem Inhalts- und Aktionsbereich.
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle("-fx-background-color: #f5f5f7;");
 
-        // --- 2. SCHICKES KÄSTCHEN FÜR DEN TITEL ---
+        // Kopfbereich und Zusammenfassung der abgeschlossenen Buchung.
         VBox headerBox = createHeaderBox("BUCHUNG ERFOLGREICH", "Ihre Buchung wurde erfolgreich abgeschlossen.");
 
         List<Ticket> bookedTickets = app.getLastBookedTickets();
@@ -70,10 +80,9 @@ public class BookingConfirmationScreen extends BaseScreen {
         }
 
         ScrollPane detailsScroll = createTransparentScrollPane(ticketList);
-        detailsScroll.setPrefHeight(300); // Etwas höher gemacht für mehr Platz
+        detailsScroll.setPrefHeight(300);
 
-        // --- 3. BUTTONS EXAKT WIE IN ANDEREN SCREENS (250px Breite, da es 3 Stück
-        // sind) ---
+        // Gleich breite Folgeaktionen sorgen für eine ruhige horizontale Anordnung.
         Button toMainButton = createBackButton("Zum Hauptmenü");
         toMainButton.setPrefWidth(250);
         toMainButton.setMinHeight(45);
@@ -83,7 +92,7 @@ public class BookingConfirmationScreen extends BaseScreen {
             app.navigateTo(ScreenManager.Screen.MAIN_MENU);
         });
 
-        Button toTicketsButton = createSelectingButton("Meine Tickets"); // Goldener Button als Highlight
+        Button toTicketsButton = createSelectingButton("Meine Tickets");
         toTicketsButton.setPrefWidth(250);
         toTicketsButton.setMinHeight(45);
         toTicketsButton.setMaxHeight(45);
@@ -98,7 +107,7 @@ public class BookingConfirmationScreen extends BaseScreen {
         openReceiptButton.setMaxHeight(45);
         openReceiptButton.setOnAction(e -> app.openLastReceiptWindow());
 
-        // Alle drei Buttons nebeneinander anordnen
+        // Navigation zu den wichtigsten Folgeschritten.
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().addAll(toMainButton, toTicketsButton, openReceiptButton);
@@ -117,6 +126,13 @@ public class BookingConfirmationScreen extends BaseScreen {
         return createDefaultScene(root);
     }
 
+    /**
+     * Erstellt eine kompakte Vorschaukarte für ein neu gebuchtes Ticket.
+     *
+     * @param ticket darzustellendes Ticket
+     * @param dateFormat Formatierung für den Veranstaltungszeitpunkt
+     * @return formatierte Ticketkarte
+     */
     private HBox createTicketCard(Ticket ticket, DateTimeFormatter dateFormat) {
         HBox card = createHBox(12, Pos.CENTER_LEFT);
         card.setPadding(new Insets(10));

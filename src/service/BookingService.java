@@ -12,11 +12,19 @@ import java.util.List;
  */
 public class BookingService {
 
+    /** Repository für Veranstaltung und Saalplan. */
     private final EventRepository eventRepo;
+    /** Repository für das dauerhafte Speichern und Löschen von Tickets. */
     private final TicketRepository ticketRepo;
+    /** Während der Laufzeit bekannte, nicht stornierte Tickets. */
     private final List<Ticket> activeTickets;
+    /** Laufender Zähler zur Erzeugung lesbarer Ticketnummern. */
     private long ticketIdCounter;
 
+    /**
+     * Verbindet den Service mit den zentralen Repositories und rekonstruiert die
+     * Belegungszustände aus bereits gespeicherten Tickets.
+     */
     public BookingService() {
         this.eventRepo = EventRepository.getInstance();
         this.ticketRepo = TicketRepository.getInstance();
@@ -26,6 +34,17 @@ public class BookingService {
         restoreBookedSeatsFromRepository();
     }
 
+    /**
+     * Bucht die nächste freie Kapazität eines Bereichs, insbesondere einen Stehplatz.
+     *
+     * @param eventId ID der gewünschten Veranstaltung
+     * @param sectionName Name des gewünschten Bereichs
+     * @param customer Ticketinhaber und Kundengruppe
+     * @param userEmail E-Mail des kaufenden Benutzerkontos
+     * @return erzeugtes und gespeichertes Ticket
+     * @throws SeatAlreadyBookedException wenn der Bereich voll oder gesperrt ist
+     * @throws IllegalArgumentException wenn Event oder Bereich nicht existieren
+     */
     public Ticket bookTicket(Long eventId, String sectionName, Customer customer, String userEmail)
             throws SeatAlreadyBookedException {
         Event event = eventRepo.findById(eventId);
@@ -71,6 +90,19 @@ public class BookingService {
         return newTicket;
     }
 
+    /**
+     * Bucht einen konkreten Sitzplatz und erzeugt das zugehörige Ticket.
+     *
+     * @param eventId ID der Veranstaltung
+     * @param sectionName Name des Sitzbereichs
+     * @param row einsbasierte Reihennummer
+     * @param seatNumber einsbasierte Platznummer
+     * @param customer Ticketinhaber und Kundengruppe
+     * @param userEmail E-Mail des kaufenden Benutzerkontos
+     * @return erzeugtes und gespeichertes Ticket
+     * @throws SeatAlreadyBookedException wenn der Sitz bereits belegt ist
+     * @throws IllegalArgumentException wenn Event, Bereich oder Sitz ungültig sind
+     */
     public Ticket bookSpecificTicket(Long eventId, String sectionName, int row, int seatNumber, Customer customer,
             String userEmail) throws SeatAlreadyBookedException {
         Event event = eventRepo.findById(eventId);
@@ -124,6 +156,12 @@ public class BookingService {
         return newTicket;
     }
 
+    /**
+     * Liefert den Multiplikator für den kundengruppenabhängigen Endpreis.
+     *
+     * @param customerType Kundengruppe
+     * @return Rabattfaktor zwischen {@code 0.5} und {@code 1.0}
+     */
     public double calculateDiscountFactor(CustomerType customerType) {
         if (customerType == null) {
             return 1.0;
@@ -140,10 +178,18 @@ public class BookingService {
         }
     }
 
+    /** @return defensive Kopie aller aktiven Tickets */
     public List<Ticket> getActiveTickets() {
         return new ArrayList<>(this.activeTickets);
     }
 
+    /**
+     * Storniert ein Ticket, gibt seine Kapazität frei und entfernt die Persistenz.
+     *
+     * @param ticket zu stornierendes Ticket
+     * @param user Benutzerkonto, aus dem das Ticket entfernt wird
+     * @return {@code true}, wenn Platzfreigabe und Löschung erfolgreich waren
+     */
     public boolean cancelTicket(Ticket ticket, User user) {
         if (ticket == null || user == null) {
             return false;
@@ -180,6 +226,12 @@ public class BookingService {
         return false;
     }
 
+    /**
+     * Extrahiert Reihe und Sitznummer aus der gespeicherten Platzbeschreibung.
+     *
+     * @param seatInfo Text wie {@code Reihe 2, Platz 7}
+     * @return Array mit Reihe und Platz oder zwei Nullen bei ungültigem Text
+     */
     private int[] parseRowAndSeat(String seatInfo) {
         if (seatInfo == null) {
             return new int[] { 0, 0 };
@@ -197,6 +249,10 @@ public class BookingService {
         return new int[] { 0, 0 };
     }
 
+    /**
+     * Überträgt persistierte Tickets in die aktive Liste und markiert die
+     * zugehörigen Sitz- beziehungsweise Stehplatzkapazitäten als belegt.
+     */
     public void restoreBookedSeatsFromRepository() {
         List<Ticket> savedTickets = ticketRepo.findAll();
 
