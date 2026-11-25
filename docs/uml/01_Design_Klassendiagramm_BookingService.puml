@@ -1,0 +1,267 @@
+@startuml Design_Klassendiagramm_BookingService
+' ============================================================
+'  Design-Klassendiagramm (OOD) - Buchungslogik "BookingService"
+'  Eventarena Ticket-Verkauf-System
+'
+'  Legende Sichtbarkeit:  + public   - private   # protected   ~ package
+'  {static}   = Klassenattribut / Klassenoperation (unterstrichen)
+'  {abstract} = abstrakte Operation (kursiv)
+'  {...}      = Constraint (Zusicherung)
+' ============================================================
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam class {
+  BackgroundColor White
+  BorderColor #333333
+  ArrowColor #333333
+}
+skinparam note {
+  BackgroundColor #FFFDE7
+  BorderColor #999999
+}
+
+title Design-Klassendiagramm: Buchungslogik (BookingService)
+
+' ------------------------------------------------------------
+package ui {
+  class App {
+    - bookingService : BookingService {readOnly}
+    + getBookingService() : BookingService
+  }
+  class MyTicketsScreen {
+    - bookingService : BookingService {readOnly}
+    + MyTicketsScreen(app : App, bookingService : BookingService, userRepo : UserRepository)
+  }
+}
+
+' ------------------------------------------------------------
+package service {
+  class BookingService {
+    - eventRepo : EventRepository {readOnly}
+    - ticketRepo : TicketRepository {readOnly}
+    - activeTickets : List<Ticket> {readOnly}
+    - ticketIdCounter : long {>= 1000}
+    --
+    + BookingService()
+    + bookTicket(eventId : Long, sectionName : String, customer : Customer, userEmail : String) : Ticket {throws SeatAlreadyBookedException}
+    + bookSpecificTicket(eventId : Long, sectionName : String, row : int, seatNumber : int, customer : Customer, userEmail : String) : Ticket {throws SeatAlreadyBookedException}
+    + calculateDiscountFactor(customerType : CustomerType) : double
+    + getActiveTickets() : List<Ticket>
+    + cancelTicket(ticket : Ticket, user : User) : boolean
+    + restoreBookedSeatsFromRepository() : void
+    - parseRowAndSeat(seatInfo : String) : int[]
+  }
+}
+
+note right of BookingService
+  **Constraints:**
+  {ticketId = "T-" + ticketIdCounter}
+  {Startwert ticketIdCounter =
+   1000 + Anzahl gespeicherter Tickets}
+  {calculateDiscountFactor() ∈ {0.5, 0.7, 0.8, 1.0}}
+  {finalPrice = basePrice * priceFactor
+   * calculateDiscountFactor(customerType)}
+end note
+
+' ------------------------------------------------------------
+package repository {
+  class EventRepository <<Singleton>> {
+    - {static} instance : EventRepository
+    - {static} EVENTS_CSV : Path {readOnly}
+    - events : List<Event> {readOnly}
+    --
+    - EventRepository()
+    + {static} getInstance() : EventRepository
+    + findById(id : Long) : Event
+    + getAllEvents() : List<Event>
+    + save(event : Event) : void
+    {method} ...
+  }
+
+  class TicketRepository <<Singleton>> {
+    - {static} instance : TicketRepository
+    - {static} CSV_FILE_PATH : String = "data/tickets.csv" {readOnly}
+    - {static} CSV_SEPARATOR : String = ";" {readOnly}
+    - tickets : List<Ticket> {readOnly}
+    --
+    - TicketRepository()
+    + {static} getInstance() : TicketRepository
+    + save(ticket : Ticket) : void
+    + findAll() : List<Ticket>
+    + deleteTickets(ticketId : String) : boolean
+    - appendTicketToCSV(ticket : Ticket) : void
+    - loadTicketsFromCSV() : void
+    - rewriteTicketsCSV() : void
+  }
+}
+
+' ------------------------------------------------------------
+package domain {
+  class Event {
+    - id : Long
+    - title : String
+    - dateTime : LocalDateTime
+    - basePrice : double
+    - sections : List<Section>
+    --
+    + addSection(section : Section) : void
+    + findSectionByName(name : String) : Section
+    + getTotalAvailableSeats() : int
+    + isSoldOut() : boolean
+    + getBasePrice() : double
+    {method} ...
+  }
+
+  abstract class Section {
+    - name : String {readOnly, nicht leer}
+    - priceFactor : double {readOnly, >= 0}
+    --
+    + Section(name : String, priceFactor : double)
+    + {abstract} bookNextAvailableTicket() : boolean {throws SeatAlreadyBookedException}
+    + {abstract} getAvailableSeats() : int
+    + {abstract} printLayout() : void
+    + getName() : String
+    + getPriceFactor() : double
+  }
+
+  class SeatedSection {
+    - seats : Seat[][] {readOnly}
+    --
+    + SeatedSection(name : String, priceFactor : double, rows : int, seatsPerRow : int)
+    + getSeat(row : int, seatNumber : int) : Seat
+    + releaseSeat(rowNumber : int, seatNumber : int) : void
+    + getRowCount() : int
+    + getSeatsPerRow() : int
+  }
+
+  class StandingSection {
+    - capacity : int {readOnly}
+    - soldTickets : int = 0 {0 <= soldTickets <= capacity}
+    --
+    + StandingSection(name : String, priceFactor : double, capacity : int)
+    + releaseStandingTicket() : boolean
+    + incrementSoldTickets() : void
+    + getCapacity() : int
+  }
+
+  class EmptySection {
+    + EmptySection(name : String)
+  }
+  note bottom of EmptySection
+    {priceFactor = 0.0}
+    {getAvailableSeats() = 0}
+  end note
+
+  class Seat {
+    - rowNumber : int {readOnly, >= 1}
+    - seatNumber : int {readOnly, >= 1}
+    - isBooked : boolean = false
+    - section : Section
+    --
+    + book() : void {throws SeatAlreadyBookedException}
+    + release() : void
+    + isBooked() : boolean
+  }
+
+  class Ticket {
+    - ticketId : String {readOnly, Format "T-<Nr>"}
+    - event : Event {readOnly}
+    - section : Section {readOnly}
+    - customer : Customer {readOnly}
+    - finalPrice : double {readOnly, >= 0}
+    - seatInfo : String {readOnly}
+    - userEmail : String
+    - customerType : String
+    - price : double
+    --
+    + Ticket(ticketId : String, event : Event, section : Section, customer : Customer, finalPrice : double, seatInfo : String, userEmail : String, customerType : String, price : double)
+    + getTicketId() : String
+    + getSection() : Section
+    + getSeatInfo() : String
+    + getFinalPrice() : double
+    {method} ...
+  }
+
+  class Customer {
+    - id : long {readOnly, > 0}
+    - firstName : String {readOnly, nicht leer}
+    - lastName : String {readOnly, nicht leer}
+    - customerType : CustomerType {readOnly}
+    --
+    + getCustomerType() : CustomerType
+    + getFullName() : String
+  }
+
+  enum CustomerType <<enumeration>> {
+    STANDARD
+    STUDENT
+    SENIOR
+    VIP
+    KIND
+  }
+
+  class User {
+    - email : String {nicht leer}
+    - passwordHash : String
+    - purchasedTickets : List<Ticket>
+    --
+    + addTicket(ticket : Ticket) : void
+    + removeTicket(ticket : Ticket) : void
+    + getPurchasedTickets() : List<Ticket>
+  }
+}
+
+' ------------------------------------------------------------
+package exceptions {
+  class SeatAlreadyBookedException {
+    + SeatAlreadyBookedException(message : String)
+  }
+}
+class "java.lang.Exception" as Exception
+Exception <|-- SeatAlreadyBookedException
+
+' ============================================================
+'  Beziehungen
+' ============================================================
+
+' --- UI -> Service
+App "1" *--> "1" BookingService : erzeugt >
+MyTicketsScreen "0..*" --> "1" BookingService : nutzt >
+
+' --- Service -> Repository / Domain (gerichtete Assoziationen)
+BookingService "0..*" --> "1" EventRepository : liest Events >
+BookingService "0..*" --> "1" TicketRepository : speichert/löscht >
+BookingService "1" --> "0..*" Ticket : activeTickets >
+
+' --- Service: Abhängigkeiten (nur Parameter / lokale Variablen / Casts)
+BookingService ..> Customer : <<use>>
+BookingService ..> User : <<use>>
+BookingService ..> CustomerType : <<use>>
+BookingService ..> SeatedSection : <<use>>
+BookingService ..> StandingSection : <<use>>
+BookingService ..> SeatAlreadyBookedException : <<throws>>
+
+' --- Repository -> Domain (Aggregation: Repository verwaltet, besitzt aber nicht exklusiv)
+EventRepository "1" o--> "0..*" Event : verwaltet >
+TicketRepository "1" o--> "0..*" Ticket : verwaltet >
+
+' --- Domain
+Event "1" *--> "0..*" Section : sections >
+Section <|-- SeatedSection
+Section <|-- StandingSection
+Section <|-- EmptySection
+SeatedSection "1" *--> "1..*" Seat : seats >
+Seat "0..*" --> "0..1" Section : section >
+
+Ticket "0..*" --> "1" Event : event >
+Ticket "0..*" --> "1" Section : section >
+Ticket "0..*" --> "1" Customer : customer >
+Customer "0..*" --> "1" CustomerType
+User "1" --> "0..*" Ticket : purchasedTickets >
+
+Seat ..> SeatAlreadyBookedException : <<throws>>
+Section ..> SeatAlreadyBookedException : <<throws>>
+
+@enduml

@@ -1,0 +1,119 @@
+@startuml OOA_OOD_OOP_SeatedSection_Seat
+' ============================================================
+'  Gegenüberstellung OOA -> OOD -> OOP
+'  Beispiel-Beziehung: Komposition "Sitzplatzbereich besteht aus Sitzplätzen"
+'  (wird in BookingService.bookSpecificTicket() und cancelTicket() genutzt)
+' ============================================================
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam class {
+  BackgroundColor White
+  BorderColor #333333
+  ArrowColor #333333
+}
+skinparam note {
+  BackgroundColor #F5F5F5
+  BorderColor #999999
+}
+
+title OOA -> OOD -> OOP: Beziehung Sitzplatzbereich <-> Sitzplatz
+
+' ------------------------------------------------------------
+package "1. OOA - Analyse (Fachkonzept)" as OOA {
+  abstract class "Bereich" as A_Bereich {
+    name
+    preisfaktor
+  }
+  class "Sitzplatzbereich" as A_Sitz {
+    anzahlReihen
+    plätzeProReihe
+    --
+    platzBuchen()
+    platzFreigeben()
+  }
+  class "Sitzplatz" as A_Platz {
+    reihe
+    platznummer
+    istGebucht
+    --
+    buchen()
+    freigeben()
+  }
+  A_Bereich <|-- A_Sitz
+  A_Sitz "1" *-- "1..*" A_Platz : besteht aus >
+}
+
+' ------------------------------------------------------------
+package "2. OOD - Entwurf (Design)" as OOD {
+  abstract class "Section" as D_Section {
+    - name : String {readOnly}
+    - priceFactor : double {readOnly, >= 0}
+    --
+    + {abstract} bookNextAvailableTicket() : boolean
+  }
+  class "SeatedSection" as D_Seated {
+    - seats : Seat[][] {readOnly}
+    --
+    + SeatedSection(name : String, priceFactor : double, rows : int, seatsPerRow : int)
+    + getSeat(row : int, seatNumber : int) : Seat
+    + releaseSeat(rowNumber : int, seatNumber : int) : void
+    + bookNextAvailableTicket() : boolean
+  }
+  class "Seat" as D_Seat {
+    - rowNumber : int {readOnly, >= 1}
+    - seatNumber : int {readOnly, >= 1}
+    - isBooked : boolean = false
+    - section : Section
+    --
+    + book() : void {throws SeatAlreadyBookedException}
+    + release() : void
+    + isBooked() : boolean
+  }
+  D_Section <|-- D_Seated
+  D_Seated "1" *--> "1..*" D_Seat : -seats >
+  D_Seat "0..*" --> "0..1" D_Section : -section >
+}
+
+' ------------------------------------------------------------
+package "3. OOP - Implementierung (Java)" as OOP {
+  note as P_Code
+<code>
+public class SeatedSection extends Section {
+    private final Seat[][] seats;          // Komposition 1 --> 1..*
+
+    public SeatedSection(String name, double priceFactor,
+                         int rows, int seatsPerRow) {
+        super(name, priceFactor);
+        this.seats = new Seat[rows][seatsPerRow];
+        for (int r = 0; r < rows; r++)
+            for (int s = 0; s < seatsPerRow; s++)
+                // Teile werden vom Ganzen erzeugt
+                this.seats[r][s] = new Seat(r + 1, s + 1, this);
+    }
+
+    public Seat getSeat(int row, int seatNumber) { ... }
+    public void releaseSeat(int rowNumber, int seatNumber) { ... }
+}
+
+public class Seat {
+    private final int rowNumber;
+    private final int seatNumber;
+    private boolean isBooked;
+    private Section section;               // Rückreferenz 0..1
+
+    public void book() throws SeatAlreadyBookedException {
+        if (this.isBooked) throw new SeatAlreadyBookedException(...);
+        this.isBooked = true;
+    }
+    public void release() { this.isBooked = false; }
+}
+</code>
+  end note
+}
+
+' Reihenfolge links -> rechts erzwingen
+A_Bereich -[hidden]right- D_Section
+
+@enduml
