@@ -78,8 +78,7 @@ Ausnahmen werden als Eigenschaft der Operation notiert: `bookTicket(..) : Ticket
 | `BookingService` ⇢ `SeatAlreadyBookedException` | **Abhängigkeit** `<<throws>>` | – | `throws`-Klausel |
 | `EventRepository` → `Event`, `TicketRepository` → `Ticket` | **Aggregation** (leere Raute) | 1 → 0..* | Repository verwaltet die Objekte, die aber auch außerhalb weiterverwendet werden (z. B. Tickets im `User`) |
 | `Event` → `Section` | **Komposition** | 1 → 0..* | Bereiche existieren nur innerhalb ihres Events; `getSections()` gibt nur eine Kopie heraus |
-| `SeatedSection` → `Seat` | **Komposition** | 1 → 1..* | Sitze werden im Konstruktor erzeugt (`new Seat(..., this)`) |
-| `Seat` → `Section` | gerichtete **Assoziation** (Rückreferenz) | 0..* → 0..1 | Attribut `section`; im 2-Parameter-Konstruktor nicht gesetzt, daher 0..1 |
+| `SeatedSection` ◆— `Seat` | **Komposition**, bidirektional (keine Pfeilspitze), Rollen `-seats` und `-section` | 1 — 1..* | Sitze werden im Konstruktor erzeugt (`new Seat(..., this)`); `SeatedSection` kennt die Sitze über `seats`, jeder `Seat` seinen Bereich über `section` |
 | `Section` ◁— `SeatedSection`, `StandingSection`, `EmptySection` | **Generalisierung** | – | `extends Section`; `bookNextAvailableTicket()` ist polymorph |
 | `Ticket` → `Event`, `Section`, `Customer` | gerichtete **Assoziation** | 0..* → 1 | `final`-Attribute im Ticket |
 | `User` → `Ticket` | gerichtete **Assoziation** | 1 → 0..* | Liste `purchasedTickets` |
@@ -101,7 +100,7 @@ Ausnahmen werden als Eigenschaft der Operation notiert: `bookTicket(..) : Ticket
 | **Klassen** | `Bereich`, `Sitzplatzbereich`, `Sitzplatz` (fachliche, deutsche Begriffe) | `Section` *(abstrakt)*, `SeatedSection`, `Seat` | `abstract class Section`, `class SeatedSection extends Section`, `class Seat` |
 | **Attribute** | `reihe`, `platznummer`, `istGebucht` (ohne Typ, ohne Sichtbarkeit) | `- rowNumber : int {readOnly, >= 1}`, `- isBooked : boolean = false` | `private final int rowNumber;` `private boolean isBooked;` |
 | **Operationen** | `buchen()`, `freigeben()` | `+ book() : void {throws SeatAlreadyBookedException}`, `+ release() : void` | `public void book() throws SeatAlreadyBookedException { ... }` |
-| **Beziehung** | Komposition `Sitzplatzbereich 1 ◆—— 1..* Sitzplatz`, **ungerichtet** | Komposition **gerichtet** `SeatedSection 1 ◆——> 1..* Seat` (Rolle `-seats`) **plus** Rückreferenz `Seat 0..* ——> 0..1 Section` (Rolle `-section`) | `private final Seat[][] seats;` in `SeatedSection`, `private Section section;` in `Seat` |
+| **Beziehung** | Komposition `Sitzplatzbereich 1 ◆—— 1..* Sitzplatz`, **ungerichtet** | **eine** Komposition `SeatedSection 1 ◆—— 1..* Seat`, **in beide Richtungen navigierbar**, mit den Rollen `-seats` (am Seat-Ende) und `-section` (am SeatedSection-Ende) | `private final Seat[][] seats;` in `SeatedSection`, `private Section section;` in `Seat` |
 | **Lebenszyklus** | „Ein Sitzplatz existiert nicht ohne seinen Bereich.“ | Komposition → das Ganze erzeugt die Teile | `new Seat(r + 1, s + 1, this)` im Konstruktor von `SeatedSection`; das Array ist `final` und wird nie nach außen ersetzt |
 | **Fehlerfall** | „Ein gebuchter Platz kann nicht noch einmal gebucht werden.“ (Anforderung) | Constraint + Ausnahme in der Signatur | `if (isBooked) throw new SeatAlreadyBookedException(...)` |
 
@@ -111,9 +110,9 @@ Ausnahmen werden als Eigenschaft der Operation notiert: `bookTicket(..) : Ticket
    - Fachbegriffe werden zu Bezeichnern im Code (`Sitzplatz` → `Seat`).
    - Attribute bekommen **Datentypen, Sichtbarkeit und Constraints** (`- rowNumber : int {readOnly, >= 1}`).
    - Operationen bekommen **Parameter, Rückgabetyp und Ausnahmen**.
-   - Die Beziehung bekommt eine **Navigierbarkeit** (Pfeil) und **Rollennamen**. Dabei wird entschieden, dass auch der Sitz seinen Bereich kennt (Rückreferenz `section`).
+   - Die Beziehung bekommt **Rollennamen** an beiden Enden, und es wird über die **Navigierbarkeit** entschieden: Beide Seiten kennen sich (`-seats` und `-section`), die Komposition ist also bidirektional.
    - Die Multiplizität `1..*` wird in der Anordnung *Reihen × Plätze* umgesetzt, als zweidimensionales Feld `Seat[][]`.
 2. **OOD → OOP**
-   - Die Rolle `-seats` mit Multiplizität `1..*` wird zum Attribut `private final Seat[][] seats`.
+   - Die Rolle `-seats` mit Multiplizität `1..*` wird zum Attribut `private final Seat[][] seats`, die Rolle `-section` zum Attribut `private Section section` (gesetzt über `this`).
    - `{readOnly}` wird zu `final`, die Komposition zur Objekterzeugung im Konstruktor des Ganzen.
    - `{throws ...}` wird zur `throws`-Klausel, der Constraint zur `if`-Prüfung.

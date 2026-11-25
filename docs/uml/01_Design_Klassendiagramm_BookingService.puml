@@ -252,8 +252,7 @@ Event "1" *--> "0..*" Section : sections >
 Section <|-- SeatedSection
 Section <|-- StandingSection
 Section <|-- EmptySection
-SeatedSection "1" *--> "1..*" Seat : seats >
-Seat "0..*" --> "0..1" Section : section >
+SeatedSection "1\n-section" *---- "1..*\n-seats" Seat
 
 Ticket "0..*" --> "1" Event : event >
 Ticket "0..*" --> "1" Section : section >

@@ -72,8 +72,8 @@ package "2. OOD - Entwurf (Design)" as OOD {
     + isBooked() : boolean
   }
   D_Section <|-- D_Seated
-  D_Seated "1" *--> "1..*" D_Seat : -seats >
-  D_Seat "0..*" --> "0..1" D_Section : -section >
+  ' Eine bidirektionale Komposition: beide Enden navigierbar, beide Rollen benannt
+  D_Seated "1\n-section" *-- "1..*\n-seats" D_Seat
 }
 
 ' ------------------------------------------------------------
@@ -101,7 +101,7 @@ public class Seat {
     private final int rowNumber;
     private final int seatNumber;
     private boolean isBooked;
-    private Section section;               // Rückreferenz 0..1
+    private Section section;               // Rolle -section (Rückrichtung)
 
     public void book() throws SeatAlreadyBookedException {
         if (this.isBooked) throw new SeatAlreadyBookedException(...);
