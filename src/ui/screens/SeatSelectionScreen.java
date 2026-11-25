@@ -16,8 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import ui.App;
 import ui.ScreenManager;
-import domain.CartItem; // Falls CartItem woanders liegt, diesen Import anpassen
-import ui.screens.BaseScreen;
+import domain.CartItem;
 
 import java.util.List;
 
@@ -27,12 +26,24 @@ import java.util.List;
  */
 public class SeatSelectionScreen extends BaseScreen {
 
+    /** Anwendungskontext für Auswahlzustand, Warenkorb und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt die Sitzplatzauswahl für den zuvor gewählten Hallenbereich.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public SeatSelectionScreen(App app) {
         this.app = app;
     }
 
+    /**
+     * Baut den interaktiven Sitzplan auf, validiert das Ticketlimit und übernimmt
+     * bestätigte Sitzplätze in den Warenkorb.
+     *
+     * @return vollständige Sitzplatzauswahlszene
+     */
     @Override
     public Scene buildScene() {
         Section selectedSection = app.getCurrentSelectedSection();
@@ -45,28 +56,24 @@ public class SeatSelectionScreen extends BaseScreen {
 
         SeatedSection seatedSection = (SeatedSection) selectedSection;
 
-        // VBox root = createRoot(15, new Insets(20), Pos.CENTER);
-
         Label title = createTitle(seatedSection.getName());
         Label instruction = createSubtitle("Wählen Sie einen Sitzplatz aus:");
 
-        VBox headerBox = new VBox(5); // 5 Pixel Abstand zwischen Titel und Untertitel
+        VBox headerBox = new VBox(5);
         headerBox.setAlignment(Pos.CENTER);
-        headerBox.setMaxWidth(400); // Breite des Kastens (kannst du beliebig anpassen)
+        headerBox.setMaxWidth(400);
         headerBox.setStyle(
                 "-fx-background-color: white; " +
-                        "-fx-padding: 15 30 15 30; " + // Innenabstand, damit der Text Luft hat
+                        "-fx-padding: 15 30 15 30; " +
                         "-fx-background-radius: 10; " +
-                        // "-fx-border-color: #81b9ed; " +
                         "-fx-border-width: 2; " +
                         "-fx-border-radius: 10; " +
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
         headerBox.getChildren().addAll(title, instruction);
 
-        // 1. Der neue, schicke Kasten für die Bühne
+        // Die Orientierungshilfe passt ihre Beschriftung an den Hallenplantyp an.
         String stageText = "B Ü H N E";
 
-        // Wenn der Saalplan eine Arena ist, ändern wir den Text[cite: 1]
         if (app.getCurrentSelectedEvent().getMapType() == domain.Event.MapType.ARENA) {
             stageText = "S P I E L F E L D";
         }
@@ -85,11 +92,10 @@ public class SeatSelectionScreen extends BaseScreen {
                         "-fx-border-radius: 10; " +
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);");
 
-        // 2. Der Wrapper, um den Kasten nach links oder rechts zu schieben
+        // Ein separater Container hält die Bühnenanzeige über dem Sitzraster mittig.
         HBox stageContainer = new HBox();
-        stageContainer.setMaxWidth(680); // Passt sich der Breite deines Sitzplans an
+        stageContainer.setMaxWidth(680);
 
-        // 3. Dynamische Anpassung je nach Block!
         stageContainer.setAlignment(Pos.CENTER);
         stageLabel.setPrefWidth(650);
         stageLabel.setMaxWidth(650);
@@ -108,20 +114,17 @@ public class SeatSelectionScreen extends BaseScreen {
                         "-fx-padding: 25px; " +
                         "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
 
-        // Das zwingt die Box, nicht über die ganze Bildschirmbreite zu wachsen,
-        // sondern nur so breit/hoch zu sein wie die Sitze darin.
+        // Das Raster bleibt auf seine tatsächlich benötigte Größe begrenzt.
         seatGrid.setMaxWidth(javafx.scene.layout.Region.USE_PREF_SIZE);
         seatGrid.setMaxHeight(javafx.scene.layout.Region.USE_PREF_SIZE);
 
         SeatSelectionController controller = new SeatSelectionController(seatGrid, app::updateSelectionLabel);
         controller.populateSeatPlan(selectedSection, app.getCartItems());
 
-        VBox gridWrapper = new VBox(20); // 20 Pixel Abstand zwischen Bühne und Sitzen
+        VBox gridWrapper = new VBox(20);
         gridWrapper.setAlignment(Pos.CENTER);
 
-        // Dies stellt sicher, dass der Container die volle Breite des ScrollPanes
-        // ausnutzt
-        // und den Inhalt (Bühne + Sitzbox) dadurch perfekt in der Mitte hält.
+        // Die volle Viewportbreite hält Bühne und Sitzraster gemeinsam zentriert.
         gridWrapper.setPrefWidth(800);
 
         gridWrapper.getChildren().addAll(stageContainer, seatGrid);
@@ -130,14 +133,14 @@ public class SeatSelectionScreen extends BaseScreen {
         seatGridScrollPane.setPannable(true);
         seatGridScrollPane.setFitToHeight(false);
         seatGridScrollPane.setFitToWidth(true);
-        seatGridScrollPane.setPrefViewportHeight(550); // Vorher 420 -> Jetzt deutlich höher!
-        seatGridScrollPane.setPrefViewportWidth(800); // Vorher 740 -> Etwas breiter
+        seatGridScrollPane.setPrefViewportHeight(550);
+        seatGridScrollPane.setPrefViewportWidth(800);
 
         Label selectionStatusLabel = app.getSelectionStatusLabel();
         selectionStatusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         selectionStatusLabel.setText("Kein Platz ausgewählt");
 
-        // --- 2. BUTTONS EXAKT WIE IN ANDEREN SCREENS MACHEN (300x45) ---
+        // Bestätigung und Rückweg verwenden dieselben Abmessungen.
         Button confirmButton = createSelectingButton("Sitzplatz bestätigen");
         confirmButton.setPrefWidth(300);
         confirmButton.setMinHeight(45);
@@ -146,12 +149,12 @@ public class SeatSelectionScreen extends BaseScreen {
             List<Seat> newSeats = controller.getSelectedSeats();
 
             if (!newSeats.isEmpty()) {
-                // PRÜFUNG AUF MAXIMAL 10 TICKETS
+                // Das gemeinsame Warenkorblimit gilt auch für Mehrfachauswahlen.
                 if (app.getCartItems().size() + newSeats.size() > 10) {
                     app.showAlert(Alert.AlertType.WARNING, "Limit erreicht",
                             "Sie können maximal 10 Tickets gleichzeitig kaufen. Sie haben bereits " +
                                     app.getCartItems().size() + " Ticket(s) im Warenkorb.");
-                    return; // Bricht hier ab und speichert die Sitze nicht
+                    return;
                 }
 
                 for (Seat seat : newSeats) {
@@ -173,20 +176,19 @@ public class SeatSelectionScreen extends BaseScreen {
         backButton.setMaxHeight(45);
         backButton.setOnAction(e -> app.navigateTo(ScreenManager.Screen.GRAPHIC_SECTION_SELECTION));
 
-        // --- 3. BUTTONS NEBENEINANDER STELLEN ---
-        HBox buttonBox = new HBox(20); // 20 Pixel Abstand zwischen den beiden Buttons
+        HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(backButton, confirmButton); // Zurück links, Bestätigen rechts
+        buttonBox.getChildren().addAll(backButton, confirmButton);
 
-        // --- 4. PERFEKTES LAYOUT ZUSAMMENBAUEN ---
+        // Sitzplan und feste Aktionsleiste werden in einem BorderPane zusammengeführt.
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle("-fx-background-color: #f5f5f7;");
 
-        // Obere Box mit Platzhalter, Titel, Saalplan und Status
+        // Scrollbarer Auswahlbereich mit aktuellem Status.
         VBox topBox = createRoot(15, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
         topBox.getChildren().addAll(headerBox, seatGridScrollPane, selectionStatusLabel);
 
-        // Untere Box mit den Buttons und dem Platzhalter-Footer
+        // Feste Navigation mit unsichtbarem Footer als Ausrichtungsplatzhalter.
         VBox bottomBox = createRoot(10, new Insets(0, 30, 30, 30), Pos.BOTTOM_CENTER);
         HBox dummyFooter = createInvisibleStandardFooter();
         bottomBox.getChildren().addAll(buttonBox, dummyFooter);

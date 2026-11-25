@@ -24,27 +24,39 @@ import ui.ScreenManager;
 
 public class LoginScreen extends BaseScreen {
 
+    /** Anwendungskontext für Authentifizierung und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt die Kundenanmeldung.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public LoginScreen(App app) {
         this.app = app;
     }
 
+    /**
+     * Baut das Anmeldeformular sowie Links zu Registrierung und
+     * Mitarbeiteranmeldung auf.
+     *
+     * @return vollständige Anmeldeszene
+     */
     @Override
     public Scene buildScene() {
         BorderPane mainRoot = new BorderPane();
         mainRoot.setStyle("-fx-background-color: #f5f5f7");
 
-        // --- UNTERE LEISTE FÜR DEN ZURÜCK-BUTTON ---
+        // Separater Fußbereich für den Rückweg zum Hauptmenü.
         HBox bottomBar = new HBox();
         bottomBar.setPadding(new Insets(20, 20, 50, 100));
         bottomBar.setAlignment(Pos.CENTER_LEFT);
 
-        // --- ZENTRALER BEREICH FÜR DAS FORMULAR ---
+        // Zentral ausgerichteter Formularbereich.
         javafx.scene.layout.VBox loginRoot = createVBox(15, Pos.CENTER);
         loginRoot.setStyle("-fx-background-color: transparent");
 
-        // Die neue weiße Box mit Schatten
+        // Eine abgesetzte Karte bündelt alle Anmeldeelemente.
         VBox formBox = createVBox(15, Pos.CENTER);
         formBox.setPadding(new Insets(40, 50, 40, 50));
         formBox.setMaxWidth(400);
@@ -82,11 +94,11 @@ public class LoginScreen extends BaseScreen {
         employeeLink
                 .setStyle("-fx-text-fill: #e74c3c; -fx-cursor: hand; -fx-font-weight: bold;");
 
-        // --- DER ZURÜCK BUTTON ---
+        // Navigation aus der Anmeldung heraus.
         Button btnBackToMain = createBackButton("Zurück zum Hauptmenü");
         btnBackToMain.setPrefWidth(250);
 
-        // --- AKTIONEN (KLICKS) ---
+        // Validierung und Navigationsaktionen des Formulars.
         loginBtn.setOnAction(e -> {
             String email = emailField.getText();
             String password = passwordField.getText();
@@ -107,17 +119,13 @@ public class LoginScreen extends BaseScreen {
         employeeLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.EMPLOYEE_LOGIN));
         registerLink.setOnMouseClicked(e -> app.navigateTo(ScreenManager.Screen.REGISTER));
 
-        // --- ZUSAMMENBAU ---
-        // 1. Felder in die weiße Box packen
+        // Formular, Inhaltsbereich und Fußleiste zusammensetzen.
         formBox.getChildren().addAll(title, emailField, passwordField, loginBtn, registerLink, employeeLink);
 
-        // 2. Weiße Box in den mittleren Bereich packen
         loginRoot.getChildren().add(formBox);
 
-        // 3. Zurück-Button in die untere Leiste packen
         bottomBar.getChildren().add(btnBackToMain);
 
-        // 4. Alles dem Haupt-Layout übergeben
         mainRoot.setCenter(loginRoot);
         mainRoot.setBottom(bottomBar);
 

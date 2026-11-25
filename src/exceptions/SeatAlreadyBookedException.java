@@ -6,7 +6,11 @@ package exceptions;
  */
 
 public class SeatAlreadyBookedException extends Exception {
-    
+    /**
+     * Erstellt eine fachliche Exception mit einer verständlichen Beschreibung.
+     *
+     * @param message Beschreibung der fehlgeschlagenen Platzbuchung
+     */
     public SeatAlreadyBookedException(String message) {
         super(message);
     }

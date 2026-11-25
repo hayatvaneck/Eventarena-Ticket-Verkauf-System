@@ -20,11 +20,20 @@ import java.time.format.DateTimeFormatter;
 
 public final class TicketDialog {
 
-    private static final int MAX_PREVIEW_LENGTH = 80; // Ab dieser Länge wird die Beschreibung gekürzt
+    /** Maximale Zeichenanzahl einer zunächst eingeklappten Eventbeschreibung. */
+    private static final int MAX_PREVIEW_LENGTH = 80;
 
+    /** Verhindert die Instanziierung der ausschließlich statisch genutzten Klasse. */
     private TicketDialog() {
     }
 
+    /**
+     * Öffnet ein modales Fenster mit allen fachlich relevanten Ticketdetails.
+     * Lange Eventbeschreibungen können darin ein- und ausgeklappt werden.
+     *
+     * @param owner übergeordnetes Fenster oder {@code null}
+     * @param ticket anzuzeigendes Ticket; bei {@code null} wird kein Fenster geöffnet
+     */
     public static void show(Stage owner, Ticket ticket) {
         if (ticket == null) {
             return;
@@ -63,7 +72,7 @@ public final class TicketDialog {
         Label lblEvent = createContentLabel("Event: " + eventName);
         Label lblDate = createContentLabel("Datum: " + eventDate);
 
-        // Beschreibung mit Ein-/Ausklapp Funktion
+        // Lange Beschreibungen bleiben durch eine Ein-/Ausklappfunktion übersichtlich.
         VBox descBox = new VBox(2);
         Label lblDesc = createContentLabel("");
         lblDesc.setWrapText(true);
@@ -102,7 +111,7 @@ public final class TicketDialog {
         Label lblSection = createContentLabel("Bereich: " + sectionName);
         Label lblSeat = createContentLabel("Platz: " + ticket.getSeatInfo());
         Label lblType = createContentLabel("Typ: " + customerType);
-        // --- STEUERBERECHNUNG FÜR EINZELTICKET ---
+        // Kaufmännische Aufteilung des Ticketpreises bei 19 Prozent Umsatzsteuer.
         double brutto = ticket.getFinalPrice();
         double netto = brutto / 1.19;
         double steuer = brutto - netto;
@@ -139,6 +148,12 @@ public final class TicketDialog {
         stage.show();
     }
 
+    /**
+     * Erstellt eine einheitlich formatierte Beschriftung für Ticketdetails.
+     *
+     * @param text anzuzeigender Inhalt
+     * @return formatierte Beschriftung
+     */
     private static Label createContentLabel(String text) {
         Label label = new Label(text);
         label.setStyle(

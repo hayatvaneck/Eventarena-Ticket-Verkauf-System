@@ -13,16 +13,22 @@ import java.util.List;
 
 public class TicketRepository {
 
+    /** Einzige Repository-Instanz innerhalb der Anwendung. */
     private static TicketRepository instance;
+    /** Im Arbeitsspeicher verwaltete Tickets. */
     private final List<Ticket> tickets;
+    /** Relativer Pfad zur Ticketdatei. */
     private static final String CSV_FILE_PATH = "data/tickets.csv";
+    /** Spaltentrennzeichen des Ticketformats. */
     private static final String CSV_SEPARATOR = ";";
 
+    /** Lädt beim ersten Zugriff alle gespeicherten Tickets. */
     private TicketRepository() {
         this.tickets = new ArrayList<>();
         loadTicketsFromCSV();
     }
 
+    /** @return zentrale Singleton-Instanz des Ticket-Repositories */
     public static synchronized TicketRepository getInstance() {
         if (instance == null) {
             instance = new TicketRepository();
@@ -30,15 +36,26 @@ public class TicketRepository {
         return instance;
     }
 
+    /**
+     * Speichert ein neues Ticket im Arbeitsspeicher und in der CSV-Datei.
+     *
+     * @param ticket zu speicherndes Ticket
+     */
     public synchronized void save(Ticket ticket) {
         this.tickets.add(ticket);
         appendTicketToCSV(ticket);
     }
 
+    /** @return defensive Kopie aller bekannten Tickets */
     public List<Ticket> findAll() {
         return new ArrayList<>(this.tickets);
     }
 
+    /**
+     * Hängt ein einzelnes Ticket an die CSV-Datei an und erzeugt bei Bedarf den Header.
+     *
+     * @param ticket zu serialisierendes Ticket
+     */
     private void appendTicketToCSV(Ticket ticket) {
         File file = new File(CSV_FILE_PATH);
         boolean isNewFile = !file.exists() || file.length() == 0;
@@ -74,6 +91,9 @@ public class TicketRepository {
         }
     }
 
+    /**
+     * Rekonstruiert beim Start Tickets und ihre Beziehungen zu Event und Bereich.
+     */
     private void loadTicketsFromCSV() {
         File file = new File(CSV_FILE_PATH);
         if(!file.exists()) {
@@ -140,6 +160,12 @@ public class TicketRepository {
         }
     }
 
+    /**
+     * Löscht ein Ticket anhand seiner ID und synchronisiert anschließend die Datei.
+     *
+     * @param ticketId ID des zu löschenden Tickets
+     * @return {@code true}, wenn ein Ticket entfernt wurde
+     */
     public synchronized boolean deleteTickets(String ticketId) {
         if (ticketId == null) {
             return false;
@@ -153,6 +179,7 @@ public class TicketRepository {
         return removed;
     }
 
+    /** Überschreibt die Ticketdatei mit dem aktuellen In-Memory-Bestand. */
     private void rewriteTicketsCSV() {
         File file = new File(CSV_FILE_PATH);
         try (FileOutputStream fos = new FileOutputStream(file, false);
@@ -184,6 +211,12 @@ public class TicketRepository {
         }
     }
 
+    /**
+     * Übersetzt gespeicherte deutsche und englische Typbezeichnungen in das Enum.
+     *
+     * @param rawType gespeicherte Kundentyp-Bezeichnung
+     * @return passender Typ, standardmäßig {@link CustomerType#STANDARD}
+     */
     private CustomerType parseCustomerType(String rawType) {
         if (rawType == null) {
             return CustomerType.STANDARD;

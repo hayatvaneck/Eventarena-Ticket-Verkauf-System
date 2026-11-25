@@ -28,19 +28,31 @@ import java.util.List;
  */
 public class CartScreen extends BaseScreen {
 
+    /** Anwendungskontext für Warenkorbdaten, Preisberechnung und Navigation. */
     private final App app;
 
+    /**
+     * Erstellt die Warenkorbübersicht des laufenden Buchungsvorgangs.
+     *
+     * @param app zentraler Anwendungskontext
+     */
     public CartScreen(App app) {
         this.app = app;
     }
 
+    /**
+     * Baut die Warenkorbpositionen, die Kundentyp-Auswahl und den verbindlichen
+     * Buchungsabschluss auf.
+     *
+     * @return vollständige Warenkorbszene
+     */
     @Override
     public Scene buildScene() {
-        // --- 1. NEUES LAYOUT: BORDERPANE ---
+        // Grundlayout mit scrollbarem Warenkorb und fester Aktionsleiste.
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
         root.setStyle("-fx-background-color: #f5f5f7;");
 
-        // --- 2. SCHICKES KÄSTCHEN FÜR DEN TITEL ---
+        // Einheitlicher Kopfbereich der Warenkorbübersicht.
         Label title = createTitle("WARENKORB");
         Label subtitle = createSubtitle("Ihre ausgewählten Tickets im Überblick:");
 
@@ -126,9 +138,9 @@ public class CartScreen extends BaseScreen {
 
                 cbType.setOnAction(e -> {
                     String selectedType = cbType.getValue();
-                    // 1. Text in den echten CustomerType (Enum) umwandeln
+                    // GUI-Bezeichnung in den fachlichen Kundentyp übersetzen.
                     domain.CustomerType cType = app.mapCustomerType(selectedType);
-                    // 2. Den echten Rabatt vom BookingService berechnen lassen
+                    // Den Rabatt ausschließlich durch den Buchungsservice berechnen lassen.
                     double discount = app.getBookingService().calculateDiscountFactor(cType);
 
                     double finalPrice = singleTicketPrice * discount;
@@ -163,21 +175,20 @@ public class CartScreen extends BaseScreen {
         ScrollPane scrollPane = createTransparentScrollPane(formContainer);
         scrollPane.setPrefHeight(300);
 
-        // --- BUTTONS NEBENEINANDER & RICHTIGES DESIGN ---
+        // Aktionen zum Fortsetzen der Auswahl oder Abschließen der Buchung.
         Button btnAddMore = createBackButton("Weitere Tickets hinzufügen");
         btnAddMore.setPrefWidth(300);
         btnAddMore.setMinHeight(45);
         btnAddMore.setMaxHeight(45);
         btnAddMore.setOnAction(e -> {
-            // --- NEU: LIMIT-PRÜFUNG WIE VOM KOLLEGEN VORGESCHLAGEN ---
+            // Das Ticketlimit gilt auch beim Fortsetzen der Auswahl.
             if (app.getCartItems().size() >= 10) {
                 app.showAlert(Alert.AlertType.WARNING, "Limit erreicht",
                         "Sie haben bereits die maximale Anzahl von 10 Tickets im Warenkorb.");
-                return; // Bricht ab, der Nutzer bleibt direkt im Warenkorb!
+                return;
             }
 
-            // Wenn noch gar kein Event ausgewählt wurde (z.B. direkt nach Registrierung),
-            // schicken wir den Nutzer zurück ins Hauptmenü zur Event-Auswahl.
+            // Ohne bestehende Eventauswahl beginnt der Benutzerfluss erneut im Hauptmenü.
             if (app.getCurrentSelectedEvent() == null) {
                 app.navigateTo(ScreenManager.Screen.MAIN_MENU);
             } else {
@@ -195,14 +206,14 @@ public class CartScreen extends BaseScreen {
         }
 
        btnFinalBook.setOnAction(e -> {
-            // --- NEU: ZUERST DEN LOGIN-STATUS PRÜFEN ---
+            // Eine verbindliche Buchung setzt ein Kundenkonto voraus.
             if (app.getLoggedInUser() == null) {
-                // Wenn nicht eingeloggt: Login aufrufen und danach zurück in den Warenkorb leiten!
+                // Nach der Anmeldung wird der Benutzer zum unveränderten Warenkorb zurückgeleitet.
                 app.ensureLoggedIn(() -> app.navigateTo(ScreenManager.Screen.CART));
-                return; // Kauf-Aktion hier zwingend abbrechen, damit nicht im Hintergrund gebucht wird
+                return;
             }
 
-            // --- WENN EINGELOGGT: GANZ NORMAL BUCHEN ---
+            // Die Kundentypen werden positionsgleich an den Buchungsvorgang übergeben.
             List<String> chosenTypes = new ArrayList<>();
             for (ComboBox<String> cb : typeComboBoxes) {
                 chosenTypes.add(cb.getValue());
@@ -210,12 +221,12 @@ public class CartScreen extends BaseScreen {
             app.bookCurrentCart(chosenTypes);
         });
 
-        // Die Buttons in eine HBox packen, damit sie nebeneinander stehen!
+        // Gleichwertige horizontale Anordnung der beiden Hauptaktionen.
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().addAll(btnAddMore, btnFinalBook);
 
-        // --- PERFEKTER ZUSAMMENBAU FÜR BORDERPANE ---
+        // Zusammensetzen des Inhalts- und Fußbereichs.
 
         VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
         topBox.getChildren().addAll(headerBox, scrollPane);

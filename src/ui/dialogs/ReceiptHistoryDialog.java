@@ -20,9 +20,18 @@ import java.util.function.Consumer;
 
 public final class ReceiptHistoryDialog {
 
+    /** Verhindert die Instanziierung der ausschließlich statisch genutzten Klasse. */
     private ReceiptHistoryDialog() {
     }
 
+    /**
+     * Zeigt alle übergebenen Quittungen chronologisch auswählbar in einem
+     * separaten Fenster an.
+     *
+     * @param owner übergeordnetes Hauptfenster
+     * @param receipts anzuzeigende Quittungen
+     * @param onOpenReceipt Aktion zum Öffnen der ausgewählten Quittung
+     */
     public static void show(Stage owner, List<Receipt> receipts, Consumer<Receipt> onOpenReceipt) {
         Stage stage = new Stage();
         stage.initOwner(owner);

@@ -12,19 +12,32 @@ import domain.StandingSection;
 
 public final class HallLayoutFactory {
 
+    /** Einheitliche Reihenanzahl der äußeren Sitzblöcke. */
     private static final int OUTER_BLOCK_ROWS = 10;
+    /** Einheitliche Sitzanzahl pro Reihe der äußeren Blöcke. */
     private static final int OUTER_BLOCK_SEATS_PER_ROW = 20;
+    /** Reihenanzahl eines bestuhlten Innenraums. */
     private static final int INTERIOR_ROWS = (int) (OUTER_BLOCK_ROWS * 1.5);
 
+    /** Beschreibt die konkrete Nutzung des zentralen Innenraums. */
     public enum InteriorMode {
+        /** Innenraum wird als Stehplatzbereich verwendet. */
         STANDING,
+        /** Innenraum wird mit nummerierten Sitzplätzen bestuhlt. */
         SEATED,
+        /** Innenraum ist Bühne, Spielfeld oder anderweitig nicht buchbar. */
         EMPTY
     }
 
+    /** Verhindert die Instanziierung der rein statischen Factory-Klasse. */
     private HallLayoutFactory() {
     }
 
+    /**
+     * Wendet das durch das Event vorgegebene Kartenlayout an.
+     *
+     * @param event Event, dessen Bereichsliste aufgebaut werden soll
+     */
     public static void applyLayoutForMapType(Event event) {
         if (event == null) {
             return;
@@ -33,6 +46,12 @@ public final class HallLayoutFactory {
         applyLayoutForMapType(event, event.getMapType());
     }
 
+    /**
+     * Wendet einen ausdrücklich übergebenen Saalplantyp auf das Event an.
+     *
+     * @param event zu befüllendes Event
+     * @param mapType zu verwendender Saalplantyp
+     */
     public static void applyLayoutForMapType(Event event, MapType mapType) {
         if (event == null) {
             return;
@@ -42,6 +61,12 @@ public final class HallLayoutFactory {
         applyStandardLayout(event, interiorMode);
     }
 
+    /**
+     * Erstellt Innenraum, Außenblöcke und VIP-Bereich des Standardlayouts.
+     *
+     * @param event zu befüllendes Event
+     * @param interiorMode Nutzung des zentralen Innenraums
+     */
     public static void applyStandardLayout(Event event, InteriorMode interiorMode) {
         if (event == null) {
             return;
@@ -76,6 +101,12 @@ public final class HallLayoutFactory {
         event.addSection(new SeatedSection("VIP", 2.5, 3, 15));
     }
 
+    /**
+     * Übersetzt den öffentlichen Kartentyp in den internen Innenraummodus.
+     *
+     * @param mapType Kartentyp des Events
+     * @return passender Innenraummodus
+     */
     private static InteriorMode inferInteriorModeFromMapType(MapType mapType) {
         if (mapType == null) {
             return InteriorMode.STANDING;
@@ -92,6 +123,12 @@ public final class HallLayoutFactory {
         }
     }
 
+    /**
+     * Erkennt den Innenraummodus anhand der bereits angelegten Bereichsobjekte.
+     *
+     * @param event zu untersuchendes Event
+     * @return erkannter Modus, standardmäßig {@link InteriorMode#STANDING}
+     */
     public static InteriorMode inferInteriorMode(Event event) {
         if (event == null || event.getSections() == null) {
             return InteriorMode.STANDING;

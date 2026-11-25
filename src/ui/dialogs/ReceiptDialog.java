@@ -17,9 +17,17 @@ import java.time.format.DateTimeFormatter;
  */
 public final class ReceiptDialog {
 
+    /** Verhindert die Instanziierung der ausschließlich statisch genutzten Klasse. */
     private ReceiptDialog() {
     }
 
+    /**
+     * Öffnet ein modales Fenster mit Kundendaten, Steueranteilen und Ticket-IDs
+     * einer Quittung.
+     *
+     * @param owner übergeordnetes Fenster oder {@code null}
+     * @param receipt anzuzeigende Quittung; bei {@code null} wird kein Fenster geöffnet
+     */
     public static void show(Stage owner, Receipt receipt) {
         if (receipt == null) {
             return;
@@ -49,12 +57,12 @@ public final class ReceiptDialog {
                 createContentLabel("E-Mail: " + receipt.getUserEmail()),
                 createContentLabel("Zeitpunkt: " + receipt.getCreatedAt().format(dtf)));
 
-        // --- KAUFMÄNNISCHE BERECHNUNG (19% MwSt) ---
+        // Kaufmännische Aufteilung des Bruttobetrags bei 19 Prozent Umsatzsteuer.
         double brutto = receipt.getTotalAmount();
         double netto = brutto / 1.19;
         double steuer = brutto - netto;
 
-        // Visueller Trennstrich
+        // Visuelle Trennung zwischen Stammdaten und Betragsaufstellung.
         Label separator = new Label("--------------------------------------------------");
         separator.setStyle("-fx-text-fill: #bdc3c7;");
 
@@ -86,6 +94,12 @@ public final class ReceiptDialog {
         stage.show();
     }
 
+    /**
+     * Erstellt eine einheitlich formatierte Beschriftung für Quittungsdetails.
+     *
+     * @param text anzuzeigender Inhalt
+     * @return formatierte Beschriftung
+     */
     private static Label createContentLabel(String text) {
         Label label = new Label(text);
         label.setStyle(

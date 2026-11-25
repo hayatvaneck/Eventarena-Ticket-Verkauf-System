@@ -16,20 +16,41 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Stellt Mitarbeitenden eine gemeinsame Oberfläche zum Anlegen, Bearbeiten und
+ * Löschen von Veranstaltungen bereit.
+ */
 public class EmployeeEventScreen extends BaseScreen {
 
+    /** Anwendungskontext für Hinweise und Navigation. */
     private final App app;
+
+    /** Datenzugriff für die angezeigten und bearbeiteten Events. */
     private final EventRepository eventRepo;
+
+    /** Einheitliches Eingabe- und Anzeigeformat für Eventzeitpunkte. */
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-    // --- NEU: Zustand, um sich zu merken, welches Event gerade bearbeitet wird ---
+    /** ID des aktuell bearbeiteten Events oder {@code null} im Anlegemodus. */
     private Long editingEventId = null;
 
+    /**
+     * Erstellt die Eventverwaltung für Mitarbeitende.
+     *
+     * @param app zentraler Anwendungskontext
+     * @param eventRepo Repository für Eventdaten
+     */
     public EmployeeEventScreen(App app, EventRepository eventRepo) {
         this.app = app;
         this.eventRepo = eventRepo;
     }
 
+    /**
+     * Baut das Eingabeformular und die Liste vorhandener Events mit Bearbeitungs-
+     * und Löschaktionen auf.
+     *
+     * @return vollständige Szene der Eventverwaltung
+     */
     @Override
     public Scene buildScene() {
         javafx.scene.layout.BorderPane root = new javafx.scene.layout.BorderPane();
@@ -40,9 +61,7 @@ public class EmployeeEventScreen extends BaseScreen {
         HBox mainContent = new HBox(30);
         mainContent.setAlignment(Pos.TOP_CENTER);
 
-        // ==========================================
-        // LINKE SEITE: FORMULAR FÜR NEUES/BEARBEITETES EVENT
-        // ==========================================
+        // Linke Spalte: gemeinsames Formular für neue und bestehende Events.
         VBox formBox = createVBox(10, Pos.TOP_LEFT);
         formBox.setPrefWidth(350);
         formBox.setStyle(
@@ -92,7 +111,7 @@ public class EmployeeEventScreen extends BaseScreen {
         saveBtn.setStyle(
                 "-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
 
-        // --- NEU: Abbrechen-Button (Standardmäßig unsichtbar) ---
+        // Die Abbruchaktion ist nur während der Bearbeitung eines Events sichtbar.
         Button cancelBtn = createSecondaryButton("Bearbeiten abbrechen");
         cancelBtn.setPrefWidth(Double.MAX_VALUE);
         cancelBtn.setVisible(false);
@@ -100,7 +119,7 @@ public class EmployeeEventScreen extends BaseScreen {
 
         cancelBtn.setOnAction(e -> {
             editingEventId = null;
-            app.navigateTo(ScreenManager.Screen.EMPLOYEE_EVENTS); // Lädt das Fenster neu und leert das Formular
+            app.navigateTo(ScreenManager.Screen.EMPLOYEE_EVENTS); // Neuaufbau leert das Formular.
         });
 
         saveBtn.setOnAction(e -> {
@@ -116,7 +135,7 @@ public class EmployeeEventScreen extends BaseScreen {
                 if (dateTime.isBefore(LocalDateTime.now())) {
                     app.showAlert(Alert.AlertType.WARNING, "Ungültiges Datum",
                             "Das Event darf nicht in der Vergangenheit liegen.");
-                    return; // Bricht das Speichern ab
+                    return;
                 }
 
                 if (eventTitle.isEmpty() || eType == null || mType == null) {
@@ -125,17 +144,17 @@ public class EmployeeEventScreen extends BaseScreen {
                 }
 
                 if (editingEventId == null) {
-                    // MODUS: NEUES EVENT ANLEGEN
+                    // Ohne Bearbeitungs-ID wird ein neues Event angelegt.
                     Long newId = eventRepo.nextEventId();
                     Event newEvent = new Event(newId, eventTitle, desc, eType, dateTime, price, mType);
                     eventRepo.save(newEvent);
                     app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Event erfolgreich hinzugefügt!");
                 } else {
-                    // MODUS: BESTEHENDES EVENT BEARBEITEN
+                    // Mit Bearbeitungs-ID wird der bestehende Datensatz ersetzt.
                     Event updatedEvent = new Event(editingEventId, eventTitle, desc, eType, dateTime, price, mType);
                     eventRepo.updateEvent(updatedEvent);
                     app.showAlert(Alert.AlertType.INFORMATION, "Erfolg", "Event erfolgreich aktualisiert!");
-                    editingEventId = null; // Nach dem Update Zustand zurücksetzen
+                    editingEventId = null;
                 }
 
                 app.navigateTo(ScreenManager.Screen.EMPLOYEE_EVENTS);
@@ -148,11 +167,9 @@ public class EmployeeEventScreen extends BaseScreen {
         formBox.getChildren().addAll(formTitle, titleField, descArea, descHint, typeBox, mapBox, dateTimeBox,
                 priceField, saveBtn, cancelBtn);
 
-        // ==========================================
-        // RECHTE SEITE: LISTE ZUM BEARBEITEN & LÖSCHEN
-        // ==========================================
+        // Rechte Spalte: vorhandene Events mit Bearbeitungs- und Löschaktionen.
         VBox listBox = createVBox(10, Pos.TOP_LEFT);
-        listBox.setPrefWidth(490); // Etwas breiter gemacht für den zweiten Button
+        listBox.setPrefWidth(490);
 
         Label listTitle = new Label("Bestehende Events");
         listTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
@@ -176,18 +193,17 @@ public class EmployeeEventScreen extends BaseScreen {
 
             Region spacer = createHorizontalSpacer();
 
-            // --- NEU: Bearbeiten-Button ---
+            // Die Bearbeitungsaktion übernimmt die Eventdaten in das linke Formular.
             Button editBtn = createSelectingButton("Bearbeiten");
             editBtn.setStyle(
                     "-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 12 6 12; -fx-background-radius: 4; -fx-cursor: hand;");
             editBtn.setOnAction(e -> {
-                // Füllt das linke Formular mit den Daten des ausgewählten Events!
                 editingEventId = ev.getId();
                 formTitle.setText("Event bearbeiten (ID: " + ev.getId() + ")");
                 titleField.setText(ev.getTitle());
                 String desc = ev.getDescription();
                 if (desc.length() > 600) {
-                    desc = desc.substring(0, 600); // Schneidet den Text radikal nach 160 Zeichen ab
+                    desc = desc.substring(0, 600); // Entspricht der Eingabegrenze des Formulars.
                 }
                 descArea.setText(desc);
                 typeBox.setValue(ev.getEventType());
@@ -196,8 +212,8 @@ public class EmployeeEventScreen extends BaseScreen {
                 timeField.setText(ev.getDateTime().format(DateTimeFormatter.ofPattern("HH:mm")));
                 priceField.setText(String.valueOf(ev.getBasePrice()));
 
-                saveBtn.setText("Änderungen speichern"); // Text des Speichern-Buttons anpassen
-                cancelBtn.setVisible(true); // Abbrechen-Button einblenden
+                saveBtn.setText("Änderungen speichern");
+                cancelBtn.setVisible(true);
                 cancelBtn.setManaged(true);
             });
 
@@ -230,7 +246,7 @@ public class EmployeeEventScreen extends BaseScreen {
         listBox.getChildren().addAll(listTitle, scroll);
         mainContent.getChildren().addAll(formBox, listBox);
 
-        // --- 3. BUTTON WIE IN ANDEREN SCREENS FORMATIEREN ---
+        // Feste Navigation zum Verlassen des Mitarbeiterportals.
         Button backBtn = createBackButton("Abmelden / Zurück zum Login");
         backBtn.setPrefWidth(300);
         backBtn.setMinHeight(45);
@@ -241,7 +257,7 @@ public class EmployeeEventScreen extends BaseScreen {
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().add(backBtn);
 
-        // --- 4. LAYOUT ZUSAMMENBAUEN (MIT DUMMYS FÜR PERFEKTEN ABSTAND) ---
+        // Unsichtbare Standardbereiche halten die Eventverwaltung mittig ausgerichtet.
         HBox dummyHeader = createInvisibleHeader();
         VBox topBox = createRoot(20, new Insets(30, 30, 20, 30), Pos.TOP_CENTER);
         topBox.getChildren().addAll(dummyHeader, headerBox, mainContent);
